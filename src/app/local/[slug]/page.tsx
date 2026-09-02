@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CardLocal from "@/components/CardLocal";
+import ContarVisita from "@/components/ContarVisita";
 import Mapa from "@/components/Mapa";
 import SeloAberto from "@/components/SeloAberto";
 import Galeria from "@/components/Galeria";
@@ -68,6 +69,7 @@ export default async function PaginaLocal({
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-6">
+      <ContarVisita localId={local.id} />
       <nav className="text-sm text-tinta/50">
         <Link href="/explorar" className="hover:text-mata-700">
           Explorar

@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { catalogo } from "@/lib/catalogo";
 import { respostaDemo } from "@/lib/demo";
+import { podeConversar } from "@/lib/limite-chat";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -59,6 +60,13 @@ export async function POST(request: Request) {
   }
 
   const ultima = mensagens[mensagens.length - 1]?.texto ?? "";
+
+  // Trava de uso: a chave da IA fica atras de um endereco publico, entao sem
+  // isto alguem poderia chamar em laco e torrar o credito da conta.
+  const veredito = await podeConversar(request);
+  if (!veredito.liberado) {
+    return respostaEmLetras(veredito.motivo);
+  }
 
   // Sem a chave da Anthropic o guia de verdade nao roda. Em vez de dar erro,
   // responde no modo demonstracao — mesmo formato, inteligencia bem menor.
