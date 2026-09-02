@@ -263,9 +263,17 @@ function Resposta({
   return (
     <>
       <div className="rounded-2xl rounded-bl-sm bg-white px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap">
-        {/* colapsa so espacos repetidos: as quebras de linha da resposta
-            precisam sobreviver, senao a listinha do guia vira um paragrafao */}
-        {formatar(corridos.join("").replace(/[ \t]{2,}/g, " ").trim())}
+        {/* Colapsa so espacos repetidos — as quebras de linha precisam
+            sobreviver, senao a listinha do guia vira um paragrafao. E tira o
+            espaco que sobra antes da pontuacao quando o marcador [[slug]] sai
+            do meio da frase ("Pizzaria do Morro ." vira "Pizzaria do Morro."). */}
+        {formatar(
+          corridos
+            .join("")
+            .replace(/[ \t]{2,}/g, " ")
+            .replace(/[ \t]+([.,!?;:])/g, "$1")
+            .trim(),
+        )}
       </div>
 
       {cartoes.length > 0 && (

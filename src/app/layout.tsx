@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
 import Cabecalho from "@/components/Cabecalho";
+import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 import Rodape from "@/components/Rodape";
 import BotaoChat from "@/components/BotaoChat";
 
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${titulo.variable} ${corpo.variable} h-full`}
     >
       <body className="flex min-h-full flex-col font-sans">
+        <FaixaDemonstracao />
         <Cabecalho />
         <main className="flex-1">{children}</main>
         <Rodape />

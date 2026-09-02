@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { catalogo } from "@/lib/catalogo";
+import { respostaDemo } from "@/lib/demo";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -34,13 +35,6 @@ TAMANHO
 - Respostas curtas: 2 a 5 frases, ou uma listinha de ate 4 itens. Nada de textao.`;
 
 export async function POST(request: Request) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return Response.json(
-      { erro: "O chat ainda nao foi configurado (falta ANTHROPIC_API_KEY)." },
-      { status: 503 },
-    );
-  }
-
   let corpo: { mensagens?: { papel: string; texto: string }[]; sessao?: string };
   try {
     corpo = await request.json();
@@ -54,6 +48,14 @@ export async function POST(request: Request) {
 
   if (mensagens.length === 0) {
     return Response.json({ erro: "Sem mensagem." }, { status: 400 });
+  }
+
+  const ultima = mensagens[mensagens.length - 1]?.texto ?? "";
+
+  // Sem a chave da Anthropic o guia de verdade nao roda. Em vez de dar erro,
+  // responde no modo demonstracao — mesmo formato, inteligencia bem menor.
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return respostaEmLetras(respostaDemo(ultima));
   }
 
   const { texto: lista } = await catalogo();
@@ -113,6 +115,35 @@ export async function POST(request: Request) {
   });
 
   return new Response(corpoResposta, {
+    headers: {
+      "Content-Type": "text/plain; charset=utf-8",
+      "Cache-Control": "no-store",
+    },
+  });
+}
+
+/**
+ * Manda um texto pronto letra por letra, com um respiro entre elas — assim o
+ * modo demonstracao aparece na tela igualzinho ao guia de verdade.
+ */
+function respostaEmLetras(texto: string) {
+  const codificador = new TextEncoder();
+
+  const fluxo = new ReadableStream({
+    async start(controle) {
+      // Array.from separa por caractere de verdade: cortar por indice
+      // partiria um emoji no meio (ele ocupa duas posicoes) e chegaria
+      // quebrado na tela.
+      const letras = Array.from(texto);
+      for (let i = 0; i < letras.length; i += 3) {
+        controle.enqueue(codificador.encode(letras.slice(i, i + 3).join("")));
+        await new Promise((r) => setTimeout(r, 12));
+      }
+      controle.close();
+    },
+  });
+
+  return new Response(fluxo, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "no-store",

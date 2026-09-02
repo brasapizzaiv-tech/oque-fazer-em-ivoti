@@ -10,6 +10,7 @@ import {
   Map,
   useMap,
 } from "@vis.gl/react-google-maps";
+import MapaPrevia from "./MapaPrevia";
 import { IVOTI, distancia, formatarDistancia, linkRota } from "@/lib/geo";
 import type { LocalCompleto } from "@/lib/tipos";
 
@@ -39,21 +40,9 @@ export default function Mapa({
     [locais],
   );
 
+  // Sem chave do Google, cai no mapa aberto — melhor do que uma caixa vazia.
   if (!CHAVE) {
-    return (
-      <div
-        className={`grid ${altura} place-items-center rounded-2xl border border-dashed border-mata-200 bg-mata-50 p-6 text-center`}
-      >
-        <div>
-          <p className="text-3xl">🗺️</p>
-          <p className="mt-2 font-semibold">Mapa ainda nao configurado</p>
-          <p className="mt-1 text-sm text-tinta/60">
-            Falta a chave do Google Maps
-            (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY).
-          </p>
-        </div>
-      </div>
-    );
+    return <MapaPrevia locais={comCoordenada} altura={altura} />;
   }
 
   return (

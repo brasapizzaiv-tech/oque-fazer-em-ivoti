@@ -1,8 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "./supabase/server";
 import { SUPABASE_CONFIGURADO } from "./supabase/config";
+import { CATEGORIAS_DEMO, LOCAIS_DEMO, TAGS_DEMO } from "./demo";
 import type { Categoria, LocalCompleto, Tag } from "./tipos";
 import { agoraNaCidade, situacao } from "./horarios";
+import { normalizar } from "./texto";
 
 // Tudo que a pagina de um local (e o chat) precisam, em uma consulta so.
 const CAMPOS = `
@@ -20,6 +22,65 @@ type LinhaBruta = Record<string, unknown> & {
   itens?: LocalCompleto["itens"] | null;
   horarios?: LocalCompleto["horarios"] | null;
 };
+
+/**
+ * Aplica os filtros que não dependem do banco (etiquetas, aberto agora) e
+ * ordena. Serve tanto para o resultado do Supabase quanto para os locais de
+ * demonstração.
+ */
+function afinar(
+  locais: LocalCompleto[],
+  { tags, abertoAgora }: Pick<FiltrosBusca, "tags" | "abertoAgora">,
+): LocalCompleto[] {
+  let saida = locais;
+
+  if (tags && tags.length) {
+    saida = saida.filter((l) =>
+      tags.every((slug) => l.tags.some((t) => t.slug === slug)),
+    );
+  }
+
+  if (abertoAgora) {
+    const agora = agoraNaCidade();
+    saida = saida.filter((l) => situacao(l.horarios, agora).aberto);
+  }
+
+  // Destaques primeiro, depois em ordem alfabética.
+  return [...saida].sort((a, b) => {
+    if (a.destaque !== b.destaque) return a.destaque ? -1 : 1;
+    return a.nome.localeCompare(b.nome, "pt-BR");
+  });
+}
+
+/** Busca nos locais de demonstração, imitando o que o banco faria. */
+function buscarNaDemonstracao(filtros: FiltrosBusca): LocalCompleto[] {
+  const { q, categoria, limite = 200 } = filtros;
+  let locais = LOCAIS_DEMO;
+
+  if (categoria) {
+    const alvo = CATEGORIAS_DEMO.find((c) => c.slug === categoria);
+    if (alvo) {
+      const ids = [
+        alvo.id,
+        ...CATEGORIAS_DEMO.filter((c) => c.pai_id === alvo.id).map((c) => c.id),
+      ];
+      locais = locais.filter((l) => l.categoria_id != null && ids.includes(l.categoria_id));
+    }
+  }
+
+  if (q && q.trim()) {
+    const alvo = normalizar(q);
+    locais = locais.filter((l) =>
+      normalizar(
+        [l.nome, l.resumo, l.descricao, l.bairro, l.categoria?.nome]
+          .filter(Boolean)
+          .join(" "),
+      ).includes(alvo),
+    );
+  }
+
+  return afinar(locais, filtros).slice(0, limite);
+}
 
 /** Arruma a linha crua do banco no formato que o site usa. */
 function montar(linha: LinhaBruta): LocalCompleto {
@@ -41,7 +102,7 @@ function montar(linha: LinhaBruta): LocalCompleto {
 export async function listarCategorias(
   supabase?: SupabaseClient,
 ): Promise<Categoria[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
+  if (!SUPABASE_CONFIGURADO) return CATEGORIAS_DEMO;
   const sb = supabase ?? (await createClient());
   const { data } = await sb
     .from("categorias")
@@ -51,7 +112,7 @@ export async function listarCategorias(
 }
 
 export async function listarTags(supabase?: SupabaseClient): Promise<Tag[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
+  if (!SUPABASE_CONFIGURADO) return TAGS_DEMO;
   const sb = supabase ?? (await createClient());
   const { data } = await sb
     .from("tags")
@@ -83,9 +144,9 @@ export async function buscarLocais(
   filtros: FiltrosBusca = {},
   supabase?: SupabaseClient,
 ): Promise<LocalCompleto[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
+  if (!SUPABASE_CONFIGURADO) return buscarNaDemonstracao(filtros);
   const sb = supabase ?? (await createClient());
-  const { q, categoria, tags, abertoAgora, limite = 200 } = filtros;
+  const { q, categoria, limite = 200 } = filtros;
 
   let consulta = sb
     .from("locais")
@@ -118,31 +179,18 @@ export async function buscarLocais(
     return [];
   }
 
-  let locais = (data ?? []).map((l) => montar(l as LinhaBruta));
-
-  if (tags && tags.length) {
-    locais = locais.filter((l) =>
-      tags.every((slug) => l.tags.some((t) => t.slug === slug)),
-    );
-  }
-
-  if (abertoAgora) {
-    const agora = agoraNaCidade();
-    locais = locais.filter((l) => situacao(l.horarios, agora).aberto);
-  }
-
-  // Destaques primeiro, depois em ordem alfabética.
-  return locais.sort((a, b) => {
-    if (a.destaque !== b.destaque) return a.destaque ? -1 : 1;
-    return a.nome.localeCompare(b.nome, "pt-BR");
-  });
+  return afinar(
+    (data ?? []).map((l) => montar(l as LinhaBruta)),
+    filtros,
+  );
 }
 
 export async function localPorSlug(
   slug: string,
   supabase?: SupabaseClient,
 ): Promise<LocalCompleto | null> {
-  if (!SUPABASE_CONFIGURADO) return null;
+  if (!SUPABASE_CONFIGURADO)
+    return LOCAIS_DEMO.find((l) => l.slug === slug) ?? null;
   const sb = supabase ?? (await createClient());
   const { data } = await sb
     .from("locais")
@@ -156,7 +204,8 @@ export async function localPorId(
   id: string,
   supabase?: SupabaseClient,
 ): Promise<LocalCompleto | null> {
-  if (!SUPABASE_CONFIGURADO) return null;
+  if (!SUPABASE_CONFIGURADO)
+    return LOCAIS_DEMO.find((l) => l.id === id) ?? null;
   const sb = supabase ?? (await createClient());
   const { data } = await sb
     .from("locais")
@@ -172,8 +221,11 @@ export async function locaisParecidos(
   quantidade = 4,
   supabase?: SupabaseClient,
 ): Promise<LocalCompleto[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
   if (!local.categoria_id) return [];
+  if (!SUPABASE_CONFIGURADO)
+    return LOCAIS_DEMO.filter(
+      (l) => l.categoria_id === local.categoria_id && l.id !== local.id,
+    ).slice(0, quantidade);
   const sb = supabase ?? (await createClient());
   const { data } = await sb
     .from("locais")
