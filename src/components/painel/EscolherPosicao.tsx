@@ -1,10 +1,17 @@
 "use client";
 
-import { AdvancedMarker, APIProvider, Map } from "@vis.gl/react-google-maps";
+import {
+  AdvancedMarker,
+  APIProvider,
+  Map,
+  Marker,
+} from "@vis.gl/react-google-maps";
 import { IVOTI } from "@/lib/geo";
 
 const CHAVE = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID";
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "";
+// Sem Map ID o Google recusa o pino personalizado; ai usamos o classico.
+const PINO_MODERNO = MAP_ID.length > 0;
 
 /**
  * Mapa em que o dono clica pra marcar onde fica o estabelecimento.
@@ -40,7 +47,7 @@ export default function EscolherPosicao({
       <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
         <div className="h-64 overflow-hidden rounded-xl">
           <Map
-            mapId={MAP_ID}
+            mapId={MAP_ID || undefined}
             defaultCenter={posicao ?? IVOTI}
             defaultZoom={posicao ? 17 : 14}
             gestureHandling="greedy"
@@ -53,20 +60,30 @@ export default function EscolherPosicao({
               if (p) onMudar(p.lat, p.lng);
             }}
           >
-            {posicao && (
-              <AdvancedMarker
-                position={posicao}
-                draggable
-                onDragEnd={(evento) => {
-                  const p = evento.latLng;
-                  if (p) onMudar(p.lat(), p.lng());
-                }}
-              >
-                <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
-                  📍
-                </span>
-              </AdvancedMarker>
-            )}
+            {posicao &&
+              (PINO_MODERNO ? (
+                <AdvancedMarker
+                  position={posicao}
+                  draggable
+                  onDragEnd={(evento) => {
+                    const p = evento.latLng;
+                    if (p) onMudar(p.lat(), p.lng());
+                  }}
+                >
+                  <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
+                    📍
+                  </span>
+                </AdvancedMarker>
+              ) : (
+                <Marker
+                  position={posicao}
+                  draggable
+                  onDragEnd={(evento) => {
+                    const p = evento.latLng;
+                    if (p) onMudar(p.lat(), p.lng());
+                  }}
+                />
+              ))}
           </Map>
         </div>
       </APIProvider>

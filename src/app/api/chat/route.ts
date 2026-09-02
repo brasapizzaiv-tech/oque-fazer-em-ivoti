@@ -8,7 +8,15 @@ export const maxDuration = 60;
 
 // Modelo configuravel: da pra trocar por um mais barato (claude-sonnet-5 ou
 // claude-haiku-4-5) sem mexer no codigo, so mudando a variavel na Vercel.
-const MODELO = process.env.CHAT_MODELO ?? "claude-opus-5";
+// Usa "||" e nao "??" de proposito: uma variavel vazia (CHAT_MODELO=) tem que
+// cair no padrao, e o "??" so cairia se ela nao existisse.
+const MODELO = process.env.CHAT_MODELO || "claude-opus-5";
+
+// O parametro de esforco (o quanto o modelo "pensa" antes de responder) so
+// existe nos modelos maiores. Mandar ele pro Haiku 4.5 devolve erro 400, entao
+// so mandamos pra quem aceita — e, na duvida, nao mandamos.
+const FAMILIAS_COM_ESFORCO = ["claude-opus-", "claude-sonnet-5", "claude-fable-"];
+const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
 
 const INSTRUCOES = `Voce e o guia do site "O que fazer em Ivoti" — um amigo local que conhece a cidade inteira e adora dar dica boa.
 
@@ -64,7 +72,7 @@ export async function POST(request: Request) {
   const stream = cliente.messages.stream({
     model: MODELO,
     max_tokens: 1200,
-    output_config: { effort: "low" },
+    ...(ACEITA_ESFORCO ? { output_config: { effort: "low" as const } } : {}),
     system: [
       // A parte estavel vai primeiro e fica em cache: barateia bastante,
       // porque o catalogo inteiro se repete em toda conversa.

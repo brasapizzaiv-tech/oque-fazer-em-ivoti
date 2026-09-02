@@ -8,6 +8,7 @@ import {
   AdvancedMarker,
   InfoWindow,
   Map,
+  Marker,
   useMap,
 } from "@vis.gl/react-google-maps";
 import MapaPrevia from "./MapaPrevia";
@@ -15,9 +16,13 @@ import { IVOTI, distancia, formatarDistancia, linkRota } from "@/lib/geo";
 import type { LocalCompleto } from "@/lib/tipos";
 
 const CHAVE = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-// O mapId e o que libera os pinos personalizados do Google.
-// "DEMO_MAP_ID" funciona pra testar; em producao vale criar um estilo proprio.
-const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID";
+// O "Map ID" e um identificador de estilo criado no console do Google. Sem
+// ele o Google recusa os pinos personalizados (AdvancedMarker) e mostra a
+// caixa de erro "esta pagina nao carregou o Google Maps corretamente".
+// Quando nao houver Map ID configurado, o mapa cai no pino classico, que
+// funciona em qualquer conta.
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "";
+const PINO_MODERNO = MAP_ID.length > 0;
 
 export type PontoNoMapa = Pick<
   LocalCompleto,
@@ -49,7 +54,7 @@ export default function Mapa({
     <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
       <div className={`relative ${altura} overflow-hidden rounded-2xl`}>
         <Map
-          mapId={MAP_ID}
+          mapId={MAP_ID || undefined}
           defaultCenter={IVOTI}
           defaultZoom={14}
           gestureHandling="greedy"
@@ -65,6 +70,16 @@ export default function Mapa({
     </APIProvider>
   );
 }
+
+// Circulo verde usado como fundo do pino classico (sem Map ID).
+const PINO_SIMPLES = {
+  path: 0 as google.maps.SymbolPath, // google.maps.SymbolPath.CIRCLE
+  scale: 16,
+  fillColor: "#147a59",
+  fillOpacity: 1,
+  strokeColor: "#ffffff",
+  strokeWeight: 2,
+};
 
 function Conteudo({
   locais,
@@ -122,24 +137,38 @@ function Conteudo({
 
   return (
     <>
-      {locais.map((l) => (
-        <AdvancedMarker
-          key={l.id}
-          position={{ lat: l.lat!, lng: l.lng! }}
-          title={l.nome}
-          onClick={() => setAberto(l)}
-        >
-          <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
-            {l.categoria?.emoji ?? "📍"}
-          </span>
-        </AdvancedMarker>
-      ))}
-
-      {euEstou && (
-        <AdvancedMarker position={euEstou} title="Voce esta aqui">
-          <span className="block h-4 w-4 rounded-full border-2 border-white bg-sol-500 shadow" />
-        </AdvancedMarker>
+      {locais.map((l) =>
+        PINO_MODERNO ? (
+          <AdvancedMarker
+            key={l.id}
+            position={{ lat: l.lat!, lng: l.lng! }}
+            title={l.nome}
+            onClick={() => setAberto(l)}
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
+              {l.categoria?.emoji ?? "📍"}
+            </span>
+          </AdvancedMarker>
+        ) : (
+          <Marker
+            key={l.id}
+            position={{ lat: l.lat!, lng: l.lng! }}
+            title={l.nome}
+            label={{ text: l.categoria?.emoji ?? "📍", fontSize: "18px" }}
+            icon={PINO_SIMPLES}
+            onClick={() => setAberto(l)}
+          />
+        ),
       )}
+
+      {euEstou &&
+        (PINO_MODERNO ? (
+          <AdvancedMarker position={euEstou} title="Voce esta aqui">
+            <span className="block h-4 w-4 rounded-full border-2 border-white bg-sol-500 shadow" />
+          </AdvancedMarker>
+        ) : (
+          <Marker position={euEstou} title="Voce esta aqui" />
+        ))}
 
       {aberto && (
         <InfoWindow
