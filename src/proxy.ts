@@ -1,0 +1,14 @@
+import { type NextRequest } from "next/server";
+import { atualizarSessao } from "@/lib/supabase/sessao";
+
+// No Next 16 o antigo "middleware" passou a se chamar "proxy".
+export async function proxy(request: NextRequest) {
+  return await atualizarSessao(request);
+}
+
+export const config = {
+  matcher: [
+    // Roda em tudo, menos arquivos estaticos e imagens.
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
+};

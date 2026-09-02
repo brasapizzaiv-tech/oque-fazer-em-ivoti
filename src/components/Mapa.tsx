@@ -1,0 +1,212 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import {
+  APIProvider,
+  AdvancedMarker,
+  InfoWindow,
+  Map,
+  useMap,
+} from "@vis.gl/react-google-maps";
+import { IVOTI, distancia, formatarDistancia, linkRota } from "@/lib/geo";
+import type { LocalCompleto } from "@/lib/tipos";
+
+const CHAVE = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
+// O mapId e o que libera os pinos personalizados do Google.
+// "DEMO_MAP_ID" funciona pra testar; em producao vale criar um estilo proprio.
+const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ?? "DEMO_MAP_ID";
+
+export type PontoNoMapa = Pick<
+  LocalCompleto,
+  "id" | "slug" | "nome" | "lat" | "lng" | "capa_url" | "bairro" | "resumo"
+> & {
+  categoria?: { nome: string; emoji: string | null } | null;
+};
+
+export default function Mapa({
+  locais,
+  altura = "h-[60vh]",
+  focoSlug,
+}: {
+  locais: PontoNoMapa[];
+  altura?: string;
+  focoSlug?: string;
+}) {
+  const comCoordenada = useMemo(
+    () => locais.filter((l) => l.lat != null && l.lng != null),
+    [locais],
+  );
+
+  if (!CHAVE) {
+    return (
+      <div
+        className={`grid ${altura} place-items-center rounded-2xl border border-dashed border-mata-200 bg-mata-50 p-6 text-center`}
+      >
+        <div>
+          <p className="text-3xl">🗺️</p>
+          <p className="mt-2 font-semibold">Mapa ainda nao configurado</p>
+          <p className="mt-1 text-sm text-tinta/60">
+            Falta a chave do Google Maps
+            (NEXT_PUBLIC_GOOGLE_MAPS_API_KEY).
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
+      <div className={`relative ${altura} overflow-hidden rounded-2xl`}>
+        <Map
+          mapId={MAP_ID}
+          defaultCenter={IVOTI}
+          defaultZoom={14}
+          gestureHandling="greedy"
+          disableDefaultUI={false}
+          mapTypeControl={false}
+          streetViewControl={false}
+          fullscreenControl={false}
+          className="h-full w-full"
+        >
+          <Conteudo locais={comCoordenada} focoSlug={focoSlug} />
+        </Map>
+      </div>
+    </APIProvider>
+  );
+}
+
+function Conteudo({
+  locais,
+  focoSlug,
+}: {
+  locais: PontoNoMapa[];
+  focoSlug?: string;
+}) {
+  const mapa = useMap();
+  const [aberto, setAberto] = useState<PontoNoMapa | null>(null);
+  const [euEstou, setEuEstou] = useState<{ lat: number; lng: number } | null>(
+    null,
+  );
+
+  // Enquadra todos os pinos assim que o mapa carrega.
+  useEffect(() => {
+    if (!mapa || locais.length === 0) return;
+
+    if (focoSlug) {
+      const alvo = locais.find((l) => l.slug === focoSlug);
+      if (alvo) {
+        mapa.setCenter({ lat: alvo.lat!, lng: alvo.lng! });
+        mapa.setZoom(16);
+        return;
+      }
+    }
+
+    if (locais.length === 1) {
+      mapa.setCenter({ lat: locais[0].lat!, lng: locais[0].lng! });
+      mapa.setZoom(16);
+      return;
+    }
+
+    const limites = new google.maps.LatLngBounds();
+    for (const l of locais) limites.extend({ lat: l.lat!, lng: l.lng! });
+    mapa.fitBounds(limites, 48);
+  }, [mapa, locais, focoSlug]);
+
+  function ondeEstou() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const meu = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+        setEuEstou(meu);
+        mapa?.setCenter(meu);
+        mapa?.setZoom(15);
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  }
+
+  return (
+    <>
+      {locais.map((l) => (
+        <AdvancedMarker
+          key={l.id}
+          position={{ lat: l.lat!, lng: l.lng! }}
+          title={l.nome}
+          onClick={() => setAberto(l)}
+        >
+          <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
+            {l.categoria?.emoji ?? "📍"}
+          </span>
+        </AdvancedMarker>
+      ))}
+
+      {euEstou && (
+        <AdvancedMarker position={euEstou} title="Voce esta aqui">
+          <span className="block h-4 w-4 rounded-full border-2 border-white bg-sol-500 shadow" />
+        </AdvancedMarker>
+      )}
+
+      {aberto && (
+        <InfoWindow
+          position={{ lat: aberto.lat!, lng: aberto.lng! }}
+          onCloseClick={() => setAberto(null)}
+          headerDisabled
+        >
+          <div className="w-56 p-1">
+            {aberto.capa_url && (
+              <div className="relative mb-2 h-24 w-full overflow-hidden rounded-lg">
+                <Image
+                  src={aberto.capa_url}
+                  alt={aberto.nome}
+                  fill
+                  sizes="224px"
+                  className="object-cover"
+                />
+              </div>
+            )}
+            <p className="text-sm leading-tight font-semibold">{aberto.nome}</p>
+            <p className="mt-0.5 text-xs text-tinta/55">
+              {aberto.categoria?.nome}
+              {aberto.bairro ? ` · ${aberto.bairro}` : ""}
+              {euEstou
+                ? ` · ${formatarDistancia(
+                    distancia(euEstou, { lat: aberto.lat!, lng: aberto.lng! }),
+                  )}`
+                : ""}
+            </p>
+            <div className="mt-2 flex gap-2">
+              <Link
+                href={`/local/${aberto.slug}`}
+                className="flex-1 rounded-lg bg-mata-600 px-2 py-1.5 text-center text-xs font-semibold text-white"
+              >
+                Ver
+              </Link>
+              <a
+                href={linkRota(aberto)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 rounded-lg border border-mata-200 px-2 py-1.5 text-center text-xs font-semibold text-mata-700"
+              >
+                Rota
+              </a>
+            </div>
+          </div>
+        </InfoWindow>
+      )}
+
+      <button
+        type="button"
+        onClick={ondeEstou}
+        className="absolute bottom-4 left-4 rounded-full bg-white px-3 py-2 text-xs font-semibold shadow-lg"
+      >
+        📍 Onde eu estou
+      </button>
+    </>
+  );
+}
