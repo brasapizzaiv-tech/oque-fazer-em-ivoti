@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import BarraBusca from "@/components/BarraBusca";
 import CardLocal from "@/components/CardLocal";
@@ -28,16 +29,34 @@ export default async function Home() {
   return (
     <>
       {/* ---------------- topo ---------------- */}
-      <section className="relative overflow-hidden border-b border-mata-100 bg-linear-to-b from-mata-50 to-creme">
-        <div className="mx-auto max-w-4xl px-4 py-14 text-center sm:py-20">
-          <p className="text-sm font-semibold text-mata-600">
+      <section className="relative overflow-hidden border-b border-mata-100">
+        {/* O Portico e o cartao-postal de quem chega em Ivoti — e a primeira
+            coisa que a pessoa ve no site tambem. O veu por cima garante que o
+            titulo continue legivel em qualquer tela. */}
+        <Image
+          src="/fotos/portico-ivoti.jpg"
+          alt="Pórtico de Ivoti"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        {/* No celular a foto entra num recorte estreito e o texto cai em cima
+            do telhado claro, entao o veu vai mais forte ali. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-linear-to-b from-mata-950/80 via-mata-950/65 to-mata-950/80 sm:from-mata-950/70 sm:via-mata-950/45 sm:to-mata-950/75"
+        />
+
+        <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:py-24">
+          <p className="text-sm font-semibold text-sol-300">
             {saudacao} É {DIAS[agora.diaSemana].toLowerCase()},{" "}
             {agora.hhmm} em Ivoti
           </p>
-          <h1 className="mt-3 text-4xl leading-tight font-bold sm:text-5xl">
-            O que fazer em <span className="text-mata-600">Ivoti</span>?
+          <h1 className="mt-3 text-4xl leading-tight font-bold text-white drop-shadow-sm sm:text-5xl">
+            O que fazer em <span className="text-sol-300">Ivoti</span>?
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-tinta/65">
+          <p className="mx-auto mt-3 max-w-xl text-white/80">
             Onde comer, beber, passear e se hospedar. Tudo num lugar só — com
             mapa, horários e um guia que responde suas perguntas.
           </p>

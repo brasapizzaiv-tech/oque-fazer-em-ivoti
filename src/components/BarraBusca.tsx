@@ -30,7 +30,7 @@ export default function BarraBusca({
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
-          placeholder="Pizza, trilha, cafe, pousada..."
+          placeholder="Pizza, trilha, café..."
           aria-label="Buscar no guia"
           className={[
             "w-full rounded-full border border-mata-200 bg-white pr-4 pl-11 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100",
