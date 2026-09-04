@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { normalizar } from "@/lib/texto";
 
 type Mensagem = { papel: "pessoa" | "guia"; texto: string };
 
@@ -233,6 +234,38 @@ function Digitando() {
 }
 
 /**
+ * Reduz um texto a letras, numeros e tracos — sem acento e sem corte de
+ * tamanho. Serve pra casar o marcador [[...]] com o endereco do local e pra
+ * saber se o nome do lugar ja apareceu antes na frase.
+ */
+function chave(texto: string): string {
+  return normalizar(texto)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * O nome do lugar acabou de ser dito?
+ *
+ * Aceita o nome inteiro e tambem a versao abreviada que o guia costuma usar:
+ * ele escreve "Praça Ecológica Vereador Edio Klein" para um lugar cadastrado
+ * como "Praça Ecológica Vereador Edio Klein – Oscar Nicolao Müller". Sem isso
+ * o nome sairia duas vezes na mesma frase.
+ */
+function jaMencionado(anterior: string, nome: string): boolean {
+  const alvo = chave(nome);
+  const cauda = chave(anterior.slice(-160));
+  if (!alvo || !cauda) return false;
+
+  // Do nome inteiro para o pedaco menor aceitavel: 12 caracteres evita casar
+  // por acaso com uma palavra solta como "praca".
+  for (let corte = alvo.length; corte >= 12; corte--) {
+    if (cauda.endsWith(alvo.slice(0, corte))) return true;
+  }
+  return cauda.endsWith(alvo);
+}
+
+/**
  * Mostra a resposta do guia trocando os marcadores [[slug]] por cartoes
  * clicaveis do local. O que nao for marcador vira texto normal, com **negrito**
  * e quebras de linha respeitadas.
@@ -244,21 +277,34 @@ function Resposta({
   texto: string;
   locais: Record<string, LocalMini>;
 }) {
-  const pedacos: (string | LocalMini)[] = [];
-  const marcador = /\[\[([a-z0-9-]+)\]\]/g;
+  // Aceita qualquer coisa dentro dos colchetes de proposito: o guia as vezes
+  // devolve o marcador "corrigido" com acento ([[praça-bom-jardim]] em vez de
+  // [[praca-bom-jardim]]). Normaliza antes de procurar, e o marcador que nao
+  // bater com nenhum local some em vez de aparecer cru na tela.
+  const marcador = /\[\[([^\]]{1,80})\]\]/g;
+  const cartoes: LocalMini[] = [];
+  let corrido = "";
   let ultimo = 0;
 
   for (const achado of texto.matchAll(marcador)) {
     const inicio = achado.index ?? 0;
-    if (inicio > ultimo) pedacos.push(texto.slice(ultimo, inicio));
-    const local = locais[achado[1]];
-    if (local) pedacos.push(local);
+    corrido += texto.slice(ultimo, inicio);
     ultimo = inicio + achado[0].length;
-  }
-  if (ultimo < texto.length) pedacos.push(texto.slice(ultimo));
 
-  const corridos = pedacos.filter((p) => typeof p === "string") as string[];
-  const cartoes = pedacos.filter((p) => typeof p !== "string") as LocalMini[];
+    const local = locais[achado[1]] ?? locais[chave(achado[1])];
+    if (!local) continue;
+
+    if (!cartoes.some((c) => c.slug === local.slug)) cartoes.push(local);
+
+    // Ora o guia escreve "o Pórtico [[portico-de-ivoti]]", ora usa o marcador
+    // no lugar do nome ("passa no [[portico-de-ivoti]]"). No primeiro caso
+    // basta tirar o marcador; no segundo, sem por o nome a frase fica com um
+    // buraco. Entao so escreve o nome quando ele ainda nao veio antes.
+    if (!jaMencionado(corrido, local.nome)) corrido += local.nome;
+  }
+  corrido += texto.slice(ultimo);
+
+  const corridos = [corrido];
 
   return (
     <>
