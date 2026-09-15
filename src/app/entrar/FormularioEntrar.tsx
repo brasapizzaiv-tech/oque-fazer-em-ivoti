@@ -15,6 +15,14 @@ export default function FormularioEntrar() {
   const params = useSearchParams();
   const voltar = params.get("voltar") ?? "/painel";
 
+  // Quem chega de um link de confirmacao que nao valeu (ja usado, vencido, ou
+  // aberto em outro navegador) cai aqui com um aviso em portugues, em vez da
+  // tela de erro crua do Supabase.
+  const avisoConfirmacao =
+    params.get("erro") === "confirmacao"
+      ? "Esse link de confirmação não vale mais — pode ter vencido, já ter sido usado, ou ter sido aberto em outro navegador. Entre com seu e-mail e senha aqui embaixo."
+      : null;
+
   async function entrar(evento: React.FormEvent) {
     evento.preventDefault();
     setErro(null);
@@ -44,6 +52,12 @@ export default function FormularioEntrar() {
 
   return (
     <form onSubmit={entrar} className="mt-6 space-y-4">
+      {avisoConfirmacao && (
+        <p className="rounded-lg bg-sol-50 px-3 py-2 text-sm text-sol-900">
+          {avisoConfirmacao}
+        </p>
+      )}
+
       <Campo
         rotulo="E-mail"
         tipo="email"
