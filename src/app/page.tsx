@@ -130,12 +130,28 @@ export default async function Home() {
 
       {/* ---------------- convite pro chat ---------------- */}
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="rounded-3xl bg-mata-700 px-6 py-10 text-center text-white sm:px-12">
+        <div className="relative isolate overflow-hidden rounded-3xl px-6 py-14 text-center text-white sm:px-12">
+          {/* O letreiro da entrada da cidade quebra o meio da home, que daqui
+              pra baixo era tudo claro. O veu escuro segura a leitura do texto
+              por cima das flores e do ceu. */}
+          <Image
+            src="/fotos/eu-amo-ivoti.jpg"
+            alt=""
+            aria-hidden
+            fill
+            sizes="(max-width: 1152px) 100vw, 1152px"
+            className="-z-10 object-cover object-center"
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 -z-10 bg-mata-900/75 sm:bg-mata-900/70"
+          />
+
           <p className="text-4xl">🌿</p>
-          <h2 className="mt-3 text-2xl font-bold sm:text-3xl">
+          <h2 className="mt-3 text-2xl font-bold drop-shadow-sm sm:text-3xl">
             Não sabe o que fazer hoje?
           </h2>
-          <p className="mx-auto mt-2 max-w-lg text-mata-100">
+          <p className="mx-auto mt-2 max-w-lg text-mata-50">
             Conta pro guia o que tu tá a fim — comer alguma coisa, sair com as
             crianças, um programa ao ar livre — que ele te indica onde ir, com
             horário e tudo.
