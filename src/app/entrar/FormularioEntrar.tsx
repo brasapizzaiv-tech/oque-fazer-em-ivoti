@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { erroEmPortugues } from "@/lib/erros-auth";
 
 export default function FormularioEntrar() {
   const [email, setEmail] = useState("");
@@ -35,13 +36,7 @@ export default function FormularioEntrar() {
     });
 
     if (error) {
-      setErro(
-        error.message.includes("Invalid login")
-          ? "E-mail ou senha não conferem."
-          : error.message.includes("Email not confirmed")
-            ? "Confirme seu e-mail antes de entrar — veja a caixa de entrada."
-            : error.message,
-      );
+      setErro(erroEmPortugues(error.message));
       setIndo(false);
       return;
     }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { erroEmPortugues } from "@/lib/erros-auth";
 
 export default function FormularioCadastro() {
   const [nome, setNome] = useState("");
@@ -41,11 +42,7 @@ export default function FormularioCadastro() {
     });
 
     if (error) {
-      setErro(
-        error.message.includes("already registered")
-          ? "Esse e-mail já tem conta. Tente entrar."
-          : error.message,
-      );
+      setErro(erroEmPortugues(error.message));
       setIndo(false);
       return;
     }
