@@ -37,18 +37,35 @@ export default async function Painel() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: locais } = await supabase
+  // A administracao enxerga tudo no painel, inclusive o que nao tem dono: os
+  // pontos turisticos da cidade sao do municipio, nao de um estabelecimento,
+  // e sem isso ninguem conseguiria subir foto ou corrigir o texto deles.
+  const { data: perfil } = await supabase
+    .from("perfis")
+    .select("papel")
+    .eq("id", user?.id ?? "")
+    .maybeSingle();
+  const admin = perfil?.papel === "admin";
+
+  let consulta = supabase
     .from("locais")
-    .select("id, slug, nome, status, capa_url, motivo_rejeicao, categoria:categorias(nome, emoji)")
-    .eq("dono_id", user?.id ?? "")
+    .select(
+      "id, slug, nome, status, capa_url, motivo_rejeicao, dono_id, categoria:categorias(nome, emoji)",
+    )
     .order("criado_em", { ascending: false });
+
+  if (!admin) consulta = consulta.eq("dono_id", user?.id ?? "");
+
+  const { data: locais } = await consulta;
 
   const lista = locais ?? [];
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-lg font-semibold">Meus locais</h1>
+        <h1 className="text-lg font-semibold">
+          {admin ? "Todos os locais" : "Meus locais"}
+        </h1>
         <Link
           href="/painel/novo"
           className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-mata-700"
