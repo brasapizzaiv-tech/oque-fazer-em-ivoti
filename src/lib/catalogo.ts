@@ -1,6 +1,12 @@
 import { createAdminClient } from "./supabase/admin";
 import { buscarLocais } from "./locais";
-import { agoraNaCidade, resumoSemana, situacao, DIAS } from "./horarios";
+import {
+  agoraNaCidade,
+  resumoSemana,
+  situacao,
+  quandoPorExtenso,
+  DIAS,
+} from "./horarios";
 import { faixaPreco } from "./texto";
 import type { LocalCompleto } from "./tipos";
 
@@ -48,12 +54,58 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
   return linhas.join("\n");
 }
 
+type EventoDoCatalogo = {
+  titulo: string;
+  inicio: string;
+  descricao: string | null;
+  local_texto: string | null;
+  local: { slug: string; nome: string } | null;
+};
+
+/**
+ * A agenda em texto, pro chat responder "o que rola esse fim de semana".
+ *
+ * Pega de seis horas atras pra frente: um evento que comecou as 14h ainda
+ * interessa a quem pergunta as 16h.
+ */
+async function agenda(): Promise<string> {
+  const desde = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
+  const ate = new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString();
+
+  const { data } = await createAdminClient()
+    .from("eventos")
+    .select("titulo, inicio, descricao, local_texto, local:locais(slug, nome)")
+    .eq("status", "publicado")
+    .gte("inicio", desde)
+    .lte("inicio", ate)
+    .order("inicio", { ascending: true })
+    .limit(40);
+
+  const eventos = (data ?? []) as unknown as EventoDoCatalogo[];
+  if (eventos.length === 0) {
+    return "\n\n## AGENDA\nNenhum evento marcado no guia por enquanto. Nao invente eventos.";
+  }
+
+  const linhas = eventos.map((e) => {
+    const onde = e.local
+      ? `${e.local.nome} [[${e.local.slug}]]`
+      : (e.local_texto ?? "local a confirmar");
+    const detalhe = e.descricao ? ` — ${e.descricao.slice(0, 200)}` : "";
+    return `- ${e.titulo} · ${quandoPorExtenso(e.inicio)} · ${onde}${detalhe}`;
+  });
+
+  return `\n\n## AGENDA (eventos com data marcada)\n${linhas.join("\n")}`;
+}
+
 /** Monta (ou reaproveita) o catalogo de locais publicados. */
 export async function catalogo(): Promise<Catalogo> {
   if (cache && Date.now() - cache.em < VALIDADE) return cache;
 
   const admin = createAdminClient();
-  const locais = await buscarLocais({ limite: 500 }, admin);
+  const [locais, proximos] = await Promise.all([
+    buscarLocais({ limite: 500 }, admin),
+    agenda(),
+  ]);
   const agora = agoraNaCidade();
 
   const cabecalho = [
@@ -63,7 +115,7 @@ export async function catalogo(): Promise<Catalogo> {
   ].join("\n");
 
   const texto =
-    cabecalho + locais.map((l) => descrever(l, agora)).join("\n\n");
+    cabecalho + locais.map((l) => descrever(l, agora)).join("\n\n") + proximos;
 
   cache = { texto, locais, em: Date.now() };
   return cache;

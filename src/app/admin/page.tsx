@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import AcoesAdmin from "./AcoesAdmin";
+import AcoesEvento from "./AcoesEvento";
 import BotaoSair from "@/components/BotaoSair";
+import { quandoPorExtenso } from "@/lib/horarios";
 
 export const dynamic = "force-dynamic";
 
@@ -16,11 +18,24 @@ type LinhaAdmin = {
   perfis: { nome: string | null } | null;
 };
 
+type EventoNaFila = {
+  id: string;
+  titulo: string;
+  inicio: string;
+  descricao: string | null;
+  local_texto: string | null;
+  local: { nome: string } | null;
+};
+
 export default async function Admin() {
   const supabase = await createClient();
 
-  const [{ data: analise }, { data: publicados }, { data: perguntas }] =
-    await Promise.all([
+  const [
+    { data: analise },
+    { data: publicados },
+    { data: perguntas },
+    { data: eventos },
+  ] = await Promise.all([
       supabase
         .from("locais")
         .select("id, slug, nome, status, resumo, bairro, criado_em")
@@ -36,10 +51,16 @@ export default async function Admin() {
         .select("id, pergunta, criado_em")
         .order("criado_em", { ascending: false })
         .limit(30),
+      supabase
+        .from("eventos")
+        .select("id, titulo, inicio, descricao, local_texto, local:locais(nome)")
+        .eq("status", "em_analise")
+        .order("inicio", { ascending: true }),
     ]);
 
   const naFila = (analise ?? []) as unknown as LinhaAdmin[];
   const noAr = (publicados ?? []) as unknown as LinhaAdmin[];
+  const eventosNaFila = (eventos ?? []) as unknown as EventoNaFila[];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -99,6 +120,59 @@ export default async function Admin() {
                   </Link>
                 </div>
                 <AcoesAdmin id={l.id} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {/* ---- eventos esperando ---- */}
+      <section className="mt-10">
+        <h2 className="font-semibold">
+          Eventos esperando aprovação{" "}
+          {eventosNaFila.length > 0 && (
+            <span className="ml-1 rounded-full bg-sol-500 px-2 py-0.5 text-xs text-white">
+              {eventosNaFila.length}
+            </span>
+          )}
+        </h2>
+
+        {eventosNaFila.length === 0 ? (
+          <p className="mt-3 rounded-xl border border-dashed border-mata-200 bg-white p-6 text-center text-sm text-tinta/55">
+            Nenhum evento na fila.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-3">
+            {eventosNaFila.map((e) => (
+              <li
+                key={e.id}
+                className="rounded-2xl border border-sol-200 bg-white p-4"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold">{e.titulo}</p>
+                    <p className="text-sm text-tinta/55">
+                      {quandoPorExtenso(e.inicio)}
+                      {e.local?.nome
+                        ? ` · ${e.local.nome}`
+                        : e.local_texto
+                          ? ` · ${e.local_texto}`
+                          : ""}
+                    </p>
+                    {e.descricao && (
+                      <p className="mt-1 line-clamp-2 text-sm text-tinta/70">
+                        {e.descricao}
+                      </p>
+                    )}
+                  </div>
+                  <Link
+                    href={`/painel/eventos/${e.id}`}
+                    className="shrink-0 rounded-lg border border-mata-200 px-3 py-1.5 text-sm font-medium hover:bg-mata-50"
+                  >
+                    Ver / editar
+                  </Link>
+                </div>
+                <AcoesEvento id={e.id} />
               </li>
             ))}
           </ul>

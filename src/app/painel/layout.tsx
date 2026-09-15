@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import BotaoSair from "@/components/BotaoSair";
+import AbasPainel from "@/components/painel/AbasPainel";
 
 export default async function LayoutPainel({ children }: LayoutProps<"/painel">) {
   const supabase = await createClient();
@@ -39,6 +40,8 @@ export default async function LayoutPainel({ children }: LayoutProps<"/painel">)
           <BotaoSair />
         </div>
       </div>
+
+      <AbasPainel />
 
       <div className="pt-6">{children}</div>
     </div>

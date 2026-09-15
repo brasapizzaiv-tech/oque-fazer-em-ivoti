@@ -179,3 +179,58 @@ export function resumoSemana(horarios: Horario[]): string {
     .map((d) => `${d.nome}: ${d.faixas.join(", ")}`);
   return linhas.length ? linhas.join(" | ") : "Horario nao informado";
 }
+
+/* ------------------------------------------------------------------
+ * Datas de evento
+ * ------------------------------------------------------------------
+ * O banco guarda o momento exato (com fuso). O campo de data e hora do
+ * navegador trabalha com a hora local de quem esta olhando. Se a pessoa
+ * cadastrar de outro estado — ou o servidor rodar em UTC, como na Vercel —
+ * o evento entra com a hora errada.
+ *
+ * Estas duas funcoes fazem a ponte sempre pelo horario de Ivoti, que e o
+ * unico que importa aqui: um show as 21h e as 21h na cidade.
+ *
+ * O Brasil nao tem mais horario de verao desde 2019, entao o fuso e -03:00
+ * o ano todo.
+ * ------------------------------------------------------------------ */
+
+const FUSO_HORAS = "-03:00";
+
+/** Momento guardado no banco -> "2026-09-20T21:00" pro campo do formulario. */
+export function paraCampoDataHora(iso: string | null): string {
+  if (!iso) return "";
+  const partes = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: FUSO,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(new Date(iso));
+  // "sv-SE" devolve "2026-09-20 21:00"; o campo do navegador quer um T no meio
+  return partes.replace(" ", "T");
+}
+
+/** "2026-09-20T21:00" digitado no formulario -> momento exato pro banco. */
+export function deCampoDataHora(valor: string): string | null {
+  if (!valor) return null;
+  const completo = valor.length === 16 ? `${valor}:00` : valor;
+  const data = new Date(`${completo}${FUSO_HORAS}`);
+  return Number.isNaN(data.getTime()) ? null : data.toISOString();
+}
+
+/** "sáb, 20 de set, 21:00" — como o evento aparece escrito no site. */
+export function quandoPorExtenso(iso: string): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: FUSO,
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+    .format(new Date(iso))
+    .replaceAll(".", "");
+}

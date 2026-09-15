@@ -7,7 +7,9 @@ import Mapa from "@/components/Mapa";
 import SeloAberto from "@/components/SeloAberto";
 import Galeria from "@/components/Galeria";
 import { localPorSlug, locaisParecidos } from "@/lib/locais";
-import { porDia } from "@/lib/horarios";
+import { porDia, quandoPorExtenso } from "@/lib/horarios";
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
 import {
   faixaPreco,
@@ -40,6 +42,32 @@ export async function generateMetadata({
   };
 }
 
+type EventoDoLocal = {
+  id: string;
+  titulo: string;
+  inicio: string;
+  descricao: string | null;
+};
+
+/**
+ * Os proximos eventos deste local, pra quem abriu a pagina saber que tem
+ * coisa marcada — e nao so o horario de funcionamento de sempre.
+ */
+async function proximosDoLocal(localId: string): Promise<EventoDoLocal[]> {
+  if (!SUPABASE_CONFIGURADO) return [];
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("eventos")
+    .select("id, titulo, inicio, descricao")
+    .eq("local_id", localId)
+    .eq("status", "publicado")
+    // Seis horas de folga: um evento que comecou as 14h ainda interessa as 16h.
+    .gte("inicio", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString())
+    .order("inicio", { ascending: true })
+    .limit(5);
+  return (data ?? []) as EventoDoLocal[];
+}
+
 export default async function PaginaLocal({
   params,
 }: PageProps<"/local/[slug]">) {
@@ -48,7 +76,10 @@ export default async function PaginaLocal({
 
   if (!local || local.status !== "publicado") notFound();
 
-  const parecidos = await locaisParecidos(local);
+  const [parecidos, eventos] = await Promise.all([
+    locaisParecidos(local),
+    proximosDoLocal(local.id),
+  ]);
   const semana = porDia(local.horarios);
   const whats = linkWhatsapp(
     local.whatsapp,
@@ -186,6 +217,39 @@ export default async function PaginaLocal({
                   </span>
                 ))}
               </div>
+            </section>
+          )}
+
+          {eventos.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold">Tem coisa marcada</h2>
+              <ul className="mt-3 space-y-2">
+                {eventos.map((e) => (
+                  <li
+                    key={e.id}
+                    className="flex gap-3 rounded-xl border border-sol-200 bg-sol-50 p-3"
+                  >
+                    <span className="text-xl">📅</span>
+                    <div className="min-w-0">
+                      <p className="font-semibold">{e.titulo}</p>
+                      <p className="text-sm text-tinta/60">
+                        {quandoPorExtenso(e.inicio)}
+                      </p>
+                      {e.descricao && (
+                        <p className="mt-1 line-clamp-2 text-sm text-tinta/70">
+                          {e.descricao}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href="/agenda"
+                className="mt-2 inline-block text-sm font-semibold text-mata-700 hover:underline"
+              >
+                Ver a agenda da cidade →
+              </Link>
             </section>
           )}
 
