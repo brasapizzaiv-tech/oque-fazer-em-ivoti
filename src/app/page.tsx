@@ -4,16 +4,18 @@ import BarraBusca from "@/components/BarraBusca";
 import CardLocal from "@/components/CardLocal";
 import { buscarLocais, listarCategorias } from "@/lib/locais";
 import { agoraNaCidade, DIAS } from "@/lib/horarios";
+import { climaDeIvoti } from "@/lib/clima";
 
 // A home muda conforme a hora (o que esta aberto agora), entao nao adianta
 // deixar guardada por muito tempo.
 export const revalidate = 60;
 
 export default async function Home() {
-  const [categorias, todos, abertos] = await Promise.all([
+  const [categorias, todos, abertos, clima] = await Promise.all([
     listarCategorias(),
     buscarLocais({ limite: 300 }),
     buscarLocais({ abertoAgora: true, limite: 300 }),
+    climaDeIvoti(),
   ]);
 
   const principais = categorias.filter((c) => c.pai_id === null);
@@ -52,6 +54,14 @@ export default async function Home() {
           <p className="text-sm font-semibold text-sol-300">
             {saudacao} É {DIAS[agora.diaSemana].toLowerCase()},{" "}
             {agora.hhmm} em Ivoti
+            {clima && (
+              <>
+                {" · "}
+                <span title={clima.descricao}>
+                  {clima.graus}°C {clima.emoji}
+                </span>
+              </>
+            )}
           </p>
           <h1 className="mt-3 text-4xl leading-tight font-bold text-white drop-shadow-sm sm:text-5xl">
             O Guia de <span className="text-sol-300">Ivoti</span>

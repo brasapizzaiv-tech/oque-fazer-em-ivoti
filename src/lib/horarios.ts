@@ -7,14 +7,14 @@ export const FUSO = "America/Sao_Paulo";
 export const DIAS = [
   "Domingo",
   "Segunda",
-  "Terca",
+  "Terça",
   "Quarta",
   "Quinta",
   "Sexta",
-  "Sabado",
+  "Sábado",
 ] as const;
 
-export const DIAS_CURTOS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+export const DIAS_CURTOS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
 export type AgoraNaCidade = {
   diaSemana: number; // 0 = domingo
