@@ -20,18 +20,18 @@ const corpo = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://oquefazeremivoti.com.br",
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://oguiaivoti.com.br",
   ),
   title: {
-    default: "O que fazer em Ivoti",
-    template: "%s · O que fazer em Ivoti",
+    default: "O Guia de Ivoti",
+    template: "%s · O Guia de Ivoti",
   },
   description:
     "O guia de Ivoti: onde comer, beber, passear, se hospedar e o que está acontecendo hoje na cidade.",
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "O que fazer em Ivoti",
+    siteName: "O Guia de Ivoti",
   },
 };
 

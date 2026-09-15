@@ -17,9 +17,9 @@ export default function Cabecalho() {
             🌿
           </span>
           <span className="font-[family-name:var(--font-titulo)] text-lg leading-5 font-semibold">
-            O que fazer
+            O Guia
             <span className="block text-xs font-medium text-mata-600">
-              em Ivoti
+              de Ivoti
             </span>
           </span>
         </Link>

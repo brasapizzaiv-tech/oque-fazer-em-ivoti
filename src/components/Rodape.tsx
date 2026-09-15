@@ -6,7 +6,7 @@ export default function Rodape() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
           <p className="font-[family-name:var(--font-titulo)] text-lg font-semibold">
-            O que fazer em Ivoti
+            O Guia de Ivoti
           </p>
           <p className="mt-2 text-sm text-tinta/60">
             O guia da cidade: onde comer, beber, passear e se hospedar. Feito

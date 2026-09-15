@@ -52,7 +52,7 @@ export default async function PaginaLocal({
   const semana = porDia(local.horarios);
   const whats = linkWhatsapp(
     local.whatsapp,
-    `Oi! Vi vocês no site "O que fazer em Ivoti".`,
+    `Oi! Vi vocês no Guia de Ivoti.`,
   );
   const insta = usuarioInstagram(local.instagram);
   const endereco = [local.endereco, local.numero, local.bairro]

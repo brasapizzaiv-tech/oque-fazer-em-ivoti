@@ -54,7 +54,7 @@ export default async function Home() {
             {agora.hhmm} em Ivoti
           </p>
           <h1 className="mt-3 text-4xl leading-tight font-bold text-white drop-shadow-sm sm:text-5xl">
-            O que fazer em <span className="text-sol-300">Ivoti</span>?
+            O Guia de <span className="text-sol-300">Ivoti</span>
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-white/80">
             Onde comer, beber, passear e se hospedar. Tudo num lugar só — com
