@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 import Cabecalho from "@/components/Cabecalho";
+import CompletarLogin from "@/components/CompletarLogin";
 import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 import Rodape from "@/components/Rodape";
 import BotaoChat from "@/components/BotaoChat";
@@ -46,6 +48,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${titulo.variable} ${corpo.variable} h-full`}
     >
       <body className="flex min-h-full flex-col font-sans">
+        {/* Rede de seguranca do link de confirmacao de e-mail: se ele cair
+            numa pagina qualquer em vez de /auth/callback, o login e concluido
+            do mesmo jeito. Nao desenha nada. */}
+        <Suspense>
+          <CompletarLogin />
+        </Suspense>
         <FaixaDemonstracao />
         <Cabecalho />
         <main className="flex-1">{children}</main>
