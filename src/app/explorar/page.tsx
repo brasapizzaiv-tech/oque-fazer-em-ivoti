@@ -10,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { DIAS, agoraNaCidade } from "@/lib/horarios";
 import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
+import { listarRoteirosCurados } from "@/lib/roteiros-curados";
+import CartaoRoteiroPronto from "@/components/CartaoRoteiroPronto";
 
 export const revalidate = 60;
 
@@ -52,11 +54,12 @@ export default async function Explorar({
   const tags = lista(params.tag);
   const quando = texto(params.quando) ?? "";
 
-  const [categorias, todasTags, locais, promocoes] = await Promise.all([
+  const [categorias, todasTags, locais, promocoes, roteiros] = await Promise.all([
     listarCategorias(),
     listarTags(),
     buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
     promocoesDeHoje(),
+    listarRoteirosCurados(),
   ]);
 
   // Eventos entram depois: precisam dos números das categorias, que só
@@ -225,6 +228,31 @@ export default async function Explorar({
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {promocoes.slice(0, 6).map((p) => (
               <CartaoPromocao key={p.id} promocao={p} mostrarLocal />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ---- roteiros prontos ---- */}
+      {semFiltro && roteiros.length > 0 && (
+        <section className="mt-8">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-semibold">Roteiros prontos</h2>
+              <p className="text-sm text-tinta/55">
+                Passeios montados, com a rota pronta para abrir no mapa.
+              </p>
+            </div>
+            <Link
+              href="/roteiros"
+              className="text-sm font-semibold text-mata-700 underline"
+            >
+              ver todos
+            </Link>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {roteiros.slice(0, 4).map((r) => (
+              <CartaoRoteiroPronto key={r.id} roteiro={r} />
             ))}
           </div>
         </section>

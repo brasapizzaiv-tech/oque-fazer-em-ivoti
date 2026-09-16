@@ -107,26 +107,37 @@ export function lerRoteiro(texto: string): {
         const [h, m] = comHora[1].replace("h", ":").split(":");
         return {
           hora: `${h.padStart(2, "0")}:${m}`,
-          slug: normalizarSlug(comHora[2]),
+          slug: enderecoCurto(comHora[2]),
         };
       }
-      return { slug: normalizarSlug(limpo) };
+      return { slug: enderecoCurto(limpo) };
     })
     .filter((p) => p.slug.length > 0);
 
   return { limpo: texto.replace(marcador, "").trim(), paradas };
 }
 
-/** O Guia às vezes devolve o endereço com acento; aqui ele volta ao formato do site. */
-function normalizarSlug(bruto: string): string {
+/**
+ * Texto livre vira endereço curto: "Ivoti em um dia" -> "ivoti-em-um-dia".
+ *
+ * Serve a dois donos: o Guia às vezes devolve o endereço de um lugar com
+ * acento, e o título de um roteiro pronto precisa virar o endereço da
+ * página dele. É a mesma transformação, então mora num lugar só.
+ *
+ * Fica aqui, e não junto das consultas de roteiro, porque este arquivo não
+ * depende do servidor — a tela de montagem roda no navegador e precisa dele.
+ */
+export function enderecoCurto(bruto: string, limite = 0): string {
   let saida = "";
   for (const c of bruto.normalize("NFD")) {
     const cp = c.codePointAt(0) ?? 0;
     if (cp >= 0x300 && cp <= 0x36f) continue;
     saida += c;
   }
-  return saida
+  const curto = saida
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+
+  return limite > 0 ? curto.slice(0, limite) : curto;
 }
