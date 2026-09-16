@@ -14,9 +14,9 @@ export type Modulo =
   | "eventos"
   | "promocoes"
   | "metricas"
-  | "gui_painel"
-  | "prioridade_gui"
-  | "roteiro_gui";
+  | "guia_painel"
+  | "prioridade_guia"
+  | "roteiro_guia";
 
 type Definicao = {
   /** Como o módulo se chama nas telas. */
@@ -44,19 +44,19 @@ export const MODULOS: Record<Modulo, Definicao> = {
     convite:
       "Veja quantas pessoas clicaram no seu WhatsApp, de onde vieram e quantas o guia mandou até você.",
   },
-  gui_painel: {
+  guia_painel: {
     nome: "Assistente no painel",
     exige: "premium",
     convite:
       "Um assistente para escrever a descrição do seu negócio, sugerir promoções e responder dúvidas.",
   },
-  prioridade_gui: {
+  prioridade_guia: {
     nome: "Prioridade nas indicações",
     exige: "premium",
     convite:
       "Apareça primeiro quando o Guia indicar um lugar e quando montar um roteiro.",
   },
-  roteiro_gui: {
+  roteiro_guia: {
     nome: "Aparecer nos roteiros",
     exige: "premium",
     convite: "Entre nos roteiros que o Guia monta para quem visita a cidade.",

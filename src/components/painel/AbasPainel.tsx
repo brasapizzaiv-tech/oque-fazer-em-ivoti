@@ -8,6 +8,7 @@ const ABAS = [
   { href: "/painel/eventos", rotulo: "Eventos" },
   { href: "/painel/promocoes", rotulo: "Promoções" },
   { href: "/painel/metricas", rotulo: "Métricas" },
+  { href: "/painel/assistente", rotulo: "Assistente" },
 ];
 
 /** Navegação entre as seções do painel do estabelecimento. */
