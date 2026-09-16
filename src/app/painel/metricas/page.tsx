@@ -141,7 +141,27 @@ export default async function Metricas({
       </div>
 
       {liberado ? (
-        <Detalhes resumo={resumo} dias={dias} />
+        <>
+          <Detalhes resumo={resumo} dias={dias} />
+
+          {/* Quem paga costuma querer os numeros fora daqui: juntar com o
+              faturamento, mandar para o contador, guardar o historico antes
+              de o periodo sair da tela. */}
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-mata-100 bg-white px-5 py-4">
+            <div>
+              <p className="font-semibold">Levar para uma planilha</p>
+              <p className="text-sm text-tinta/55">
+                Dia a dia dos ultimos {dias} dias, pronto para abrir no Excel.
+              </p>
+            </div>
+            <a
+              href={`/api/metricas/exportar?local=${local.id}&dias=${dias}`}
+              className="rounded-full border border-mata-300 px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+            >
+              Baixar planilha
+            </a>
+          </div>
+        </>
       ) : (
         <div className="mt-6">
           <Bloqueado modulo="metricas" nome={local.nome}>
