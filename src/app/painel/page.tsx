@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import type { StatusLocal } from "@/lib/tipos";
+import { planoAtivo, diasParaVencer } from "@/lib/planos";
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +32,33 @@ const SITUACAO: Record<
   },
 };
 
+/**
+ * O selo do plano ao lado do nome.
+ *
+ * Só aparece no premium: um selo "Gratuito" em toda linha viraria ruído, e
+ * quem está no gratuito já descobre o que existe pelos módulos bloqueados.
+ * Avisa quando falta pouco para vencer, que é quando ainda dá para renovar.
+ */
+function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
+  if (planoAtivo(plano, ate) !== "premium") return null;
+
+  const dias = diasParaVencer(ate);
+  const acabando = dias !== null && dias <= 7;
+
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+        acabando ? "bg-red-100 text-red-800" : "bg-sol-100 text-sol-900"
+      }`}
+      title={ate ? `Vale até ${ate}` : "Sem data de vencimento"}
+    >
+      ⭐ Premium
+      {acabando &&
+        (dias === 0 ? " · vence hoje" : dias === 1 ? " · vence amanhã" : ` · ${dias} dias`)}
+    </span>
+  );
+}
+
 export default async function Painel() {
   const supabase = await createClient();
   const {
@@ -50,7 +78,7 @@ export default async function Painel() {
   let consulta = supabase
     .from("locais")
     .select(
-      "id, slug, nome, status, capa_url, motivo_rejeicao, dono_id, categoria:categorias(nome, emoji)",
+      "id, slug, nome, status, capa_url, motivo_rejeicao, dono_id, plano, plano_ate, categoria:categorias(nome, emoji)",
     )
     .order("criado_em", { ascending: false });
 
@@ -125,6 +153,10 @@ export default async function Painel() {
                     >
                       {s.texto}
                     </span>
+                    <SeloPlano
+                      plano={l.plano as string}
+                      ate={l.plano_ate as string | null}
+                    />
                   </div>
                   <p className="mt-0.5 text-sm text-tinta/55">{s.dica}</p>
                   {l.status === "rejeitado" && l.motivo_rejeicao && (
