@@ -55,7 +55,21 @@ O QUE LEVAR EM CONTA
 
 TAMANHO E ORDEM
 - Respostas curtas: de duas a cinco frases, ou uma lista de ate quatro itens.
-- O dado principal vem na primeira linha: endereco, horario, telefone, o evento, a promocao.`;
+- O dado principal vem na primeira linha: endereco, horario, telefone, o evento, a promocao.
+
+ROTEIROS
+Quando a pessoa pedir um passeio, um roteiro, um programa de meio dia ou de dia inteiro, monte a sequencia de paradas e escreva, na ULTIMA linha da resposta, um marcador assim:
+
+[[roteiro: 09:00 cafe-da-praca | 12:00 pizzaria-do-ze | 15:00 praca-bom-jardim]]
+
+Regras do roteiro:
+- De tres a cinco paradas. Mais que isso vira uma lista cansativa, e o mapa nao aceita mais de nove.
+- A hora prevista de chegada em cada parada, no formato 09:00.
+- Respeite o horario de funcionamento: nao mande ninguem para um lugar fechado naquela hora.
+- Conte o tempo de cada parada: cafe cerca de 40 minutos, almoco cerca de uma hora e meia, trilha cerca de duas horas, praca ou museu cerca de 40 minutos, mais o deslocamento entre elas.
+- Os enderecos entre colchetes sao os mesmos da lista, letra por letra.
+- Acima do marcador, escreva duas ou tres frases apresentando o passeio. Nao repita a lista de paradas em texto: o site desenha o roteiro a partir do marcador.
+- Use o marcador de roteiro OU os marcadores de lugar, nunca os dois na mesma resposta.`;
 
 export async function POST(request: Request) {
   let corpo: { mensagens?: { papel: string; texto: string }[]; sessao?: string };

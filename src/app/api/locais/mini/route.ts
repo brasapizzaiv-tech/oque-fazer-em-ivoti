@@ -10,6 +10,10 @@ export async function GET() {
   if (!SUPABASE_CONFIGURADO) {
     return Response.json({
       locais: LOCAIS_DEMO.map((l) => ({
+        id: l.id,
+        lat: l.lat,
+        lng: l.lng,
+        endereco: l.endereco,
         slug: l.slug,
         nome: l.nome,
         capa_url: l.capa_url,
@@ -25,7 +29,9 @@ export async function GET() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("locais")
-    .select("slug, nome, capa_url, resumo, bairro, categoria:categorias(nome, emoji)")
+    .select(
+      "id, slug, nome, capa_url, resumo, bairro, lat, lng, endereco, categoria:categorias(nome, emoji)",
+    )
     .eq("status", "publicado");
 
   return Response.json(

@@ -4,15 +4,21 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { normalizar } from "@/lib/texto";
+import CartaoRoteiro from "./CartaoRoteiro";
+import { lerRoteiro, type Parada } from "@/lib/roteiro";
 
 type Mensagem = { papel: "pessoa" | "guia"; texto: string };
 
 type LocalMini = {
+  id: string;
   slug: string;
   nome: string;
   capa_url: string | null;
   resumo: string | null;
   bairro: string | null;
+  lat: number | null;
+  lng: number | null;
+  endereco: string | null;
   categoria: { nome: string; emoji: string | null } | null;
 };
 
@@ -271,12 +277,36 @@ function jaMencionado(anterior: string, nome: string): boolean {
  * e quebras de linha respeitadas.
  */
 function Resposta({
-  texto,
+  texto: original,
   locais,
 }: {
   texto: string;
   locais: Record<string, LocalMini>;
 }) {
+  let texto = original;
+  // O roteiro sai primeiro: ele vira um cartao proprio, e o resto da
+  // resposta segue o caminho normal dos marcadores de lugar.
+  const { limpo, paradas: pedidas } = lerRoteiro(texto);
+  texto = limpo;
+
+  const roteiro: Parada[] = pedidas
+    .map((p) => {
+      const local = locais[p.slug] ?? locais[chave(p.slug)];
+      if (!local) return null;
+      return {
+        id: local.id,
+        slug: local.slug,
+        nome: local.nome,
+        hora: p.hora,
+        lat: local.lat,
+        lng: local.lng,
+        endereco: local.endereco,
+        bairro: local.bairro,
+        categoria: local.categoria?.nome ?? null,
+      } satisfies Parada;
+    })
+    .filter(Boolean) as Parada[];
+
   // Aceita qualquer coisa dentro dos colchetes de proposito: o guia as vezes
   // devolve o marcador "corrigido" com acento ([[praça-bom-jardim]] em vez de
   // [[praca-bom-jardim]]). Normaliza antes de procurar, e o marcador que nao
@@ -322,7 +352,11 @@ function Resposta({
         )}
       </div>
 
-      {cartoes.length > 0 && (
+      {roteiro.length > 0 && <CartaoRoteiro paradas={roteiro} />}
+
+      {/* Com roteiro na tela os cartoes soltos sobram: repetiriam as mesmas
+          paradas logo abaixo da lista numerada. */}
+      {roteiro.length === 0 && cartoes.length > 0 && (
         <div className="grid gap-2 sm:grid-cols-2">
           {cartoes.map((l) => (
             <Link
