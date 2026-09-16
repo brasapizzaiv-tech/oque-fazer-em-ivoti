@@ -11,6 +11,7 @@ import Galeria from "@/components/Galeria";
 import { localPorSlug, locaisParecidos } from "@/lib/locais";
 import { porDia, quandoPorExtenso } from "@/lib/horarios";
 import { createClient } from "@/lib/supabase/server";
+import { eventosVisiveis } from "@/lib/eventos";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
 import {
@@ -64,18 +65,7 @@ async function promocoesDeHoje(localId: string) {
 }
 
 async function proximosDoLocal(localId: string): Promise<EventoDoLocal[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("eventos")
-    .select("id, titulo, inicio, descricao")
-    .eq("local_id", localId)
-    .eq("status", "publicado")
-    // Seis horas de folga: um evento que comecou as 14h ainda interessa as 16h.
-    .gte("inicio", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString())
-    .order("inicio", { ascending: true })
-    .limit(5);
-  return (data ?? []) as EventoDoLocal[];
+  return eventosVisiveis({ local: localId, limite: 5 });
 }
 
 export default async function PaginaLocal({

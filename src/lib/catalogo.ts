@@ -1,5 +1,6 @@
 import { createAdminClient } from "./supabase/admin";
 import { buscarLocais } from "./locais";
+import { eventosVisiveis } from "./eventos";
 import {
   agoraNaCidade,
   resumoSemana,
@@ -55,14 +56,6 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
   return linhas.join("\n");
 }
 
-type EventoDoCatalogo = {
-  titulo: string;
-  inicio: string;
-  descricao: string | null;
-  local_texto: string | null;
-  local: { slug: string; nome: string } | null;
-};
-
 /**
  * A agenda em texto, pro chat responder "o que rola esse fim de semana".
  *
@@ -70,19 +63,9 @@ type EventoDoCatalogo = {
  * interessa a quem pergunta as 16h.
  */
 async function agenda(): Promise<string> {
-  const desde = new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString();
-  const ate = new Date(Date.now() + 45 * 24 * 60 * 60 * 1000).toISOString();
+  // Mesma regra das telas: publicado, ja liberado, ainda nao passou.
+  const eventos = await eventosVisiveis({ limite: 40 }, createAdminClient());
 
-  const { data } = await createAdminClient()
-    .from("eventos")
-    .select("titulo, inicio, descricao, local_texto, local:locais(slug, nome)")
-    .eq("status", "publicado")
-    .gte("inicio", desde)
-    .lte("inicio", ate)
-    .order("inicio", { ascending: true })
-    .limit(40);
-
-  const eventos = (data ?? []) as unknown as EventoDoCatalogo[];
   if (eventos.length === 0) {
     return "\n\n## AGENDA\nNenhum evento marcado no guia por enquanto. Nao invente eventos.";
   }

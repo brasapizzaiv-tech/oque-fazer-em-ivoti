@@ -34,6 +34,9 @@ export default function FormularioEvento({
   const [descricao, setDescricao] = useState(evento?.descricao ?? "");
   const [url, setUrl] = useState(evento?.url ?? "");
   const [imagem, setImagem] = useState(evento?.imagem_url ?? "");
+  const [publicarEm, setPublicarEm] = useState(
+    paraCampoDataHora(evento?.publicar_em ?? null),
+  );
 
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
@@ -105,6 +108,7 @@ export default function FormularioEvento({
       descricao: descricao.trim() || null,
       url: url.trim() || null,
       imagem_url: imagem || null,
+      publicar_em: deCampoDataHora(publicarEm),
     };
 
     if (evento) {
@@ -192,6 +196,19 @@ export default function FormularioEvento({
             onChange={setFim}
           />
         </div>
+      </Bloco>
+
+      <Bloco
+        titulo="Quando aparece no site"
+        descricao="Deixe vazio para aparecer assim que for aprovado."
+      >
+        <Texto
+          rotulo="Publicar em (opcional)"
+          tipo="datetime-local"
+          valor={publicarEm}
+          onChange={setPublicarEm}
+          dica="Monte a divulgação com antecedência e escolha o dia de soltar. Até lá o evento fica só aqui no painel."
+        />
       </Bloco>
 
       <Bloco titulo="Detalhes">

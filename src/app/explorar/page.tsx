@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import BarraBusca from "@/components/BarraBusca";
 import CardLocal from "@/components/CardLocal";
 import CartaoPromocao, { type PromocaoNaTela } from "@/components/CartaoPromocao";
+import CartaoEvento from "@/components/CartaoEvento";
+import { eventosVisiveis } from "@/lib/eventos";
+import { hojeEmIvoti } from "@/lib/planos";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { DIAS, agoraNaCidade } from "@/lib/horarios";
@@ -47,6 +50,7 @@ export default async function Explorar({
   const categoria = texto(params.categoria);
   const aberto = texto(params.aberto) === "1";
   const tags = lista(params.tag);
+  const quando = texto(params.quando) ?? "";
 
   const [categorias, todasTags, locais, promocoes] = await Promise.all([
     listarCategorias(),
@@ -54,6 +58,14 @@ export default async function Explorar({
     buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
     promocoesDeHoje(),
   ]);
+
+  // Eventos entram depois: precisam dos números das categorias, que só
+  // existem depois que a lista de categorias volta.
+  const eventos = await eventosVisiveis({
+    ate: ateQuando(quando),
+    categorias: categoria ? idsDaCategoria(categorias, categoria) : undefined,
+    limite: 12,
+  });
 
   // A faixa de promoções some quando há busca ou filtro: quem digitou
   // "pizza" quer pizza, não a quinta de caipirinha de outro lugar.
@@ -72,6 +84,7 @@ export default async function Explorar({
       categoria,
       aberto: aberto ? "1" : undefined,
       tag: tags,
+      quando: quando || undefined,
       ...mudanca,
     };
     const busca = new URLSearchParams();
@@ -159,6 +172,46 @@ export default async function Explorar({
           </Link>
         )}
       </div>
+
+      {/* ---- o que rola ---- */}
+      {(eventos.length > 0 || quando !== "") && (
+        <section className="mt-8">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="text-lg font-semibold">O que rola</h2>
+            <Link href="/agenda" className="text-sm font-semibold text-mata-700 hover:underline">
+              Ver a agenda →
+            </Link>
+          </div>
+
+          <div className="sem-barra mt-3 flex gap-2 overflow-x-auto pb-1">
+            {PERIODOS.map((p) => (
+              <Link
+                key={p.valor}
+                href={url({ quando: p.valor || undefined })}
+                className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition ${
+                  quando === p.valor
+                    ? "bg-mata-600 font-semibold text-white"
+                    : "border border-mata-200 bg-white hover:bg-mata-50"
+                }`}
+              >
+                {p.rotulo}
+              </Link>
+            ))}
+          </div>
+
+          {eventos.length === 0 ? (
+            <p className="mt-3 rounded-2xl border border-dashed border-mata-200 bg-white px-4 py-6 text-center text-sm text-tinta/55">
+              Nada marcado para esse período.
+            </p>
+          ) : (
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {eventos.map((e) => (
+                <CartaoEvento key={e.id} evento={e} />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       {/* ---- promoções de hoje ---- */}
       {semFiltro && promocoes.length > 0 && (
@@ -251,4 +304,44 @@ function texto(valor: string | string[] | undefined): string | undefined {
 function lista(valor: string | string[] | undefined): string[] {
   if (!valor) return [];
   return Array.isArray(valor) ? valor : [valor];
+}
+
+/** Os períodos que o visitante pode escolher na faixa de eventos. */
+const PERIODOS = [
+  { valor: "", rotulo: "Todos" },
+  { valor: "hoje", rotulo: "Hoje" },
+  { valor: "fds", rotulo: "Fim de semana" },
+  { valor: "mes", rotulo: "Próximos 30 dias" },
+];
+
+/** Traduz o período escolhido na última data que ainda entra. */
+function ateQuando(quando: string): string | undefined {
+  const hoje = hojeEmIvoti();
+  if (quando === "hoje") return hoje;
+
+  if (quando === "fds") {
+    // Até o domingo desta semana. Se hoje já é domingo, é hoje mesmo.
+    const d = new Date(`${hoje}T12:00:00-03:00`);
+    const faltam = (7 - d.getDay()) % 7;
+    d.setDate(d.getDate() + faltam);
+    return d.toISOString().slice(0, 10);
+  }
+
+  if (quando === "mes") {
+    const d = new Date(`${hoje}T12:00:00-03:00`);
+    d.setDate(d.getDate() + 30);
+    return d.toISOString().slice(0, 10);
+  }
+
+  return undefined;
+}
+
+/** A categoria escolhida mais as filhas dela, em números. */
+function idsDaCategoria(
+  categorias: { id: number; slug: string; pai_id: number | null }[],
+  slug: string,
+): number[] | undefined {
+  const alvo = categorias.find((c) => c.slug === slug);
+  if (!alvo) return undefined;
+  return [alvo.id, ...categorias.filter((c) => c.pai_id === alvo.id).map((c) => c.id)];
 }

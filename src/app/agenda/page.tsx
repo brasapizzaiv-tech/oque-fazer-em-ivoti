@@ -1,8 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
-import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
+import { eventosVisiveis } from "@/lib/eventos";
 import { FUSO } from "@/lib/horarios";
 
 export const revalidate = 300;
@@ -103,18 +102,9 @@ export default async function Agenda() {
 }
 
 async function proximosEventos(): Promise<EventoNaLista[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("eventos")
-    .select(
-      "id, titulo, descricao, inicio, fim, local_texto, imagem_url, url, local:locais(slug, nome)",
-    )
-    .eq("status", "publicado")
-    .gte("inicio", new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString())
-    .order("inicio", { ascending: true })
-    .limit(60);
-  return (data ?? []) as unknown as EventoNaLista[];
+  // A regra de visibilidade (publicado, ja liberado, ainda nao passou) mora
+  // em eventosVisiveis, que a pagina do local, o Explorar e o Gui usam tambem.
+  return (await eventosVisiveis({ limite: 60 })) as unknown as EventoNaLista[];
 }
 
 function DataCarimbo({ quando }: { quando: string }) {

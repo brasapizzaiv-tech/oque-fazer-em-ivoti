@@ -102,4 +102,6 @@ export type Evento = {
   imagem_url: string | null;
   url: string | null;
   status: "em_analise" | "publicado" | "rejeitado";
+  /** A partir de quando aparece no site. Nulo = assim que aprovado. */
+  publicar_em: string | null;
 };
