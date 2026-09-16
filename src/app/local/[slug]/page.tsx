@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CardLocal from "@/components/CardLocal";
-import ContarVisita from "@/components/ContarVisita";
+import ContarAcesso from "@/components/ContarAcesso";
+import LinkDeContato from "@/components/LinkDeContato";
 import Mapa from "@/components/Mapa";
 import SeloAberto from "@/components/SeloAberto";
 import Galeria from "@/components/Galeria";
@@ -100,7 +101,7 @@ export default async function PaginaLocal({
 
   return (
     <article className="mx-auto max-w-5xl px-4 py-6">
-      <ContarVisita localId={local.id} />
+      <ContarAcesso local={local.id} />
       <nav className="text-sm text-tinta/50">
         <Link href="/explorar" className="hover:text-mata-700">
           Explorar
@@ -145,51 +146,54 @@ export default async function PaginaLocal({
 
       {/* ---- botões de ação ---- */}
       <div className="mt-5 flex flex-wrap gap-2">
-        <a
+        <LinkDeContato
           href={linkRota(local)}
-          target="_blank"
-          rel="noopener noreferrer"
+          tipo="clique_rota"
+          local={local.id}
           className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-mata-700"
         >
           🧭 Como chegar
-        </a>
+        </LinkDeContato>
         {whats && (
-          <a
+          <LinkDeContato
             href={whats}
-            target="_blank"
-            rel="noopener noreferrer"
+            tipo="clique_whatsapp"
+            local={local.id}
             className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             💬 WhatsApp
-          </a>
+          </LinkDeContato>
         )}
         {local.telefone && (
-          <a
+          <LinkDeContato
             href={`tel:${local.telefone.replace(/\D/g, "")}`}
+            tipo="clique_telefone"
+            local={local.id}
+            externo={false}
             className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             📞 {telefoneBonito(local.telefone)}
-          </a>
+          </LinkDeContato>
         )}
         {insta && (
-          <a
+          <LinkDeContato
             href={`https://instagram.com/${insta}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            tipo="clique_instagram"
+            local={local.id}
             className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             📷 @{insta}
-          </a>
+          </LinkDeContato>
         )}
         {local.site && (
-          <a
+          <LinkDeContato
             href={local.site.startsWith("http") ? local.site : `https://${local.site}`}
-            target="_blank"
-            rel="noopener noreferrer"
+            tipo="clique_site"
+            local={local.id}
             className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             🌐 Site
-          </a>
+          </LinkDeContato>
         )}
       </div>
 

@@ -4,6 +4,7 @@ import "./globals.css";
 import { Suspense } from "react";
 import Cabecalho from "@/components/Cabecalho";
 import CompletarLogin from "@/components/CompletarLogin";
+import ContarAcesso from "@/components/ContarAcesso";
 import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 import Rodape from "@/components/Rodape";
 import BotaoChat from "@/components/BotaoChat";
@@ -53,6 +54,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             do mesmo jeito. Nao desenha nada. */}
         <Suspense>
           <CompletarLogin />
+        </Suspense>
+        {/* Conta o acesso de toda pagina, para o painel geral do admin. A
+            pagina de um estabelecimento monta outro destes com o local, que
+            e o numero que o comerciante ve. */}
+        <Suspense>
+          <ContarAcesso />
         </Suspense>
         <FaixaDemonstracao />
         <Cabecalho />
