@@ -73,6 +73,12 @@ export default async function Admin() {
         </div>
         <div className="flex gap-2">
           <Link
+            href="/admin/metricas"
+            className="rounded-full border border-mata-200 px-4 py-2 text-sm font-medium hover:bg-mata-50"
+          >
+            Movimento
+          </Link>
+          <Link
             href="/admin/planos"
             className="rounded-full border border-sol-300 bg-sol-50 px-4 py-2 text-sm font-semibold text-sol-900 hover:bg-sol-100"
           >

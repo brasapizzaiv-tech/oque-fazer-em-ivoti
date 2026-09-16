@@ -7,9 +7,10 @@ const ABAS = [
   { href: "/painel", rotulo: "Meus locais" },
   { href: "/painel/eventos", rotulo: "Eventos" },
   { href: "/painel/promocoes", rotulo: "Promoções" },
+  { href: "/painel/metricas", rotulo: "Métricas" },
 ];
 
-/** Troca entre as duas partes do painel: os locais e a agenda. */
+/** Navegação entre as seções do painel do estabelecimento. */
 export default function AbasPainel() {
   const caminho = usePathname();
 
