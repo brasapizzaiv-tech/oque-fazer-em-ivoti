@@ -2,6 +2,10 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import BarraBusca from "@/components/BarraBusca";
 import CardLocal from "@/components/CardLocal";
+import CartaoPromocao, { type PromocaoNaTela } from "@/components/CartaoPromocao";
+import { createClient } from "@/lib/supabase/server";
+import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
+import { DIAS, agoraNaCidade } from "@/lib/horarios";
 import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
 
 export const revalidate = 60;
@@ -10,6 +14,29 @@ export const metadata: Metadata = {
   title: "Explorar",
   description: "Todos os lugares de Ivoti: filtre por tipo, etiqueta e horário.",
 };
+
+/**
+ * As promoções que valem hoje, na cidade inteira.
+ *
+ * A regra de "vale hoje" mora no banco, na mesma função que a página do
+ * estabelecimento usa — assim as duas telas nunca discordam.
+ */
+async function promocoesDeHoje(): Promise<PromocaoNaTela[]> {
+  if (!SUPABASE_CONFIGURADO) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("promocoes_de_hoje", { p_local: null });
+  const promocoes = (data ?? []) as PromocaoNaTela[];
+  if (promocoes.length === 0) return [];
+
+  // A função devolve a promoção crua; o cartão precisa do nome do lugar.
+  const { data: locais } = await supabase
+    .from("locais")
+    .select("id, slug, nome")
+    .in("id", [...new Set(promocoes.map((p) => p.local_id))]);
+
+  const porId = new Map((locais ?? []).map((l) => [l.id, l]));
+  return promocoes.map((p) => ({ ...p, local: porId.get(p.local_id) ?? null }));
+}
 
 export default async function Explorar({
   searchParams,
@@ -21,11 +48,16 @@ export default async function Explorar({
   const aberto = texto(params.aberto) === "1";
   const tags = lista(params.tag);
 
-  const [categorias, todasTags, locais] = await Promise.all([
+  const [categorias, todasTags, locais, promocoes] = await Promise.all([
     listarCategorias(),
     listarTags(),
     buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
+    promocoesDeHoje(),
   ]);
+
+  // A faixa de promoções some quando há busca ou filtro: quem digitou
+  // "pizza" quer pizza, não a quinta de caipirinha de outro lugar.
+  const semFiltro = !q && !categoria && !aberto && tags.length === 0;
 
   const principais = categorias.filter((c) => c.pai_id === null);
   const atual = categorias.find((c) => c.slug === categoria);
@@ -127,6 +159,23 @@ export default async function Explorar({
           </Link>
         )}
       </div>
+
+      {/* ---- promoções de hoje ---- */}
+      {semFiltro && promocoes.length > 0 && (
+        <section className="mt-8">
+          <h2 className="text-lg font-semibold">
+            Promoções de {DIAS[agoraNaCidade().diaSemana].toLowerCase()}
+          </h2>
+          <p className="text-sm text-tinta/55">
+            Valem hoje, em quem está no guia.
+          </p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {promocoes.slice(0, 6).map((p) => (
+              <CartaoPromocao key={p.id} promocao={p} mostrarLocal />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ---- resultados ---- */}
       <p className="mt-6 text-sm text-tinta/55">

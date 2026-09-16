@@ -8,6 +8,7 @@ import {
   DIAS,
 } from "./horarios";
 import { faixaPreco } from "./texto";
+import { quandoVale } from "./promocoes";
 import type { LocalCompleto } from "./tipos";
 
 // O catalogo inteiro da cidade em texto, do jeito que o chat le.
@@ -97,14 +98,49 @@ async function agenda(): Promise<string> {
   return `\n\n## AGENDA (eventos com data marcada)\n${linhas.join("\n")}`;
 }
 
+/**
+ * As promocoes que valem hoje, para o Gui responder "tem promocao hoje?".
+ *
+ * Usa a mesma funcao do banco que o site usa, entao chat e tela nunca
+ * discordam sobre o que esta valendo.
+ */
+async function promocoesDeHoje(nomePorId: Map<string, string>): Promise<string> {
+  const { data } = await createAdminClient().rpc("promocoes_de_hoje", {
+    p_local: null,
+  });
+
+  const promocoes = (data ?? []) as {
+    local_id: string;
+    titulo: string;
+    descricao: string | null;
+    dias_semana: number[];
+    hora_inicio: string | null;
+    hora_fim: string | null;
+  }[];
+
+  if (promocoes.length === 0) {
+    return "\n\n## PROMOCOES DE HOJE\nNenhuma promocao valendo hoje. Nao invente promocao.";
+  }
+
+  const linhas = promocoes.map((p) => {
+    const onde = nomePorId.get(p.local_id) ?? "local do guia";
+    const detalhe = p.descricao ? ` — ${p.descricao.slice(0, 160)}` : "";
+    return `- ${p.titulo} · ${onde} · ${quandoVale(p)}${detalhe}`;
+  });
+
+  return `\n\n## PROMOCOES DE HOJE\n${linhas.join("\n")}`;
+}
+
 /** Monta (ou reaproveita) o catalogo de locais publicados. */
 export async function catalogo(): Promise<Catalogo> {
   if (cache && Date.now() - cache.em < VALIDADE) return cache;
 
   const admin = createAdminClient();
-  const [locais, proximos] = await Promise.all([
-    buscarLocais({ limite: 500 }, admin),
+  const locais = await buscarLocais({ limite: 500 }, admin);
+  const nomePorId = new Map(locais.map((l) => [l.id, l.nome]));
+  const [proximos, promocoes] = await Promise.all([
     agenda(),
+    promocoesDeHoje(nomePorId),
   ]);
   const agora = agoraNaCidade();
 
@@ -115,7 +151,10 @@ export async function catalogo(): Promise<Catalogo> {
   ].join("\n");
 
   const texto =
-    cabecalho + locais.map((l) => descrever(l, agora)).join("\n\n") + proximos;
+    cabecalho +
+    locais.map((l) => descrever(l, agora)).join("\n\n") +
+    proximos +
+    promocoes;
 
   cache = { texto, locais, em: Date.now() };
   return cache;

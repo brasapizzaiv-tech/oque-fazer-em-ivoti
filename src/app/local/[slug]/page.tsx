@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import CardLocal from "@/components/CardLocal";
 import ContarAcesso from "@/components/ContarAcesso";
+import CartaoPromocao, { type PromocaoNaTela } from "@/components/CartaoPromocao";
 import LinkDeContato from "@/components/LinkDeContato";
 import Mapa from "@/components/Mapa";
 import SeloAberto from "@/components/SeloAberto";
@@ -54,6 +55,14 @@ type EventoDoLocal = {
  * Os proximos eventos deste local, pra quem abriu a pagina saber que tem
  * coisa marcada — e nao so o horario de funcionamento de sempre.
  */
+/** As promoções que valem hoje neste local. A regra do dia mora no banco. */
+async function promocoesDeHoje(localId: string) {
+  if (!SUPABASE_CONFIGURADO) return [];
+  const supabase = await createClient();
+  const { data } = await supabase.rpc("promocoes_de_hoje", { p_local: localId });
+  return (data ?? []) as PromocaoNaTela[];
+}
+
 async function proximosDoLocal(localId: string): Promise<EventoDoLocal[]> {
   if (!SUPABASE_CONFIGURADO) return [];
   const supabase = await createClient();
@@ -77,9 +86,10 @@ export default async function PaginaLocal({
 
   if (!local || local.status !== "publicado") notFound();
 
-  const [parecidos, eventos] = await Promise.all([
+  const [parecidos, eventos, promocoes] = await Promise.all([
     locaisParecidos(local),
     proximosDoLocal(local.id),
+    promocoesDeHoje(local.id),
   ]);
   const semana = porDia(local.horarios);
   const whats = linkWhatsapp(
@@ -219,6 +229,17 @@ export default async function PaginaLocal({
                   >
                     {t.emoji} {t.nome}
                   </span>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {promocoes.length > 0 && (
+            <section>
+              <h2 className="text-lg font-semibold">Promoções de hoje</h2>
+              <div className="mt-3 space-y-2">
+                {promocoes.map((p) => (
+                  <CartaoPromocao key={p.id} promocao={p} />
                 ))}
               </div>
             </section>
