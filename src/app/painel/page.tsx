@@ -30,6 +30,11 @@ const SITUACAO: Record<
     cor: "bg-red-100 text-red-800",
     dica: "Veja o motivo, corrija e mande de novo.",
   },
+  inativo: {
+    texto: "Fora do ar",
+    cor: "bg-tinta/10 text-tinta/70",
+    dica: "Nao aparece no guia. Nada foi perdido: da para voltar quando quiser.",
+  },
 };
 
 /**

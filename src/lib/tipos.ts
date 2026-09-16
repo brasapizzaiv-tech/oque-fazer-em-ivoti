@@ -4,7 +4,8 @@ export type StatusLocal =
   | "rascunho"
   | "em_analise"
   | "publicado"
-  | "rejeitado";
+  | "rejeitado"
+  | "inativo";
 
 export type Categoria = {
   id: number;
@@ -78,6 +79,8 @@ export type Local = {
   status: StatusLocal;
   motivo_rejeicao: string | null;
   destaque: boolean;
+  /** Quando saiu do ar. So vem preenchido nos locais inativos. */
+  desativado_em?: string | null;
   dono_id: string | null;
   criado_em: string;
   atualizado_em: string;

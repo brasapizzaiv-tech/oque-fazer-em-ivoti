@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import AcoesAdmin from "./AcoesAdmin";
 import AcoesEvento from "./AcoesEvento";
+import TirarDoAr from "@/components/painel/TirarDoAr";
 import BotaoSair from "@/components/BotaoSair";
 import { quandoPorExtenso } from "@/lib/horarios";
 
@@ -15,6 +16,7 @@ type LinhaAdmin = {
   resumo: string | null;
   bairro: string | null;
   criado_em: string;
+  desativado_em?: string | null;
   perfis: { nome: string | null } | null;
 };
 
@@ -33,6 +35,7 @@ export default async function Admin() {
   const [
     { data: analise },
     { data: publicados },
+    { data: desativados },
     { data: perguntas },
     { data: eventos },
   ] = await Promise.all([
@@ -47,6 +50,11 @@ export default async function Admin() {
         .eq("status", "publicado")
         .order("nome"),
       supabase
+        .from("locais")
+        .select("id, slug, nome, status, resumo, bairro, criado_em, desativado_em")
+        .eq("status", "inativo")
+        .order("desativado_em", { ascending: false }),
+      supabase
         .from("chat_conversas")
         .select("id, pergunta, criado_em")
         .order("criado_em", { ascending: false })
@@ -60,6 +68,7 @@ export default async function Admin() {
 
   const naFila = (analise ?? []) as unknown as LinhaAdmin[];
   const noAr = (publicados ?? []) as unknown as LinhaAdmin[];
+  const foraDoAr = (desativados ?? []) as unknown as LinhaAdmin[];
   const eventosNaFila = (eventos ?? []) as unknown as EventoNaFila[];
 
   return (
@@ -208,17 +217,51 @@ export default async function Admin() {
                 <Link href={`/local/${l.slug}`} className="truncate font-medium">
                   {l.nome}
                 </Link>
-                <Link
-                  href={`/painel/${l.id}`}
-                  className="shrink-0 text-xs text-mata-700 underline"
-                >
-                  editar
-                </Link>
+                <span className="flex shrink-0 items-center gap-2">
+                  <Link
+                    href={`/painel/${l.id}`}
+                    className="text-xs text-mata-700 underline"
+                  >
+                    editar
+                  </Link>
+                  <TirarDoAr id={l.id} nome={l.nome} ativo />
+                </span>
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      {/* ---- fora do ar ---- */}
+      {foraDoAr.length > 0 && (
+        <section className="mt-10">
+          <h2 className="font-semibold">Fora do ar ({foraDoAr.length})</h2>
+          <p className="text-sm text-tinta/55">
+            Nao aparecem no guia. O cadastro, as fotos e as metricas continuam
+            guardados.
+          </p>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {foraDoAr.map((l) => (
+              <li
+                key={l.id}
+                className="flex items-center justify-between gap-2 rounded-xl border border-dashed border-mata-200 bg-white px-3 py-2 text-sm"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate font-medium text-tinta/70">
+                    {l.nome}
+                  </span>
+                  {l.desativado_em && (
+                    <span className="text-xs text-tinta/45">
+                      desde {new Date(l.desativado_em).toLocaleDateString("pt-BR")}
+                    </span>
+                  )}
+                </span>
+                <TirarDoAr id={l.id} nome={l.nome} ativo={false} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* ---- o que perguntam pro guia ---- */}
       <section className="mt-10">

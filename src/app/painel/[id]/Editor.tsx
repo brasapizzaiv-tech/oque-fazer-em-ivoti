@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import TirarDoAr from "@/components/painel/TirarDoAr";
 import { AreaTexto, Bloco, BotaoSalvar, Texto } from "@/components/painel/Campos";
 import EditorFotos from "@/components/painel/EditorFotos";
 import EditorHorarios from "@/components/painel/EditorHorarios";
@@ -124,9 +125,27 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
 
   if (local.status === "publicado") {
     return (
-      <div className="mt-4 rounded-xl bg-mata-50 px-4 py-3 text-sm text-mata-900">
-        ✅ <strong>No ar.</strong> Toda alteração que você salvar aparece no
-        site em poucos minutos.
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-mata-50 px-4 py-3 text-sm text-mata-900">
+        <span>
+          ✅ <strong>No ar.</strong> Toda alteração que você salvar aparece no
+          site em poucos minutos.
+        </span>
+        <TirarDoAr id={local.id} nome={local.nome} ativo />
+      </div>
+    );
+  }
+
+  // Fechou para reforma, mudou de dono, parou por um tempo: em vez de ligar
+  // para a administração e esperar, ele mesmo tira do ar e devolve quando
+  // reabrir. Nada se perde no caminho.
+  if (local.status === "inativo") {
+    return (
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-mata-200 bg-white px-4 py-3 text-sm">
+        <span className="text-tinta/70">
+          <strong>Fora do ar.</strong> Seu estabelecimento não aparece no guia
+          agora. Tudo continua guardado: fotos, horários e números.
+        </span>
+        <TirarDoAr id={local.id} nome={local.nome} ativo={false} />
       </div>
     );
   }
