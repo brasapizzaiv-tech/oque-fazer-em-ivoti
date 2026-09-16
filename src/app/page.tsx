@@ -92,7 +92,7 @@ export default async function Home() {
               href="/chat"
               className="rounded-full bg-mata-600 px-3 py-1.5 font-semibold text-white hover:bg-mata-700"
             >
-              💬 Pergunte ao Gui
+              💬 Pergunte ao Guia
             </Link>
           </div>
         </div>
@@ -162,7 +162,7 @@ export default async function Home() {
             Não sabe o que fazer hoje?
           </h2>
           <p className="mx-auto mt-2 max-w-lg text-mata-50">
-            Conte para o Gui o que você está com vontade de fazer — comer
+            Conte para o Guia o que você está com vontade de fazer — comer
             alguma coisa, sair com as crianças, um programa ao ar livre — que
             ele indica onde ir, com horário e tudo.
           </p>
@@ -170,7 +170,7 @@ export default async function Home() {
             href="/chat"
             className="mt-6 inline-block rounded-full bg-white px-6 py-3 font-semibold text-mata-800 transition hover:bg-mata-50"
           >
-            Conversar com o Gui
+            Conversar com o Guia
           </Link>
         </div>
       </section>

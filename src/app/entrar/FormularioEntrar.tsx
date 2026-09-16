@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
 
@@ -11,6 +11,7 @@ export default function FormularioEntrar() {
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [indo, setIndo] = useState(false);
+  const relogio = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const router = useRouter();
   const params = useSearchParams();
@@ -24,25 +25,57 @@ export default function FormularioEntrar() {
       ? "Esse link de confirmação não vale mais — pode ter vencido, já ter sido usado, ou ter sido aberto em outro navegador. Entre com seu e-mail e senha aqui embaixo."
       : null;
 
+  useEffect(() => () => {
+    if (relogio.current) clearTimeout(relogio.current);
+  }, []);
+
   async function entrar(evento: React.FormEvent) {
     evento.preventDefault();
     setErro(null);
     setIndo(true);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: senha,
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: senha,
+      });
 
-    if (error) {
-      setErro(erroEmPortugues(error.message));
+      if (error) {
+        setErro(erroEmPortugues(error.message));
+        setIndo(false);
+        return;
+      }
+
+      // O endereco de volta chega pela URL, entao so aceitamos caminhos deste
+      // site: sem isso, um link preparado poderia mandar quem acabou de
+      // entrar para fora, achando que ainda esta no guia.
+      const destino =
+        voltar.startsWith("/") && !voltar.startsWith("//") ? voltar : "/painel";
+
+      router.push(destino);
+      router.refresh();
+
+      // O painel e montado no servidor. Se ele demorar demais para responder,
+      // esta tela ficaria em "Entrando..." sem fim e sem explicacao — entao
+      // depois de alguns segundos devolvemos o botao e contamos o que houve.
+      relogio.current = setTimeout(() => {
+        setErro(
+          "O painel esta demorando para abrir. Sua entrada deu certo: tente de novo ou recarregue a pagina.",
+        );
+        setIndo(false);
+      }, 10000);
+    } catch (falha) {
+      // Sem isto a tela travava de vez: a excecao subia sem ninguem pegar, o
+      // botao continuava em "Entrando..." e nenhum recado aparecia.
+      console.error("Nao consegui entrar:", falha);
+      setErro(
+        falha instanceof Error
+          ? erroEmPortugues(falha.message)
+          : "Nao consegui concluir agora. Tente de novo em instantes.",
+      );
       setIndo(false);
-      return;
     }
-
-    router.push(voltar);
-    router.refresh();
   }
 
   return (

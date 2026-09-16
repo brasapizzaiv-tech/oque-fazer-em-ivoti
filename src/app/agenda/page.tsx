@@ -103,7 +103,7 @@ export default async function Agenda() {
 
 async function proximosEventos(): Promise<EventoNaLista[]> {
   // A regra de visibilidade (publicado, ja liberado, ainda nao passou) mora
-  // em eventosVisiveis, que a pagina do local, o Explorar e o Gui usam tambem.
+  // em eventosVisiveis, que a pagina do local, o Explorar e o Guia usam tambem.
   return (await eventosVisiveis({ limite: 60 })) as unknown as EventoNaLista[];
 }
 

@@ -26,36 +26,48 @@ export default function FormularioCadastro() {
     }
 
     setIndo(true);
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password: senha,
-      options: {
-        data: { nome: nome.trim(), telefone: telefone.trim() },
-        // Para onde o link do e-mail de confirmacao volta. Sem isto o Supabase
-        // usa o endereco configurado no painel dele, que nasce apontando para
-        // localhost — e o link chega quebrado na caixa de entrada de quem se
-        // cadastrou. Usa a origem da propria janela, entao funciona igual no
-        // site publicado e aqui no computador.
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/painel/novo`,
-      },
-    });
 
-    if (error) {
-      setErro(erroEmPortugues(error.message));
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: senha,
+        options: {
+          data: { nome: nome.trim(), telefone: telefone.trim() },
+          // Para onde o link do e-mail de confirmacao volta. Sem isto o Supabase
+          // usa o endereco configurado no painel dele, que nasce apontando para
+          // localhost — e o link chega quebrado na caixa de entrada de quem se
+          // cadastrou. Usa a origem da propria janela, entao funciona igual no
+          // site publicado e aqui no computador.
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/painel/novo`,
+        },
+      });
+
+      if (error) {
+        setErro(erroEmPortugues(error.message));
+        setIndo(false);
+        return;
+      }
+
+      // Sem sessão = o Supabase está exigindo confirmação por e-mail.
+      if (!data.session) {
+        setConfirmar(true);
+        setIndo(false);
+        return;
+      }
+
+      router.push("/painel/novo");
+      router.refresh();
+    } catch (falha) {
+      // Excecao solta aqui deixava o botao preso em "Criando..." para sempre.
+      console.error("Nao consegui cadastrar:", falha);
+      setErro(
+        falha instanceof Error
+          ? erroEmPortugues(falha.message)
+          : "Nao consegui concluir agora. Tente de novo em instantes.",
+      );
       setIndo(false);
-      return;
     }
-
-    // Sem sessão = o Supabase está exigindo confirmação por e-mail.
-    if (!data.session) {
-      setConfirmar(true);
-      setIndo(false);
-      return;
-    }
-
-    router.push("/painel/novo");
-    router.refresh();
   }
 
   if (confirmar) {

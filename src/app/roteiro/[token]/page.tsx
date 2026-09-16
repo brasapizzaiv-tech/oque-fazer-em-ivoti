@@ -78,14 +78,14 @@ export default async function RoteiroSalvo({
       <div className="mt-8 rounded-2xl border border-dashed border-mata-200 bg-white p-6 text-center">
         <p className="font-semibold">Quer montar o seu?</p>
         <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
-          Diga ao Gui o que você tem vontade de fazer e ele monta um passeio
+          Diga ao Guia o que você tem vontade de fazer e ele monta um passeio
           com horário e rota.
         </p>
         <Link
           href="/chat"
           className="mt-4 inline-block rounded-full bg-mata-600 px-6 py-3 font-semibold text-white"
         >
-          Conversar com o Gui
+          Conversar com o Guia
         </Link>
       </div>
     </div>

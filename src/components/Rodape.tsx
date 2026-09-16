@@ -34,7 +34,7 @@ export default function Rodape() {
             </li>
             <li>
               <Link href="/chat" className="hover:text-mata-700">
-                Pergunte ao Gui
+                Pergunte ao Guia
               </Link>
             </li>
           </ul>

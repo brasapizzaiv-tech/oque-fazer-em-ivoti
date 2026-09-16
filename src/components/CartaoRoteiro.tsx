@@ -15,7 +15,7 @@ import {
  * O roteiro montado, com os botões que levam a pessoa para a rua.
  *
  * Ela pode tirar uma parada antes de sair — quase todo roteiro sugerido tem
- * uma parada que não serve, e obrigar a pedir outro ao Gui seria atrito à toa.
+ * uma parada que não serve, e obrigar a pedir outro ao Guia seria atrito à toa.
  */
 export default function CartaoRoteiro({
   titulo = "Seu roteiro",
@@ -69,7 +69,7 @@ export default function CartaoRoteiro({
   if (paradas.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-mata-200 bg-white px-4 py-6 text-center text-sm text-tinta/55">
-        Você tirou todas as paradas. Peça outro roteiro ao Gui.
+        Você tirou todas as paradas. Peça outro roteiro ao Guia.
       </p>
     );
   }

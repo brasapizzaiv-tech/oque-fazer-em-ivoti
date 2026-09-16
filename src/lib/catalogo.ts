@@ -29,7 +29,7 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
   const parceiro = planoAtivo(local.plano, local.plano_ate) === "premium";
 
   linhas.push(`### ${local.nome} [[${local.slug}]]`);
-  // A marca que o Gui usa para desempatar entre dois lugares que servem
+  // A marca que o Guia usa para desempatar entre dois lugares que servem
   // igualmente bem. Nunca para esconder os demais: o catalogo vai inteiro.
   if (parceiro) linhas.push("PARCEIRO");
   if (local.categoria) linhas.push(`Categoria: ${local.categoria.nome}`);
@@ -88,7 +88,7 @@ async function agenda(): Promise<string> {
 }
 
 /**
- * As promocoes que valem hoje, para o Gui responder "tem promocao hoje?".
+ * As promocoes que valem hoje, para o Guia responder "tem promocao hoje?".
  *
  * Usa a mesma funcao do banco que o site usa, entao chat e tela nunca
  * discordam sobre o que esta valendo.

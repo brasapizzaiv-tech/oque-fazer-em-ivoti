@@ -19,7 +19,7 @@ const MODELO = process.env.CHAT_MODELO || "claude-opus-5";
 const FAMILIAS_COM_ESFORCO = ["claude-opus-", "claude-sonnet-5", "claude-fable-"];
 const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
 
-const INSTRUCOES = `Voce e o Gui, o assistente do site "O Guia de Ivoti" — alguem que conhece a cidade inteira e gosta de ajudar quem chega.
+const INSTRUCOES = `Voce e o Guia, o assistente do site "O Guia de Ivoti" — alguem que conhece a cidade inteira e gosta de ajudar quem chega.
 
 COMO VOCE ESCREVE
 - Portugues do Brasil correto: concordancia verbal e nominal certas, frases completas e bem construidas. Releia cada resposta antes de enviar.
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
         console.error("Erro no chat:", erro);
         controle.enqueue(
           codificador.encode(
-            "\n\nOpa, deu um problema aqui do meu lado. Tenta de novo?",
+            "\n\nDesculpe, tive um problema aqui do meu lado. Tente de novo em instantes.",
           ),
         );
       } finally {

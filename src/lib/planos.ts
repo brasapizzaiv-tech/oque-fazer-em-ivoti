@@ -45,7 +45,7 @@ export const MODULOS: Record<Modulo, Definicao> = {
       "Veja quantas pessoas clicaram no seu WhatsApp, de onde vieram e quantas o guia mandou até você.",
   },
   gui_painel: {
-    nome: "Gui no painel",
+    nome: "Assistente no painel",
     exige: "premium",
     convite:
       "Um assistente para escrever a descrição do seu negócio, sugerir promoções e responder dúvidas.",
@@ -54,12 +54,12 @@ export const MODULOS: Record<Modulo, Definicao> = {
     nome: "Prioridade nas indicações",
     exige: "premium",
     convite:
-      "Apareça primeiro quando o Gui indicar um lugar e quando montar um roteiro.",
+      "Apareça primeiro quando o Guia indicar um lugar e quando montar um roteiro.",
   },
   roteiro_gui: {
     nome: "Aparecer nos roteiros",
     exige: "premium",
-    convite: "Entre nos roteiros que o Gui monta para quem visita a cidade.",
+    convite: "Entre nos roteiros que o Guia monta para quem visita a cidade.",
   },
 };
 

@@ -5,7 +5,7 @@ const LINKS = [
   { href: "/explorar", texto: "Explorar" },
   { href: "/mapa", texto: "Mapa" },
   { href: "/agenda", texto: "Agenda" },
-  { href: "/chat", texto: "Pergunte ao Gui" },
+  { href: "/chat", texto: "Pergunte ao Guia" },
 ];
 
 export default function Cabecalho() {

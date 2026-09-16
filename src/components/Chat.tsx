@@ -32,7 +32,7 @@ const SUGESTOES = [
 ];
 
 const ABERTURA =
-  "Olá! 👋 Eu sou o Gui, o assistente do Guia de Ivoti. Me diga o que você está com vontade de fazer — comer, passear, tomar alguma coisa — que eu indico onde ir.";
+  "Olá! 👋 Eu sou o Guia, o assistente do Guia de Ivoti. Me diga o que você está com vontade de fazer — comer, passear, tomar alguma coisa — que eu indico onde ir.";
 
 export default function Chat({ compacto = false }: { compacto?: boolean }) {
   const [mensagens, setMensagens] = useState<Mensagem[]>([

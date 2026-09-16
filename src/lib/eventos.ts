@@ -5,7 +5,7 @@ import { SUPABASE_CONFIGURADO } from "./supabase/config";
 // ============================================================
 // Eventos visíveis
 // ============================================================
-// A agenda, a página do local, o Explorar e o Gui perguntam aqui. Antes cada
+// A agenda, a página do local, o Explorar e o Guia perguntam aqui. Antes cada
 // um montava a própria consulta, e "publicado" corria o risco de significar
 // uma coisa em cada tela.
 //

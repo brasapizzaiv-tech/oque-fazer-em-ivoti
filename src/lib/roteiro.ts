@@ -5,7 +5,7 @@
 export type Parada = {
   slug: string;
   nome: string;
-  /** Horário previsto de chegada, quando o Gui sugeriu um. */
+  /** Horário previsto de chegada, quando o Guia sugeriu um. */
   hora?: string;
   lat: number | null;
   lng: number | null;
@@ -79,7 +79,7 @@ export function linkWhatsappDoRoteiro(titulo: string, endereco: string): string 
 }
 
 /**
- * Lê o roteiro que o Gui escreveu no fim da resposta.
+ * Lê o roteiro que o Guia escreveu no fim da resposta.
  *
  * Formato: [[roteiro: 09:00 cafe-da-praca | 12:00 brasa | praca-concordia]]
  * A hora é opcional em cada parada.
@@ -117,7 +117,7 @@ export function lerRoteiro(texto: string): {
   return { limpo: texto.replace(marcador, "").trim(), paradas };
 }
 
-/** O Gui às vezes devolve o endereço com acento; aqui ele volta ao formato do site. */
+/** O Guia às vezes devolve o endereço com acento; aqui ele volta ao formato do site. */
 function normalizarSlug(bruto: string): string {
   let saida = "";
   for (const c of bruto.normalize("NFD")) {

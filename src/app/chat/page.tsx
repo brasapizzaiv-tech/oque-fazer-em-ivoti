@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Chat from "@/components/Chat";
 
 export const metadata: Metadata = {
-  title: "Pergunte ao Gui",
+  title: "Pergunte ao Guia",
   description:
-    "Converse com o Gui, o assistente do Guia de Ivoti: ele indica onde comer, passear e o que fazer agora, com base no que está aberto.",
+    "Converse com o Guia, o assistente do Guia de Ivoti: ele indica onde comer, passear e o que fazer agora, com base no que está aberto.",
 };
 
 export default function PaginaChat() {

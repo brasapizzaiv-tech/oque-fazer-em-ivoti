@@ -5,6 +5,7 @@ import { NOME_DO_TIPO } from "@/lib/metricas";
 import { planoAtivo, podeUsar } from "@/lib/planos";
 import { BarrasRanqueadas, GraficoDias, Numero } from "@/components/painel/Graficos";
 import Bloqueado from "@/components/painel/Bloqueado";
+import EscolherLocal from "@/components/painel/EscolherLocal";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +58,12 @@ export default async function Metricas({
 
   const local = locais.find((l) => l.id === escolhido) ?? locais[0];
   const plano = planoAtivo(local.plano, local.plano_ate);
-  const liberado = podeUsar("metricas", plano);
+  // A administracao enxerga as metricas de qualquer local, premium ou nao:
+  // e voce quem precisa saber como o guia inteiro esta indo para decidir o
+  // que melhorar e o que oferecer a quem. O bloqueio continua valendo para o
+  // comerciante: no login dele, so o premium abre os numeros.
+  const liberado = admin || podeUsar("metricas", plano);
+  const vendoComoAdmin = admin && !podeUsar("metricas", plano);
   const resumo = await resumoDoLocal(local.id, dias, supabase);
 
   return (
@@ -87,22 +93,14 @@ export default async function Metricas({
         </div>
       </div>
 
-      {locais.length > 1 && (
-        <div className="sem-barra mt-4 flex gap-2 overflow-x-auto pb-1">
-          {locais.map((l) => (
-            <Link
-              key={l.id}
-              href={`/painel/metricas?local=${l.id}&dias=${dias}`}
-              className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition ${
-                l.id === local.id
-                  ? "bg-mata-800 font-semibold text-white"
-                  : "border border-mata-200 bg-white hover:bg-mata-50"
-              }`}
-            >
-              {l.nome}
-            </Link>
-          ))}
-        </div>
+      <EscolherLocal locais={locais} escolhido={local.id} dias={dias} />
+
+      {vendoComoAdmin && (
+        <p className="mt-4 rounded-xl border border-sol-200 bg-sol-50 px-3 py-2 text-sm text-sol-900">
+          Voce esta vendo como administracao. {local.nome} esta no plano
+          gratuito — no painel do proprio estabelecimento, estes numeros
+          aparecem bloqueados.
+        </p>
       )}
 
       {/* O total de acessos é gratuito de propósito: é o número que faz o
