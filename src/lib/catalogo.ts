@@ -9,6 +9,7 @@ import {
   DIAS,
 } from "./horarios";
 import { faixaPreco } from "./texto";
+import { planoAtivo } from "./planos";
 import { quandoVale } from "./promocoes";
 import type { LocalCompleto } from "./tipos";
 
@@ -25,7 +26,12 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
   const s = situacao(local.horarios, agora);
   const linhas: string[] = [];
 
+  const parceiro = planoAtivo(local.plano, local.plano_ate) === "premium";
+
   linhas.push(`### ${local.nome} [[${local.slug}]]`);
+  // A marca que o Gui usa para desempatar entre dois lugares que servem
+  // igualmente bem. Nunca para esconder os demais: o catalogo vai inteiro.
+  if (parceiro) linhas.push("PARCEIRO");
   if (local.categoria) linhas.push(`Categoria: ${local.categoria.nome}`);
   if (local.resumo) linhas.push(`Resumo: ${local.resumo}`);
   if (local.descricao) linhas.push(`Sobre: ${local.descricao.slice(0, 600)}`);
@@ -119,7 +125,16 @@ export async function catalogo(): Promise<Catalogo> {
   if (cache && Date.now() - cache.em < VALIDADE) return cache;
 
   const admin = createAdminClient();
-  const locais = await buscarLocais({ limite: 500 }, admin);
+  const todos = await buscarLocais({ limite: 500 }, admin);
+
+  // Parceiro primeiro na lista. A ordem tambem pesa na escolha do modelo, e
+  // aqui ela reforca o desempate que as instrucoes ja pedem — sem tirar
+  // ninguem do catalogo.
+  const locais = [...todos].sort((a, b) => {
+    const pa = planoAtivo(a.plano, a.plano_ate) === "premium" ? 0 : 1;
+    const pb = planoAtivo(b.plano, b.plano_ate) === "premium" ? 0 : 1;
+    return pa - pb;
+  });
   const nomePorId = new Map(locais.map((l) => [l.id, l.nome]));
   const [proximos, promocoes] = await Promise.all([
     agenda(),

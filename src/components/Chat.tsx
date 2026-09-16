@@ -17,16 +17,16 @@ type LocalMini = {
 };
 
 const SUGESTOES = [
-  "O que fazer hoje a noite?",
-  "Quero comer um hamburguer",
-  "Um lugar tranquilo pra levar as criancas",
-  "Onde tomar um cafe agora?",
+  "O que fazer hoje à noite?",
+  "Quero comer um hambúrguer",
+  "Um lugar tranquilo para levar as crianças",
+  "Onde tomar um café agora?",
   "Programa de domingo ao ar livre",
-  "Monta um roteiro de um dia em Ivoti",
+  "Monte um roteiro de um dia em Ivoti",
 ];
 
 const ABERTURA =
-  "Oi! 👋 Sou o guia de Ivoti. Me diz o que tu ta a fim de fazer — comer, passear, tomar alguma coisa — que eu te indico onde ir.";
+  "Olá! 👋 Eu sou o Gui, o assistente do Guia de Ivoti. Me diga o que você está com vontade de fazer — comer, passear, tomar alguma coisa — que eu indico onde ir.";
 
 export default function Chat({ compacto = false }: { compacto?: boolean }) {
   const [mensagens, setMensagens] = useState<Mensagem[]>([
@@ -87,7 +87,7 @@ export default function Chat({ compacto = false }: { compacto?: boolean }) {
 
       if (!resposta.ok || !resposta.body) {
         const erro = await resposta.json().catch(() => null);
-        throw new Error(erro?.erro ?? "Nao consegui responder agora.");
+        throw new Error(erro?.erro ?? "não consegui responder agora.");
       }
 
       const leitor = resposta.body.getReader();
@@ -107,8 +107,8 @@ export default function Chat({ compacto = false }: { compacto?: boolean }) {
           papel: "guia",
           texto:
             erro instanceof Error
-              ? `Ops — ${erro.message}`
-              : "Ops, deu ruim aqui. Tenta de novo?",
+              ? `Desculpe, ${erro.message} Tente de novo em instantes.`
+              : "Desculpe, tive um problema aqui. Tente de novo em instantes.",
         },
       ]);
     } finally {
@@ -166,7 +166,7 @@ export default function Chat({ compacto = false }: { compacto?: boolean }) {
           <input
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
-            placeholder="O que tu ta a fim de fazer?"
+            placeholder="O que você está com vontade de fazer?"
             aria-label="Escreva sua pergunta"
             className="flex-1 rounded-full border border-mata-200 px-4 py-3 text-sm outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
           />

@@ -73,6 +73,8 @@ export type Local = {
   facebook: string | null;
   faixa_preco: number | null;
   capa_url: string | null;
+  plano: string;
+  plano_ate: string | null;
   status: StatusLocal;
   motivo_rejeicao: string | null;
   destaque: boolean;

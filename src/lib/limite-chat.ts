@@ -87,7 +87,7 @@ export async function podeConversar(request: Request): Promise<Veredito> {
       return {
         liberado: false,
         motivo:
-          "Opa, tu perguntou bastante coisa nessa ultima hora! 😅 Da uma respirada e volta daqui a pouco — enquanto isso da pra explorar o guia normalmente.",
+          "Você fez bastante pergunta nesta última hora! 😅 Descanse um pouco e volte daqui a pouco. Enquanto isso, dá para explorar o guia normalmente.",
       };
     }
 
@@ -95,7 +95,7 @@ export async function podeConversar(request: Request): Promise<Veredito> {
       return {
         liberado: false,
         motivo:
-          "O guia ja conversou demais hoje e precisa descansar 😴 Volta amanha! Enquanto isso, da pra usar a busca e o mapa normalmente.",
+          "Já conversei bastante hoje e preciso descansar 😴 Volte amanhã! Enquanto isso, você pode usar a busca e o mapa normalmente.",
       };
     }
 
