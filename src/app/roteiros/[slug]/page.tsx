@@ -5,6 +5,7 @@ import CartaoRoteiro from "@/components/CartaoRoteiro";
 import ContarAcesso from "@/components/ContarAcesso";
 import { roteiroCurado } from "@/lib/roteiros-curados";
 import { linkWhatsappDoRoteiro } from "@/lib/roteiro";
+import { SITE } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -38,7 +39,7 @@ export default async function RoteiroPronto({
   // visitante, a pagina ainda nao nasceu.
   if (!roteiro || !roteiro.publicado) notFound();
 
-  const endereco = `${process.env.NEXT_PUBLIC_SITE_URL ?? "https://oguiaivoti.com.br"}/roteiros/${roteiro.slug}`;
+  const endereco = `${SITE}/roteiros/${roteiro.slug}`;
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8">

@@ -1,13 +1,11 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
+import { SITE } from "@/lib/site";
 
 // O mapa do site se refaz de hora em hora. Cadastro novo nao precisa esperar
 // um deploy para o Google saber que existe.
 export const revalidate = 3600;
-
-const SITE =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://oguiaivoti.com.br";
 
 /**
  * O mapa do site para os buscadores.

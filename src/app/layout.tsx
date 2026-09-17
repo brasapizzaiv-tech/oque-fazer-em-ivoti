@@ -1,3 +1,4 @@
+import { SITE } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 import { Outfit, Inter } from "next/font/google";
 import "./globals.css";
@@ -22,9 +23,7 @@ const corpo = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://oguiaivoti.com.br",
-  ),
+  metadataBase: new URL(SITE),
   title: {
     default: "O Guia de Ivoti",
     template: "%s · O Guia de Ivoti",

@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const SITE =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://oguiaivoti.com.br";
+import { SITE } from "@/lib/site";
 
 /**
  * O que os buscadores podem varrer.

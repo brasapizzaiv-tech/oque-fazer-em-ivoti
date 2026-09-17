@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { SITE } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -57,10 +58,7 @@ export async function POST(request: Request) {
       return Response.json({ erro: "não consegui salvar" }, { status: 500 });
     }
 
-    const base =
-      process.env.NEXT_PUBLIC_SITE_URL ?? new URL(request.url).origin;
-
-    return Response.json({ endereco: `${base}/roteiro/${token}` });
+    return Response.json({ endereco: `${SITE}/roteiro/${token}` });
   } catch (erro) {
     console.error("Roteiro recusado:", erro);
     return Response.json({ erro: "pedido inválido" }, { status: 400 });

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { enderecoCurto } from "@/lib/roteiro";
+import { SITE_LIMPO } from "@/lib/site";
 
 type LocalDisponivel = { id: string; nome: string; bairro: string | null };
 
@@ -162,7 +163,7 @@ export default function EditorRoteiro({
               className="mt-1 w-full rounded-xl border border-mata-200 px-4 py-2.5 font-mono text-sm outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
             />
             <span className="mt-1 block text-xs text-tinta/45">
-              oguiaivoti.com.br/roteiros/{enderecoFinal || "..."}
+              {SITE_LIMPO}/roteiros/{enderecoFinal || "..."}
             </span>
           </label>
 
