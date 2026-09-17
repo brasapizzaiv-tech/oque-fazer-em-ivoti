@@ -33,7 +33,7 @@ export default function CardLocal({
         )}
 
         {local.destaque && (
-          <span className="absolute top-2 left-2 rounded-full bg-sol-500 px-2 py-0.5 text-[11px] font-bold text-white">
+          <span className="absolute top-2 left-2 rounded-full bg-sol-500 px-2 py-0.5 text-xs font-bold text-white">
             Destaque
           </span>
         )}
@@ -66,7 +66,7 @@ export default function CardLocal({
           {local.tags.slice(0, 2).map((t) => (
             <span
               key={t.id}
-              className="rounded-full bg-mata-50 px-2 py-0.5 text-[11px] text-mata-700"
+              className="rounded-full bg-mata-50 px-2 py-0.5 text-xs text-mata-700"
             >
               {t.emoji} {t.nome}
             </span>

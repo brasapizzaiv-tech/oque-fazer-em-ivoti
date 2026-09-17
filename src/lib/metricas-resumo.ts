@@ -167,3 +167,43 @@ export async function resumoDoSite(
       .reduce((s, l) => s + l.contagem, 0),
   };
 }
+
+/**
+ * Um resumo inventado, só para a prévia desfocada do bloqueio premium.
+ *
+ * Antes o bloqueio mostrava os números REAIS por baixo de um desfoque de
+ * CSS. Parecia seguro e não era: o desfoque é enfeite, e os dados iam
+ * inteiros no HTML — bastava abrir o inspetor do navegador para ler o que
+ * era pago. Quem está no plano gratuito via tudo.
+ *
+ * A prévia continua existindo porque ela vende: ver a forma do gráfico faz
+ * o comerciante querer os números. Só que agora a forma é de mentira. Os
+ * valores nunca saem do servidor para quem não pode vê-los.
+ *
+ * Os números são fixos, não sorteados: assim a tela não muda a cada
+ * recarga, o que faria a prévia parecer dado de verdade oscilando.
+ */
+export function resumoDeExemplo(dias: number): ResumoLocal {
+  // Uma curva com fim de semana mais cheio, que é o desenho que qualquer
+  // comerciante reconhece como plausível.
+  const porDia: { dia: string; contagem: number }[] = [];
+  for (let i = dias - 1; i >= 0; i--) {
+    const dia = diasAtras(i);
+    const diaDaSemana = new Date(`${dia}T12:00:00-03:00`).getDay();
+    const base = diaDaSemana === 0 || diaDaSemana === 6 ? 14 : 7;
+    porDia.push({ dia, contagem: base + ((i * 7) % 9) });
+  }
+
+  return {
+    porDia,
+    acessos: porDia.reduce((s, d) => s + d.contagem, 0),
+    indicacoes: 23,
+    cliques: [
+      { tipo: "clique_whatsapp", contagem: 31 },
+      { tipo: "clique_rota", contagem: 18 },
+      { tipo: "clique_telefone", contagem: 9 },
+    ],
+    eventosVistos: 12,
+    promocoesVistas: 27,
+  };
+}

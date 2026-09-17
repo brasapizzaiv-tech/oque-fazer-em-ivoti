@@ -122,7 +122,7 @@ function DataCarimbo({ quando }: { quando: string }) {
     <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-mata-50 leading-none">
       <div className="text-center">
         <p className="text-lg font-bold text-mata-800">{dia}</p>
-        <p className="text-[11px] text-mata-600 uppercase">
+        <p className="text-xs text-mata-600 uppercase">
           {mes.replace(".", "")}
         </p>
       </div>

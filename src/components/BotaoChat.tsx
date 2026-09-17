@@ -30,7 +30,7 @@ export default function BotaoChat() {
               <span className="text-lg">🌿</span>
               <div className="leading-tight">
                 <p className="text-sm font-semibold">Guia de Ivoti</p>
-                <p className="text-[11px] text-mata-100">
+                <p className="text-xs text-mata-100">
                   Pergunte o que fazer hoje
                 </p>
               </div>

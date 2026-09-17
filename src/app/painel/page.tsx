@@ -52,7 +52,7 @@ function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
 
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
         acabando ? "bg-red-100 text-red-800" : "bg-sol-100 text-sol-900"
       }`}
       title={ate ? `Vale até ${ate}` : "Sem data de vencimento"}
@@ -154,7 +154,7 @@ export default async function Painel() {
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-semibold">{l.nome}</p>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${s.cor}`}
+                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.cor}`}
                     >
                       {s.texto}
                     </span>

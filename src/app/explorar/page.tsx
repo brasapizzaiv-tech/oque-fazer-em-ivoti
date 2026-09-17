@@ -192,7 +192,7 @@ export default async function Explorar({
               <Link
                 key={p.valor}
                 href={url({ quando: p.valor || undefined })}
-                className={`shrink-0 rounded-full px-3 py-1.5 text-sm transition ${
+                className={`shrink-0 rounded-full px-3.5 py-2 text-sm transition ${
                   quando === p.valor
                     ? "bg-mata-600 font-semibold text-white"
                     : "border border-mata-200 bg-white hover:bg-mata-50"
@@ -260,11 +260,13 @@ export default async function Explorar({
       )}
 
       {/* ---- resultados ---- */}
-      <p className="mt-6 text-sm text-tinta/55">
+      {/* Titulo de secao de verdade: sem ele a pagina pulava de H1 para os
+          H3 dos cartoes, e quem navega por titulos perdia a referencia. */}
+      <h2 className="mt-6 text-sm font-normal text-tinta/55">
         {locais.length === 0
           ? "Nenhum lugar encontrado"
           : `${locais.length} ${locais.length === 1 ? "lugar" : "lugares"}`}
-      </p>
+      </h2>
 
       {locais.length === 0 ? (
         <div className="mt-4 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
@@ -318,7 +320,7 @@ function Chip({
       href={href}
       className={[
         "shrink-0 rounded-full border whitespace-nowrap transition",
-        pequeno ? "px-3 py-1.5 text-xs" : "px-4 py-2 text-sm font-medium",
+        pequeno ? "min-h-9 px-3.5 py-2 text-xs" : "min-h-9 px-4 py-2 text-sm font-medium",
         ativo
           ? "border-mata-600 bg-mata-600 text-white"
           : "border-mata-200 bg-white text-tinta/75 hover:bg-mata-50",

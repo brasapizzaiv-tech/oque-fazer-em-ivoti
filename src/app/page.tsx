@@ -227,7 +227,7 @@ function Secao({
         {verMais && locais.length > 0 && (
           <Link
             href={verMais}
-            className="shrink-0 text-sm font-semibold text-mata-600 hover:text-mata-800"
+            className="-my-2 shrink-0 py-2 text-sm font-semibold text-mata-600 hover:text-mata-800"
           >
             Ver todos →
           </Link>

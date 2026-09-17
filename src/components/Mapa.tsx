@@ -35,6 +35,8 @@ export default function Mapa({
   altura?: string;
   focoSlug?: string;
 }) {
+  const [pronto, setPronto] = useState(false);
+
   const comCoordenada = useMemo(
     () => locais.filter((l) => l.lat != null && l.lng != null),
     [locais],
@@ -47,8 +49,23 @@ export default function Mapa({
 
   return (
     <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
-      <div className={`relative ${altura} overflow-hidden rounded-2xl`}>
+      <div className={`relative ${altura} overflow-hidden rounded-2xl bg-mata-50`}>
+        {/* Enquanto os ladrilhos do Google nao chegam, a area fica cinza e
+            vazia — em conexao lenta isso passa de dez segundos e parece
+            defeito. Este aviso cobre o vazio e some sozinho quando o mapa
+            desenha. */}
+        {!pronto && (
+          <div className="absolute inset-0 z-10 grid place-items-center bg-mata-50 text-center">
+            <div>
+              <p className="text-2xl">🗺️</p>
+              <p className="mt-2 text-sm font-medium text-tinta/60">
+                Carregando o mapa...
+              </p>
+            </div>
+          </div>
+        )}
         <Map
+          onTilesLoaded={() => setPronto(true)}
           mapId={MAP_ID || undefined}
           defaultCenter={IVOTI}
           defaultZoom={14}

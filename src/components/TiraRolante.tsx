@@ -105,7 +105,7 @@ export default function TiraRolante({
           type="button"
           onClick={() => setAberta((v) => !v)}
           aria-expanded={aberta}
-          className="mt-2 text-sm font-medium text-mata-700 underline decoration-mata-300 underline-offset-2"
+          className="-mx-1 mt-1 inline-block px-1 py-2 text-sm font-medium text-mata-700 underline decoration-mata-300 underline-offset-2"
         >
           {aberta
             ? "Mostrar menos"

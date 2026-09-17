@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { resumoDoLocal } from "@/lib/metricas-resumo";
+import { resumoDoLocal, resumoDeExemplo } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO } from "@/lib/metricas";
 import { planoAtivo, podeUsar } from "@/lib/planos";
 import { BarrasRanqueadas, GraficoDias, Numero } from "@/components/painel/Graficos";
@@ -66,6 +66,10 @@ export default async function Metricas({
   const vendoComoAdmin = admin && !podeUsar("metricas", plano);
   const resumo = await resumoDoLocal(local.id, dias, supabase);
 
+  // Numeros de mentira para a previa desfocada. O desfoque e so CSS: os
+  // valores reais nao podem sair do servidor para quem nao pode ve-los.
+  const exemplo = liberado ? resumo : resumoDeExemplo(dias);
+
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -97,8 +101,8 @@ export default async function Metricas({
 
       {vendoComoAdmin && (
         <p className="mt-4 rounded-xl border border-sol-200 bg-sol-50 px-3 py-2 text-sm text-sol-900">
-          Voce esta vendo como administracao. {local.nome} esta no plano
-          gratuito — no painel do proprio estabelecimento, estes numeros
+          Você está vendo como administração. {local.nome} está no plano
+          gratuito — no painel do próprio estabelecimento, estes números
           aparecem bloqueados.
         </p>
       )}
@@ -129,9 +133,9 @@ export default async function Metricas({
           <div className="sm:col-span-2">
             <Bloqueado modulo="metricas" nome={local.nome}>
               <div className="grid gap-3 p-1 sm:grid-cols-2">
-                <Numero valor={resumo.indicacoes} rotulo="Indicações do Guia" />
+                <Numero valor={exemplo.indicacoes} rotulo="Indicações do Guia" />
                 <Numero
-                  valor={resumo.cliques.reduce((s, c) => s + c.contagem, 0)}
+                  valor={exemplo.cliques.reduce((s, c) => s + c.contagem, 0)}
                   rotulo="Cliques nos seus contatos"
                 />
               </div>
@@ -151,7 +155,7 @@ export default async function Metricas({
             <div>
               <p className="font-semibold">Levar para uma planilha</p>
               <p className="text-sm text-tinta/55">
-                Dia a dia dos ultimos {dias} dias, pronto para abrir no Excel.
+                Dia a dia dos últimos {dias} dias, pronto para abrir no Excel.
               </p>
             </div>
             <a
@@ -165,7 +169,7 @@ export default async function Metricas({
       ) : (
         <div className="mt-6">
           <Bloqueado modulo="metricas" nome={local.nome}>
-            <Detalhes resumo={resumo} dias={dias} />
+            <Detalhes resumo={exemplo} dias={dias} />
           </Bloqueado>
         </div>
       )}

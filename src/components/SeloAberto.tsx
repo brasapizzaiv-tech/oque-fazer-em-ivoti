@@ -37,7 +37,7 @@ export default function SeloAberto({
     <span
       className={[
         "inline-flex items-center gap-1.5 rounded-full font-semibold",
-        pequeno ? "px-2 py-0.5 text-[11px]" : "px-2.5 py-1 text-xs",
+        pequeno ? "px-2 py-1 text-xs" : "px-2.5 py-1 text-xs",
         estado.aberto
           ? "bg-mata-100 text-mata-800"
           : "bg-tinta/5 text-tinta/60",

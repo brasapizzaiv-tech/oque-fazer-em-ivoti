@@ -16,24 +16,24 @@ export default function Rodape() {
 
         <div className="text-sm">
           <p className="font-semibold">Descobrir</p>
-          <ul className="mt-2 space-y-1 text-tinta/70">
+          <ul className="mt-1 text-tinta/70">
             <li>
-              <Link href="/explorar" className="hover:text-mata-700">
+              <Link href="/explorar" className="-mx-2 inline-block px-2 py-2 hover:text-mata-700">
                 Explorar tudo
               </Link>
             </li>
             <li>
-              <Link href="/mapa" className="hover:text-mata-700">
+              <Link href="/mapa" className="-mx-2 inline-block px-2 py-2 hover:text-mata-700">
                 Mapa da cidade
               </Link>
             </li>
             <li>
-              <Link href="/agenda" className="hover:text-mata-700">
+              <Link href="/agenda" className="-mx-2 inline-block px-2 py-2 hover:text-mata-700">
                 Agenda de eventos
               </Link>
             </li>
             <li>
-              <Link href="/chat" className="hover:text-mata-700">
+              <Link href="/chat" className="-mx-2 inline-block px-2 py-2 hover:text-mata-700">
                 Pergunte ao Guia
               </Link>
             </li>
@@ -42,14 +42,14 @@ export default function Rodape() {
 
         <div className="text-sm">
           <p className="font-semibold">Para estabelecimentos</p>
-          <ul className="mt-2 space-y-1 text-tinta/70">
+          <ul className="mt-1 text-tinta/70">
             <li>
-              <Link href="/cadastrar" className="hover:text-mata-700">
+              <Link href="/cadastrar" className="-mx-2 inline-block px-2 py-2 hover:text-mata-700">
                 Cadastrar meu negócio (grátis)
               </Link>
             </li>
             <li>
-              <Link href="/painel" className="hover:text-mata-700">
+              <Link href="/painel" className="-mx-2 inline-block px-2 py-2 hover:text-mata-700">
                 Entrar no painel
               </Link>
             </li>
