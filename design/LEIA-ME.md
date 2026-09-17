@@ -1,5 +1,18 @@
 # Estilo do mapa
 
+> **ATENCAO — o formato deste arquivo esta desatualizado.**
+>
+> Em 17/09/2026 descobrimos que o editor de estilos do console do Google
+> mudou. O formato antigo, uma LISTA de regras (`[{featureType, elementType,
+> stylers}]`), e o que a documentacao da propriedade `styles` descreve e o
+> que o `estilo-do-mapa.json` daqui usa — mas o editor novo espera um
+> OBJETO, comecando por `{"variant": "light"}`. Ele recusa a lista dizendo
+> "erro de sintaxe", que confunde: o JSON e valido, o esquema e que e outro.
+>
+> Este arquivo fica como registro das decisoes de design (o que ligar, o que
+> desligar e por que). Antes de usa-lo, converta para o formato novo — ou
+> aplique as mesmas decisoes pela aba "Elementos do mapa".
+
 `estilo-do-mapa.json` é o visual do mapa do guia: fundo creme, verde da mata
 nos parques e na água, rodovias em âmbar e o comércio do Google desligado.
 
