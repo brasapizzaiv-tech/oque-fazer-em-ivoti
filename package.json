@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "migrate": "node scripts/migrate.mjs"
+    "migrate": "node scripts/migrate.mjs",
+    "og": "node scripts/gerar-og.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.0",
