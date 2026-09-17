@@ -14,8 +14,12 @@
  *
  * Se um dia voce trocar de projeto no Google, troque aqui e na chave da API,
  * que precisam ser do mesmo projeto.
+ *
+ * O primeiro Map ID (14c49df2a3f5ef6c8e155db2) funcionava, mas foi criado
+ * antes do console novo e nao dava para ligar um estilo nele. Este, chamado
+ * "guia" e do tipo JavaScript, e o que carrega o estilo do guia.
  */
-export const MAP_ID = "14c49df2a3f5ef6c8e155db2";
+export const MAP_ID = "1ce77266e51221037820af24";
 
 /** Com Map ID valido da para desenhar o pino do jeito do guia. */
 export const PINO_MODERNO = MAP_ID.length > 0;
