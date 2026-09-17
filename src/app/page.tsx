@@ -1,4 +1,5 @@
 import Image from "next/image";
+import TiraRolante from "@/components/TiraRolante";
 import Link from "next/link";
 import BarraBusca from "@/components/BarraBusca";
 import CardLocal from "@/components/CardLocal";
@@ -102,7 +103,7 @@ export default async function Home() {
       {principais.length > 0 && (
         <section className="mx-auto max-w-6xl px-4 py-10">
           <h2 className="text-xl font-semibold">Por onde começar</h2>
-          <div className="sem-barra mt-4 flex gap-3 overflow-x-auto pb-2">
+          <TiraRolante className="mt-4" nome="categorias">
             {principais.map((c) => (
               <Link
                 key={c.id}
@@ -115,7 +116,7 @@ export default async function Home() {
                 </span>
               </Link>
             ))}
-          </div>
+          </TiraRolante>
         </section>
       )}
 

@@ -12,6 +12,7 @@ import { DIAS, agoraNaCidade } from "@/lib/horarios";
 import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
 import { listarRoteirosCurados } from "@/lib/roteiros-curados";
 import CartaoRoteiroPronto from "@/components/CartaoRoteiroPronto";
+import TiraRolante from "@/components/TiraRolante";
 
 export const revalidate = 60;
 
@@ -114,7 +115,7 @@ export default async function Explorar({
 
       {/* ---- filtros ---- */}
       <div className="mt-5 space-y-3">
-        <Tira>
+        <Tira nome="categorias">
           <Chip href={url({ categoria: undefined })} ativo={!categoria}>
             Tudo
           </Chip>
@@ -130,7 +131,7 @@ export default async function Explorar({
         </Tira>
 
         {filhas.length > 0 && (
-          <Tira>
+          <Tira nome="subcategorias">
             {filhas.map((c) => (
               <Chip key={c.id} href={url({ categoria: c.slug })} pequeno>
                 {c.emoji} {c.nome}
@@ -139,7 +140,7 @@ export default async function Explorar({
           </Tira>
         )}
 
-        <Tira>
+        <Tira nome="etiquetas">
           <Chip
             href={url({ aberto: aberto ? undefined : "1" })}
             ativo={aberto}
@@ -186,7 +187,7 @@ export default async function Explorar({
             </Link>
           </div>
 
-          <div className="sem-barra mt-3 flex gap-2 overflow-x-auto pb-1">
+          <TiraRolante className="mt-3">
             {PERIODOS.map((p) => (
               <Link
                 key={p.valor}
@@ -200,7 +201,7 @@ export default async function Explorar({
                 {p.rotulo}
               </Link>
             ))}
-          </div>
+          </TiraRolante>
 
           {eventos.length === 0 ? (
             <p className="mt-3 rounded-2xl border border-dashed border-mata-200 bg-white px-4 py-6 text-center text-sm text-tinta/55">
@@ -291,10 +292,14 @@ export default async function Explorar({
   );
 }
 
-function Tira({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="sem-barra flex gap-2 overflow-x-auto pb-1">{children}</div>
-  );
+function Tira({
+  children,
+  nome,
+}: {
+  children: React.ReactNode;
+  nome?: string;
+}) {
+  return <TiraRolante nome={nome}>{children}</TiraRolante>;
 }
 
 function Chip({

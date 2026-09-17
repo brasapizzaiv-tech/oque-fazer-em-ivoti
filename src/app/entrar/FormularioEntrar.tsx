@@ -61,7 +61,7 @@ export default function FormularioEntrar() {
       // depois de alguns segundos devolvemos o botao e contamos o que houve.
       relogio.current = setTimeout(() => {
         setErro(
-          "O painel esta demorando para abrir. Sua entrada deu certo: tente de novo ou recarregue a pagina.",
+          "O painel está demorando para abrir. Sua entrada deu certo: tente de novo ou recarregue a página.",
         );
         setIndo(false);
       }, 10000);
@@ -114,6 +114,15 @@ export default function FormularioEntrar() {
       >
         {indo ? "Entrando..." : "Entrar"}
       </button>
+
+      <p className="text-center text-sm">
+        <Link
+          href="/recuperar-senha"
+          className="font-medium text-tinta/60 underline hover:text-mata-700"
+        >
+          Esqueci minha senha
+        </Link>
+      </p>
 
       <p className="text-center text-sm text-tinta/60">
         Ainda não tem conta?{" "}

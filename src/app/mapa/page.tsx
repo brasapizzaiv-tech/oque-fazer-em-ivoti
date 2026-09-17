@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import TiraRolante from "@/components/TiraRolante";
 import Link from "next/link";
 import Mapa from "@/components/Mapa";
 import { buscarLocais, listarCategorias } from "@/lib/locais";
@@ -32,7 +33,7 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
         Toque num pino pra ver os detalhes e traçar a rota.
       </p>
 
-      <div className="sem-barra mt-4 flex gap-2 overflow-x-auto pb-1">
+      <TiraRolante className="mt-4" nome="categorias">
         <Filtro href="/mapa" ativo={!categoria}>
           Tudo
         </Filtro>
@@ -45,7 +46,7 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
             {c.emoji} {c.nome}
           </Filtro>
         ))}
-      </div>
+      </TiraRolante>
 
       <div className="mt-4">
         <Mapa locais={noMapa} altura="h-[65vh]" />
