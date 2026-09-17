@@ -5,7 +5,7 @@ import { situacao } from "@/lib/horarios";
 import type { Horario } from "@/lib/tipos";
 
 /**
- * "Aberto ate as 23h" / "Abre as 18h".
+ * "Aberto até às 23h" / "Abre às 18h".
  *
  * Roda no navegador de proposito: a pagina pode ficar guardada em cache por
  * alguns minutos, e o selo precisa dizer a verdade na hora em que a pessoa

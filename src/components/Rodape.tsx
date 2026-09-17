@@ -45,7 +45,7 @@ export default function Rodape() {
           <ul className="mt-2 space-y-1 text-tinta/70">
             <li>
               <Link href="/cadastrar" className="hover:text-mata-700">
-                Cadastrar meu negocio (gratis)
+                Cadastrar meu negócio (grátis)
               </Link>
             </li>
             <li>

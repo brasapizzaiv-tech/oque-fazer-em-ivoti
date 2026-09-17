@@ -71,7 +71,7 @@ export function hhmm(hora: string): string {
 
 export type SituacaoLocal = {
   aberto: boolean;
-  /** Frase pronta: "Aberto ate as 23h", "Abre as 18h", "Fechado hoje". */
+  /** Frase pronta: "Aberto até às 23h", "Abre às 18h", "Fechado hoje". */
   texto: string;
   /** Minutos ate fechar (se aberto) ou ate abrir (se fechado hoje ainda). */
   minutosAte: number | null;
@@ -87,7 +87,7 @@ export function situacao(
   agora = agoraNaCidade(),
 ): SituacaoLocal {
   if (!horarios || horarios.length === 0) {
-    return { aberto: false, texto: "Horario nao informado", minutosAte: null };
+    return { aberto: false, texto: "Horário não informado", minutosAte: null };
   }
 
   const { diaSemana, minutos } = agora;
@@ -104,7 +104,7 @@ export function situacao(
       if (minutos >= abre && minutos < fim) {
         return {
           aberto: true,
-          texto: `Aberto ate ${formatoHora(h.fecha)}`,
+          texto: `Aberto até ${formatoHora(h.fecha)}`,
           minutosAte: fim - minutos,
         };
       }
@@ -114,7 +114,7 @@ export function situacao(
     if (viraDia && h.dia_semana === ontem && minutos < fecha) {
       return {
         aberto: true,
-        texto: `Aberto ate ${formatoHora(h.fecha)}`,
+        texto: `Aberto até ${formatoHora(h.fecha)}`,
         minutosAte: fecha - minutos,
       };
     }
@@ -140,7 +140,7 @@ export function situacao(
       .filter((h) => h.dia_semana === dia)
       .sort((a, b) => paraMinutos(a.abre) - paraMinutos(b.abre))[0];
     if (doDia) {
-      const quando = i === 1 ? "amanha" : DIAS[dia].toLowerCase();
+      const quando = i === 1 ? "amanhã" : DIAS[dia].toLowerCase();
       return {
         aberto: false,
         texto: `Abre ${quando} ${formatoHora(doDia.abre)}`,
@@ -152,22 +152,22 @@ export function situacao(
   return { aberto: false, texto: "Fechado", minutosAte: null };
 }
 
-/** 19:00 -> "as 19h" | 19:30 -> "as 19h30" */
+/** 19:00 -> "às 19h" | 19:30 -> "às 19h30" */
 export function formatoHora(hora: string): string {
   const [h, m] = hhmm(hora).split(":");
-  return m === "00" ? `as ${Number(h)}h` : `as ${Number(h)}h${m}`;
+  return m === "00" ? `às ${Number(h)}h` : `às ${Number(h)}h${m}`;
 }
 
 /**
- * Agrupa os horarios pra mostrar na pagina do local:
- * [{ dia: "Segunda", faixas: "11:30 as 14:00, 18:00 as 23:00" }, ...]
+ * Agrupa os horários para mostrar na pagina do local:
+ * [{ dia: "Segunda", faixas: "11:30 às 14:00, 18:00 às 23:00" }, ...]
  */
 export function porDia(horarios: Horario[]) {
   return DIAS.map((nome, dia) => {
     const faixas = horarios
       .filter((h) => h.dia_semana === dia)
       .sort((a, b) => paraMinutos(a.abre) - paraMinutos(b.abre))
-      .map((h) => `${hhmm(h.abre)} as ${hhmm(h.fecha)}`);
+      .map((h) => `${hhmm(h.abre)} às ${hhmm(h.fecha)}`);
     return { dia, nome, faixas, fechado: faixas.length === 0 };
   });
 }
@@ -177,7 +177,7 @@ export function resumoSemana(horarios: Horario[]): string {
   const linhas = porDia(horarios)
     .filter((d) => !d.fechado)
     .map((d) => `${d.nome}: ${d.faixas.join(", ")}`);
-  return linhas.length ? linhas.join(" | ") : "Horario nao informado";
+  return linhas.length ? linhas.join(" | ") : "Horário não informado";
 }
 
 /* ------------------------------------------------------------------
