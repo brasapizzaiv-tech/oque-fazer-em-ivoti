@@ -7,11 +7,10 @@ import {
   Marker,
 } from "@vis.gl/react-google-maps";
 import { IVOTI } from "@/lib/geo";
+import { MAP_ID, PINO_MODERNO } from "@/lib/mapa-config";
 
 const CHAVE = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "";
 // Sem Map ID o Google recusa o pino personalizado; ai usamos o classico.
-const PINO_MODERNO = MAP_ID.length > 0;
 
 /**
  * Mapa em que o dono clica pra marcar onde fica o estabelecimento.

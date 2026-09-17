@@ -14,15 +14,10 @@ import {
 import MapaPrevia from "./MapaPrevia";
 import { IVOTI, distancia, formatarDistancia, linkRota } from "@/lib/geo";
 import type { LocalCompleto } from "@/lib/tipos";
+import { MAP_ID, PINO_MODERNO } from "@/lib/mapa-config";
 
 const CHAVE = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-// O "Map ID" e um identificador de estilo criado no console do Google. Sem
-// ele o Google recusa os pinos personalizados (AdvancedMarker) e mostra a
-// caixa de erro "esta pagina nao carregou o Google Maps corretamente".
-// Quando nao houver Map ID configurado, o mapa cai no pino classico, que
-// funciona em qualquer conta.
-const MAP_ID = process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "";
-const PINO_MODERNO = MAP_ID.length > 0;
+
 
 export type PontoNoMapa = Pick<
   LocalCompleto,
@@ -143,6 +138,9 @@ function Conteudo({
             key={l.id}
             position={{ lat: l.lat!, lng: l.lng! }}
             title={l.nome}
+            // Precisa ser dito em voz alta: so passar onClick nao torna o
+            // pino clicavel, e ele fica bonito e inerte.
+            clickable
             onClick={() => setAberto(l)}
           >
             <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
