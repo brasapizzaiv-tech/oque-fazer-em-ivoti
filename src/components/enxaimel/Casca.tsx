@@ -21,8 +21,8 @@ import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
  * inteiro some quando ela esvaziar.
  */
 // Comeca com barra e nao termina: "/local" cobre /local/qualquer-coisa.
-const MIGRADAS = ["/", "/explorar"];
-const PREFIXOS_MIGRADOS = ["/local/"];
+const MIGRADAS = ["/", "/explorar", "/chat"];
+const PREFIXOS_MIGRADOS = ["/local/", "/roteiros"];
 
 export default function Casca({ children }: { children: React.ReactNode }) {
   const caminho = usePathname();

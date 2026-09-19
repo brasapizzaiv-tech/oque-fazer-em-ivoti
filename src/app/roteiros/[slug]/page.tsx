@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import CartaoRoteiro from "@/components/CartaoRoteiro";
 import ContarAcesso from "@/components/ContarAcesso";
+import ListaDeParadas from "@/components/enxaimel/ListaDeParadas";
+import { CasaEnxaimel } from "@/components/enxaimel/icones";
+import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
 import { roteiroCurado } from "@/lib/roteiros-curados";
-import { linkWhatsappDoRoteiro } from "@/lib/roteiro";
-import { SITE } from "@/lib/site";
+import { linkGoogleMaps, resumoDoPasseio } from "@/lib/roteiro";
 
 export const revalidate = 300;
 
@@ -35,68 +36,109 @@ export default async function RoteiroPronto({
   const { slug } = await params;
   const roteiro = await roteiroCurado(slug);
 
-  // Rascunho nao publicado so existe para quem esta montando: para o
-  // visitante, a pagina ainda nao nasceu.
   if (!roteiro || !roteiro.publicado) notFound();
 
-  const endereco = `${SITE}/roteiros/${roteiro.slug}`;
+  const rota = linkGoogleMaps(roteiro.paradas);
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
+    <div style={{ backgroundColor: "var(--color-reboco)" }}>
       <ContarAcesso />
 
-      <nav className="text-sm text-tinta/55">
-        <Link href="/roteiros" className="hover:text-mata-700">
-          Roteiros
-        </Link>
-      </nav>
+      <header
+        className="px-4 pt-5 pb-6"
+        style={{ backgroundColor: "var(--color-madeira)" }}
+      >
+        <Legenda cor="var(--color-petunia-clara)">Roteiro pronto</Legenda>
 
-      <h1 className="mt-1 text-3xl font-bold">{roteiro.titulo}</h1>
-      {roteiro.descricao && (
-        <p className="mt-2 text-tinta/70">{roteiro.descricao}</p>
-      )}
-
-      {roteiro.paradas.length === 0 ? (
-        <p className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme px-4 py-8 text-center text-sm text-tinta/55">
-          As paradas deste roteiro saíram do ar. Pergunte ao Guia que ele monta
-          um passeio com o que está aberto hoje.
-        </p>
-      ) : (
-        <div className="mt-6">
-          {/* Sem o botão de salvar: esta página já tem endereço próprio, e
-              guardar uma cópia dela com outro link só confundiria. */}
-          <CartaoRoteiro
-            titulo={roteiro.titulo}
-            paradas={roteiro.paradas}
-            compartilhavel={false}
+        <div className="mt-1.5 flex items-start gap-2">
+          <h1
+            className="text-[26px] leading-tight font-bold"
+            style={{
+              color: "var(--color-creme-claro)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            {roteiro.titulo}
+          </h1>
+          <CasaEnxaimel
+            tamanho={28}
+            className="mt-1 shrink-0"
+            style={{ color: "var(--color-creme-claro)" }}
           />
         </div>
-      )}
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        <a
-          href={linkWhatsappDoRoteiro(roteiro.titulo, endereco)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="border-2 border-carvalho bg-creme px-4 py-2 text-sm font-semibold text-mata-700 transition hover:bg-cal-sombra"
+        <p
+          className="mt-2 text-[13px]"
+          style={{ color: "var(--color-creme-fundo)" }}
         >
-          Mandar no WhatsApp
-        </a>
-      </div>
-
-      <div className="mt-8 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center">
-        <p className="font-semibold">Quer um passeio do seu jeito?</p>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
-          Diga ao Guia quanto tempo você tem e o que gosta de fazer, e ele monta
-          um roteiro com horário e rota.
+          {resumoDoPasseio(roteiro.paradas)}
         </p>
-        <Link
-          href="/chat"
-          className="mt-4 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
+
+        {roteiro.descricao && (
+          <p
+            className="mt-3 text-[14px]"
+            style={{ color: "var(--color-creme-claro)" }}
+          >
+            {roteiro.descricao}
+          </p>
+        )}
+      </header>
+
+      {roteiro.paradas.length === 0 ? (
+        <p
+          className="px-4 py-10 text-center text-[14px]"
+          style={{ color: "var(--color-texto-suave)" }}
         >
-          Conversar com o Guia
-        </Link>
-      </div>
+          As paradas deste roteiro saíram do ar. Peça outro ao Guia, com o que
+          está aberto hoje.
+        </p>
+      ) : (
+        <>
+          <div className="px-4 pt-6">
+            <ListaDeParadas paradas={roteiro.paradas} />
+          </div>
+
+          <div className="pt-7">
+            <FaixaEnxaimel />
+          </div>
+
+          {/* O rodapé acompanha a rolagem porque é o que a pessoa vem fazer:
+              ela lê as paradas e sai andando. Ter de voltar ao topo para
+              achar a rota seria atrito no pior momento. */}
+          <div
+            className="sticky bottom-0 z-30 flex gap-2 px-4 py-3"
+            style={{
+              backgroundColor: "var(--color-reboco)",
+              borderTop: "2px solid var(--color-madeira)",
+            }}
+          >
+            {rota && (
+              <a
+                href={rota}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-12 flex-1 items-center justify-center rounded-[11px] px-4 text-center text-[14px] font-bold"
+                style={{
+                  backgroundColor: "var(--color-torii)",
+                  color: "#fff7ea",
+                }}
+              >
+                Abrir rota no Google Maps
+              </a>
+            )}
+            <Link
+              href="/chat"
+              className="flex h-12 shrink-0 items-center justify-center rounded-[11px] px-4 text-[14px] font-bold"
+              style={{
+                border: "2px solid var(--color-madeira)",
+                color: "var(--color-madeira)",
+              }}
+            >
+              Editar paradas
+            </Link>
+          </div>
+        </>
+      )}
     </div>
   );
 }

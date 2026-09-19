@@ -141,3 +141,70 @@ export function enderecoCurto(bruto: string, limite = 0): string {
 
   return limite > 0 ? curto.slice(0, limite) : curto;
 }
+
+/**
+ * O resumo de uma linha que abre o roteiro: "5 paradas · cerca de 6 horas ·
+ * 9,4 km".
+ *
+ * A distância é a soma dos trechos entre paradas consecutivas, em linha reta.
+ * A rua real é sempre mais longa, então o número sai com uma folga de 30% —
+ * é o fator que costuma aproximar distância reta de distância rodada em
+ * cidade pequena, e prometer menos do que se roda seria pior do que
+ * arredondar para cima.
+ *
+ * O tempo é estimativa declarada: 45 minutos em cada parada mais o
+ * deslocamento a 30 km/h, que é o que se anda numa cidade com semáforo e
+ * lombada. Por isso a palavra "cerca de" fica no texto e não some — ninguém
+ * deve planejar o dia como se fosse horário de trem.
+ */
+export function resumoDoPasseio(paradas: Parada[]): string {
+  const partes = [
+    `${paradas.length} ${paradas.length === 1 ? "parada" : "paradas"}`,
+  ];
+
+  const metros = distanciaTotal(paradas);
+  const minutosParado = paradas.length * 45;
+  const minutosAndando = metros > 0 ? (metros / 1000 / 30) * 60 : 0;
+  const horas = Math.round((minutosParado + minutosAndando) / 60);
+
+  if (horas > 0) {
+    partes.push(`cerca de ${horas} ${horas === 1 ? "hora" : "horas"}`);
+  }
+  if (metros > 0) {
+    partes.push(`${(metros / 1000).toFixed(1).replace(".", ",")} km`);
+  }
+
+  return partes.join(" · ");
+}
+
+/** A soma dos trechos, com a folga de rua. Zero quando faltam coordenadas. */
+function distanciaTotal(paradas: Parada[]): number {
+  let total = 0;
+  for (let i = 1; i < paradas.length; i++) {
+    const a = paradas[i - 1];
+    const b = paradas[i];
+    if (a.lat == null || a.lng == null || b.lat == null || b.lng == null) {
+      continue;
+    }
+    total += emLinhaReta(
+      { lat: a.lat, lng: a.lng },
+      { lat: b.lat, lng: b.lng },
+    );
+  }
+  return total * 1.3;
+}
+
+/** Haversine: a distância em linha reta entre dois pontos, em metros. */
+function emLinhaReta(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const R = 6371000;
+  const rad = (g: number) => (g * Math.PI) / 180;
+  const dLat = rad(b.lat - a.lat);
+  const dLng = rad(b.lng - a.lng);
+  const s =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(s));
+}

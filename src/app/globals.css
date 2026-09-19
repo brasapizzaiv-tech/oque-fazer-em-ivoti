@@ -174,3 +174,15 @@ h4 {
     repeating-linear-gradient(62deg, var(--color-madeira) 0 3px, transparent 3px 26px),
     repeating-linear-gradient(-62deg, var(--color-madeira) 0 3px, transparent 3px 26px);
 }
+
+/* A trama asanoha, folha de canhamo — o traco japones da cidade.
+   Fica atras da conversa: da textura sem competir com o que esta escrito,
+   por isso as linhas vao bem claras. Desenhada com tres familias de retas a
+   0, 60 e -60 graus, que e a geometria do padrao original. */
+.asanoha {
+  background-color: var(--color-reboco);
+  background-image:
+    repeating-linear-gradient(60deg, rgba(59, 36, 24, 0.07) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(-60deg, rgba(59, 36, 24, 0.07) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(0deg, rgba(59, 36, 24, 0.055) 0 1px, transparent 1px 38px);
+}

@@ -1,16 +1,12 @@
 import type { Metadata } from "next";
-import Chat from "@/components/Chat";
+import ChatDoGuia from "@/components/enxaimel/ChatDoGuia";
 
 export const metadata: Metadata = {
-  title: "Pergunte ao Guia",
+  title: "O Guia",
   description:
-    "Converse com o Guia, o assistente do Guia de Ivoti: ele indica onde comer, passear e o que fazer agora, com base no que está aberto.",
+    "Converse com o Guia: onde comer, o que visitar e um roteiro pronto para você em Ivoti.",
 };
 
-export default function PaginaChat() {
-  return (
-    <div className="mx-auto flex h-[calc(100dvh-4rem)] max-w-3xl flex-col">
-      <Chat />
-    </div>
-  );
+export default function Chat() {
+  return <ChatDoGuia />;
 }
