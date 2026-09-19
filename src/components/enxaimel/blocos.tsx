@@ -3,9 +3,11 @@ import Link from "next/link";
 import CardMadeira from "./CardMadeira";
 import { Trelica } from "./icones";
 import { Botao, Legenda, SeloStatus } from "./pecas";
-import { quandoPorExtenso } from "@/lib/horarios";
+import { quandoPorExtenso, situacao } from "@/lib/horarios";
+import { formatarDistancia } from "@/lib/geo";
 import { quandoVale } from "@/lib/promocoes";
 import type { EventoNaTela } from "@/lib/eventos";
+import type { LocalCompleto } from "@/lib/tipos";
 import type { PromocaoNaTela } from "@/components/CartaoPromocao";
 
 /**
@@ -251,3 +253,88 @@ export function Vazio({ children }: { children: React.ReactNode }) {
 }
 
 export { Botao };
+
+/* ------------------------------------------------------------------ */
+/* Lugar                                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * O card de um lugar na lista do Explorar: foto à esquerda, o resto à
+ * direita.
+ *
+ * Horizontal e não vertical porque a lista é longa e a pessoa está varrendo:
+ * nesse formato cabem quatro ou cinco por tela, contra dois do card com foto
+ * em cima. A foto continua grande o bastante para reconhecer o lugar.
+ */
+export function CardLugar({
+  local,
+  distancia,
+  variante = 1,
+}: {
+  local: LocalCompleto;
+  distancia?: number;
+  variante?: 1 | 2;
+}) {
+  const { aberto } = situacao(local.horarios ?? []);
+
+  return (
+    <CardMadeira variante={variante}>
+      <Link href={`/local/${local.slug}`} className="flex gap-3 p-3">
+        <span className="relative block h-[84px] w-[84px] shrink-0 overflow-hidden">
+          {local.capa_url ? (
+            <Image
+              src={local.capa_url}
+              alt=""
+              fill
+              sizes="84px"
+              className="object-cover"
+            />
+          ) : (
+            <Trelica />
+          )}
+        </span>
+
+        <span className="min-w-0 flex-1">
+          <span className="flex items-center gap-1.5">
+            <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+            {distancia != null && (
+              <span
+                className="text-[12px] font-medium"
+                style={{ color: "var(--color-texto-suave)" }}
+              >
+                {formatarDistancia(distancia)}
+              </span>
+            )}
+          </span>
+
+          <span
+            className="mt-1 block text-[16px] leading-tight font-bold"
+            style={{
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            {local.nome}
+          </span>
+
+          <span
+            className="mt-0.5 block truncate text-[13px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            {local.categoria?.nome}
+            {local.bairro ? ` · ${local.bairro}` : ""}
+          </span>
+
+          {local.resumo && (
+            <span
+              className="mt-1 line-clamp-2 block text-[13px]"
+              style={{ color: "var(--color-texto-suave)" }}
+            >
+              {local.resumo}
+            </span>
+          )}
+        </span>
+      </Link>
+    </CardMadeira>
+  );
+}

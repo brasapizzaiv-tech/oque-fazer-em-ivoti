@@ -20,7 +20,7 @@ import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
  * botão flutuante de sempre. A lista encolhe a cada tela migrada e o arquivo
  * inteiro some quando ela esvaziar.
  */
-const MIGRADAS = ["/"];
+const MIGRADAS = ["/", "/explorar"];
 
 export default function Casca({ children }: { children: React.ReactNode }) {
   const caminho = usePathname();

@@ -1,47 +1,36 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import BarraBusca from "@/components/BarraBusca";
-import CardLocal from "@/components/CardLocal";
-import CartaoPromocao, { type PromocaoNaTela } from "@/components/CartaoPromocao";
-import CartaoEvento from "@/components/CartaoEvento";
-import { eventosVisiveis } from "@/lib/eventos";
-import { hojeEmIvoti } from "@/lib/planos";
-import { createClient } from "@/lib/supabase/server";
-import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
-import { DIAS, agoraNaCidade } from "@/lib/horarios";
+import { Suspense } from "react";
+import Cabecalho, { BuscaCabecalho } from "@/components/enxaimel/Cabecalho";
+import PertoDeMim from "@/components/enxaimel/PertoDeMim";
+import { CardLugar, Fileira, Vazio } from "@/components/enxaimel/blocos";
+import { Chip, FaixaEnxaimel } from "@/components/enxaimel/pecas";
+import { CasaEnxaimel } from "@/components/enxaimel/icones";
 import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
-import { listarRoteirosCurados } from "@/lib/roteiros-curados";
-import CartaoRoteiroPronto from "@/components/CartaoRoteiroPronto";
-import TiraRolante from "@/components/TiraRolante";
+import { distancia } from "@/lib/geo";
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Explorar",
-  description: "Todos os lugares de Ivoti: filtre por tipo, etiqueta e horário.",
+  description:
+    "Todos os lugares de Ivoti: filtre por tipo, etiqueta e horário.",
 };
 
-/**
- * As promoções que valem hoje, na cidade inteira.
- *
- * A regra de "vale hoje" mora no banco, na mesma função que a página do
- * estabelecimento usa — assim as duas telas nunca discordam.
- */
-async function promocoesDeHoje(): Promise<PromocaoNaTela[]> {
-  if (!SUPABASE_CONFIGURADO) return [];
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("promocoes_de_hoje", { p_local: null });
-  const promocoes = (data ?? []) as PromocaoNaTela[];
-  if (promocoes.length === 0) return [];
+function texto(v: string | string[] | undefined) {
+  return typeof v === "string" && v.trim() ? v.trim() : undefined;
+}
 
-  // A função devolve a promoção crua; o cartão precisa do nome do lugar.
-  const { data: locais } = await supabase
-    .from("locais")
-    .select("id, slug, nome")
-    .in("id", [...new Set(promocoes.map((p) => p.local_id))]);
+function lista(v: string | string[] | undefined) {
+  if (!v) return [];
+  return Array.isArray(v) ? v : [v];
+}
 
-  const porId = new Map((locais ?? []).map((l) => [l.id, l]));
-  return promocoes.map((p) => ({ ...p, local: porId.get(p.local_id) ?? null }));
+/** "−29.5901,-51.1631" vira coordenada, ou nada se vier torto. */
+function lerPosicao(v: string | undefined) {
+  if (!v) return null;
+  const [lat, lng] = v.split(",").map(Number);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
 }
 
 export default async function Explorar({
@@ -53,42 +42,24 @@ export default async function Explorar({
   const categoria = texto(params.categoria);
   const aberto = texto(params.aberto) === "1";
   const tags = lista(params.tag);
-  const quando = texto(params.quando) ?? "";
+  const posicao = lerPosicao(texto(params.perto));
 
-  const [categorias, todasTags, locais, promocoes, roteiros] = await Promise.all([
+  const [categorias, todasTags, locais] = await Promise.all([
     listarCategorias(),
     listarTags(),
     buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
-    promocoesDeHoje(),
-    listarRoteirosCurados(),
   ]);
 
-  // Eventos entram depois: precisam dos números das categorias, que só
-  // existem depois que a lista de categorias volta.
-  const eventos = await eventosVisiveis({
-    ate: ateQuando(quando),
-    categorias: categoria ? idsDaCategoria(categorias, categoria) : undefined,
-    limite: 12,
-  });
-
-  // A faixa de promoções some quando há busca ou filtro: quem digitou
-  // "pizza" quer pizza, não a quinta de caipirinha de outro lugar.
-  const semFiltro = !q && !categoria && !aberto && tags.length === 0;
-
   const principais = categorias.filter((c) => c.pai_id === null);
-  const atual = categorias.find((c) => c.slug === categoria);
-  const filhas = atual
-    ? categorias.filter((c) => c.pai_id === atual.id)
-    : [];
 
-  // Monta uma URL mantendo os filtros que já estão valendo.
+  /** Monta o endereço mantendo o que já estava filtrado. */
   function url(mudanca: Record<string, string | string[] | undefined>) {
     const base: Record<string, string | string[] | undefined> = {
       q,
       categoria,
       aberto: aberto ? "1" : undefined,
       tag: tags,
-      quando: quando || undefined,
+      perto: texto(params.perto),
       ...mudanca,
     };
     const busca = new URLSearchParams();
@@ -101,282 +72,122 @@ export default async function Explorar({
     return s ? `/explorar?${s}` : "/explorar";
   }
 
-  const temFiltro = Boolean(q || categoria || aberto || tags.length);
+  // Com a posição em mãos, a lista sai ordenada do mais perto ao mais longe.
+  // Lugar sem coordenada vai para o fim: não dá para dizer que está perto,
+  // e some do topo seria pior do que aparecer depois.
+  const comDistancia = posicao
+    ? locais
+        .map((l) => ({
+          local: l,
+          metros:
+            l.lat != null && l.lng != null
+              ? distancia(posicao, { lat: l.lat, lng: l.lng })
+              : null,
+        }))
+        .sort((a, b) => (a.metros ?? Infinity) - (b.metros ?? Infinity))
+    : locais.map((l) => ({ local: l, metros: null }));
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-bold">
-        {atual ? `${atual.emoji ?? ""} ${atual.nome}` : "Explorar Ivoti"}
-      </h1>
+    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+      <Cabecalho foto="/fotos/portico-ivoti.jpg" alt="">
+        <div className="flex items-center gap-2">
+          <h1
+            className="text-[22px] leading-none font-bold"
+            style={{
+              color: "var(--color-creme-claro)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            Explorar
+          </h1>
+          <CasaEnxaimel
+            tamanho={26}
+            style={{ color: "var(--color-creme-claro)" }}
+          />
+        </div>
+        <div className="mt-3">
+          <BuscaCabecalho placeholder="Pizza, trilha, café..." />
+        </div>
+      </Cabecalho>
 
-      <div className="mt-4 max-w-xl">
-        <BarraBusca inicial={q ?? ""} />
-      </div>
-
-      {/* ---- filtros ---- */}
-      <div className="mt-5 space-y-3">
-        <Tira nome="categorias">
+      <div className="pt-4">
+        <Fileira>
           <Chip href={url({ categoria: undefined })} ativo={!categoria}>
-            Tudo
+            Todos
           </Chip>
           {principais.map((c) => (
             <Chip
               key={c.id}
               href={url({ categoria: c.slug })}
               ativo={categoria === c.slug}
+              flor={c.slug === "natureza"}
             >
-              {c.emoji} {c.nome}
+              {c.nome}
             </Chip>
           ))}
-        </Tira>
+        </Fileira>
+      </div>
 
-        {filhas.length > 0 && (
-          <Tira nome="subcategorias">
-            {filhas.map((c) => (
-              <Chip key={c.id} href={url({ categoria: c.slug })} pequeno>
-                {c.emoji} {c.nome}
-              </Chip>
-            ))}
-          </Tira>
-        )}
-
-        <Tira nome="etiquetas">
+      <div className="pt-2">
+        <Fileira>
           <Chip
             href={url({ aberto: aberto ? undefined : "1" })}
             ativo={aberto}
-            pequeno
+            destaque
           >
-            🟢 Aberto agora
+            Aberto agora
           </Chip>
           {todasTags.map((t) => {
             const marcada = tags.includes(t.slug);
             return (
               <Chip
                 key={t.id}
-                pequeno
-                ativo={marcada}
                 href={url({
                   tag: marcada
-                    ? tags.filter((s) => s !== t.slug)
+                    ? tags.filter((x) => x !== t.slug)
                     : [...tags, t.slug],
                 })}
+                ativo={marcada}
               >
                 {t.emoji} {t.nome}
               </Chip>
             );
           })}
-        </Tira>
-
-        {temFiltro && (
-          <Link
-            href="/explorar"
-            className="inline-block text-sm font-medium text-mata-600 hover:underline"
-          >
-            Limpar filtros
-          </Link>
-        )}
+        </Fileira>
       </div>
 
-      {/* ---- o que rola ---- */}
-      {(eventos.length > 0 || quando !== "") && (
-        <section className="mt-8">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 className="text-lg font-semibold">O que rola</h2>
-            <Link href="/agenda" className="text-sm font-semibold text-mata-700 hover:underline">
-              Ver a agenda →
-            </Link>
-          </div>
+      <div className="pt-5">
+        <FaixaEnxaimel />
+      </div>
 
-          <TiraRolante className="mt-3">
-            {PERIODOS.map((p) => (
-              <Link
-                key={p.valor}
-                href={url({ quando: p.valor || undefined })}
-                className={`shrink-0 rounded-full px-3.5 py-2 text-sm transition ${
-                  quando === p.valor
-                    ? "bg-mata-600 font-semibold text-white"
-                    : "border border-mata-200 bg-creme hover:bg-mata-50"
-                }`}
-              >
-                {p.rotulo}
-              </Link>
-            ))}
-          </TiraRolante>
+      <div className="flex items-start justify-between gap-3 px-4 pt-4">
+        <p className="text-[14px]" style={{ color: "var(--color-texto-suave)" }}>
+          <strong style={{ color: "var(--color-texto)" }}>
+            {locais.length}
+          </strong>{" "}
+          {locais.length === 1 ? "lugar" : "lugares"} em Ivoti
+        </p>
+        <Suspense>
+          <PertoDeMim ativo={posicao !== null} />
+        </Suspense>
+      </div>
 
-          {eventos.length === 0 ? (
-            <p className="mt-3 rounded-2xl border border-dashed border-mata-200 bg-creme px-4 py-6 text-center text-sm text-tinta/55">
-              Nada marcado para esse período.
-            </p>
-          ) : (
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              {eventos.map((e) => (
-                <CartaoEvento key={e.id} evento={e} />
-              ))}
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* ---- promoções de hoje ---- */}
-      {semFiltro && promocoes.length > 0 && (
-        <section className="mt-8">
-          <h2 className="text-lg font-semibold">
-            Promoções de {DIAS[agoraNaCidade().diaSemana].toLowerCase()}
-          </h2>
-          <p className="text-sm text-tinta/55">
-            Valem hoje, em quem está no guia.
-          </p>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {promocoes.slice(0, 6).map((p) => (
-              <CartaoPromocao key={p.id} promocao={p} mostrarLocal />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ---- roteiros prontos ---- */}
-      {semFiltro && roteiros.length > 0 && (
-        <section className="mt-8">
-          <div className="flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2 className="text-lg font-semibold">Roteiros prontos</h2>
-              <p className="text-sm text-tinta/55">
-                Passeios montados, com a rota pronta para abrir no mapa.
-              </p>
-            </div>
-            <Link
-              href="/roteiros"
-              className="text-sm font-semibold text-mata-700 underline"
-            >
-              ver todos
-            </Link>
-          </div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
-            {roteiros.slice(0, 4).map((r) => (
-              <CartaoRoteiroPronto key={r.id} roteiro={r} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ---- resultados ---- */}
-      {/* Titulo de secao de verdade: sem ele a pagina pulava de H1 para os
-          H3 dos cartoes, e quem navega por titulos perdia a referencia. */}
-      <h2 className="mt-6 text-sm font-normal text-tinta/55">
-        {locais.length === 0
-          ? "Nenhum lugar encontrado"
-          : `${locais.length} ${locais.length === 1 ? "lugar" : "lugares"}`}
-      </h2>
-
-      {locais.length === 0 ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-mata-200 bg-creme p-10 text-center">
-          <p className="text-3xl">🤔</p>
-          <p className="mt-2 font-semibold">Não achei nada com esses filtros</p>
-          <p className="mt-1 text-sm text-tinta/60">
-            Tente afrouxar a busca — ou pergunte pro guia, ele sempre acha
-            alguma coisa.
-          </p>
-          <Link
-            href="/chat"
-            className="mt-5 inline-block rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white"
-          >
-            Perguntar ao guia
-          </Link>
-        </div>
-      ) : (
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {locais.map((l) => (
-            <CardLocal key={l.id} local={l} />
-          ))}
-        </div>
-      )}
+      <div className="space-y-3 px-4 pt-3 pb-8">
+        {comDistancia.length === 0 ? (
+          <Vazio>
+            Nada encontrado com esses filtros. Tente afrouxar a busca.
+          </Vazio>
+        ) : (
+          comDistancia.map(({ local, metros }, i) => (
+            <CardLugar
+              key={local.id}
+              local={local}
+              distancia={metros ?? undefined}
+              variante={i % 2 === 0 ? 1 : 2}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
-}
-
-function Tira({
-  children,
-  nome,
-}: {
-  children: React.ReactNode;
-  nome?: string;
-}) {
-  return <TiraRolante nome={nome}>{children}</TiraRolante>;
-}
-
-function Chip({
-  href,
-  children,
-  ativo,
-  pequeno,
-}: {
-  href: string;
-  children: React.ReactNode;
-  ativo?: boolean;
-  pequeno?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={[
-        "shrink-0 border whitespace-nowrap transition",
-        pequeno ? "min-h-9 px-3.5 py-2 text-xs" : "min-h-9 px-4 py-2 text-sm font-medium",
-        ativo
-          ? "border-carvalho bg-carvalho text-creme"
-          : "border-carvalho/25 bg-creme text-tinta/70 hover:border-carvalho hover:text-tinta",
-      ].join(" ")}
-    >
-      {children}
-    </Link>
-  );
-}
-
-function texto(valor: string | string[] | undefined): string | undefined {
-  if (Array.isArray(valor)) return valor[0];
-  return valor || undefined;
-}
-
-function lista(valor: string | string[] | undefined): string[] {
-  if (!valor) return [];
-  return Array.isArray(valor) ? valor : [valor];
-}
-
-/** Os períodos que o visitante pode escolher na faixa de eventos. */
-const PERIODOS = [
-  { valor: "", rotulo: "Todos" },
-  { valor: "hoje", rotulo: "Hoje" },
-  { valor: "fds", rotulo: "Fim de semana" },
-  { valor: "mes", rotulo: "Próximos 30 dias" },
-];
-
-/** Traduz o período escolhido na última data que ainda entra. */
-function ateQuando(quando: string): string | undefined {
-  const hoje = hojeEmIvoti();
-  if (quando === "hoje") return hoje;
-
-  if (quando === "fds") {
-    // Até o domingo desta semana. Se hoje já é domingo, é hoje mesmo.
-    const d = new Date(`${hoje}T12:00:00-03:00`);
-    const faltam = (7 - d.getDay()) % 7;
-    d.setDate(d.getDate() + faltam);
-    return d.toISOString().slice(0, 10);
-  }
-
-  if (quando === "mes") {
-    const d = new Date(`${hoje}T12:00:00-03:00`);
-    d.setDate(d.getDate() + 30);
-    return d.toISOString().slice(0, 10);
-  }
-
-  return undefined;
-}
-
-/** A categoria escolhida mais as filhas dela, em números. */
-function idsDaCategoria(
-  categorias: { id: number; slug: string; pai_id: number | null }[],
-  slug: string,
-): number[] | undefined {
-  const alvo = categorias.find((c) => c.slug === slug);
-  if (!alvo) return undefined;
-  return [alvo.id, ...categorias.filter((c) => c.pai_id === alvo.id).map((c) => c.id)];
 }
