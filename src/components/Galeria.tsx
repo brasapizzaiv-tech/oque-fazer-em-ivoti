@@ -55,7 +55,7 @@ export default function Galeria({
 
   if (total === 0) {
     return (
-      <div className="mt-4 grid aspect-[16/7] place-items-center rounded-2xl bg-mata-50 text-6xl">
+      <div className="mt-4 grid aspect-[16/7] place-items-center border-2 border-carvalho bg-cal-sombra text-6xl">
         {emoji}
       </div>
     );
@@ -63,7 +63,7 @@ export default function Galeria({
 
   return (
     <div className="mt-4">
-      <div className="relative aspect-[16/9] overflow-hidden rounded-2xl bg-mata-50 sm:aspect-[16/7]">
+      <div className="relative aspect-[16/9] overflow-hidden border-2 border-carvalho bg-cal-sombra sm:aspect-[16/7]">
         {/* A mesma foto, ampliada e desfocada, preenchendo o fundo.
             A foto de cima aparece inteira, sem corte — e como quase nenhuma
             tem o formato exato da moldura, sobrariam tarjas vazias dos lados.
@@ -116,8 +116,8 @@ export default function Galeria({
               onClick={() => setAtual(i)}
               aria-label={`Foto ${i + 1}`}
               className={[
-                "relative h-16 w-24 shrink-0 overflow-hidden rounded-lg border-2 transition",
-                i === atual ? "border-mata-600" : "border-transparent",
+                "relative h-16 w-24 shrink-0 overflow-hidden border-2 transition",
+                i === atual ? "border-sol-600" : "border-carvalho/25",
               ].join(" ")}
             >
               <Image src={url} alt="" fill sizes="96px" className="object-cover" />

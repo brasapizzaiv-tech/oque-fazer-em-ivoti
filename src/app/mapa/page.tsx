@@ -80,8 +80,8 @@ function Filtro({
       className={[
         "shrink-0 rounded-full border px-4 py-2 text-sm font-medium whitespace-nowrap transition",
         ativo
-          ? "border-mata-600 bg-mata-600 text-white"
-          : "border-mata-200 bg-white text-tinta/75 hover:bg-mata-50",
+          ? "border-carvalho bg-carvalho text-creme"
+          : "border-carvalho/25 bg-creme text-tinta/70 hover:border-carvalho hover:text-tinta",
       ].join(" ")}
     >
       {children}

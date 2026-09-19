@@ -132,8 +132,8 @@ export default async function PaginaLocal({
             <h1 className="text-3xl font-bold">{local.nome}</h1>
             <p className="mt-1 text-sm text-tinta/55">
               {local.categoria?.nome}
-              {local.bairro ? ` · ${local.bairro}` : ""}
-              {local.faixa_preco ? ` · ${faixaPreco(local.faixa_preco)}` : ""}
+              {local.bairro ? `   ${local.bairro}` : ""}
+              {local.faixa_preco ? `   ${faixaPreco(local.faixa_preco)}` : ""}
             </p>
           </div>
           <SeloAberto horarios={local.horarios} />
@@ -150,7 +150,7 @@ export default async function PaginaLocal({
           href={linkRota(local)}
           tipo="clique_rota"
           local={local.id}
-          className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-mata-700"
+          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-creme transition hover:border-sol-700 hover:bg-sol-700"
         >
           🧭 Como chegar
         </LinkDeContato>
@@ -215,7 +215,7 @@ export default async function PaginaLocal({
                 {local.tags.map((t) => (
                   <span
                     key={t.id}
-                    className="rounded-full bg-mata-50 px-3 py-1.5 text-sm text-mata-800"
+                    className="border border-carvalho/25 px-3 py-1.5 text-sm text-tinta/75"
                   >
                     {t.emoji} {t.nome}
                   </span>
@@ -314,7 +314,7 @@ export default async function PaginaLocal({
 
         {/* ---- coluna lateral ---- */}
         <aside className="space-y-6">
-          <section className="rounded-2xl border border-mata-100 bg-white p-4">
+          <section className="border-2 border-carvalho bg-creme p-4">
             <h2 className="font-semibold">Horários</h2>
             {local.horarios.length === 0 ? (
               <p className="mt-2 text-sm text-tinta/55">
@@ -339,7 +339,7 @@ export default async function PaginaLocal({
           </section>
 
           {endereco && (
-            <section className="rounded-2xl border border-mata-100 bg-white p-4">
+            <section className="border-2 border-carvalho bg-creme p-4">
               <h2 className="font-semibold">Endereço</h2>
               <p className="mt-1 text-sm text-tinta/70">
                 {endereco}

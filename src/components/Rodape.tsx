@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Rodape() {
   return (
-    <footer className="mt-16 border-t border-mata-100 bg-white">
+    <footer className="mt-16 border-t-2 border-carvalho bg-creme">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
           <p className="font-[family-name:var(--font-titulo)] text-lg font-semibold">
@@ -57,7 +57,7 @@ export default function Rodape() {
         </div>
       </div>
 
-      <div className="border-t border-mata-50 py-4 text-center text-xs text-tinta/50">
+      <div className="border-t-2 border-carvalho/20 py-4 text-center text-xs text-tinta/50">
         Ivoti · Rio Grande do Sul
       </div>
     </footer>

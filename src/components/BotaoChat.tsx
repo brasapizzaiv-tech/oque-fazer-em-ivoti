@@ -26,7 +26,7 @@ export default function BotaoChat() {
             className="absolute inset-0 bg-tinta/30 backdrop-blur-[2px]"
           />
           <div className="relative flex h-[min(600px,100dvh)] w-full flex-col overflow-hidden bg-creme shadow-2xl sm:h-[600px] sm:w-[400px] sm:rounded-2xl">
-            <div className="flex items-center gap-2 border-b border-mata-100 bg-mata-600 px-4 py-3 text-white">
+            <div className="flex items-center gap-2 border-b-2 border-carvalho bg-carvalho px-4 py-3 text-creme">
               <span className="text-lg">🌿</span>
               <div className="leading-tight">
                 <p className="text-sm font-semibold">Guia de Ivoti</p>
@@ -54,7 +54,7 @@ export default function BotaoChat() {
         <button
           type="button"
           onClick={() => setAberto(true)}
-          className="fixed right-4 bottom-4 z-40 flex items-center gap-2 rounded-full bg-mata-600 py-3 pr-5 pl-4 font-semibold text-white shadow-xl transition hover:bg-mata-700"
+          className="fixed right-4 bottom-4 z-40 flex items-center gap-2 border-2 border-carvalho bg-sol-700 py-3 pr-5 pl-4 font-semibold text-creme shadow-lg transition hover:bg-sol-800"
         >
           <span className="text-lg">🌿</span>
           <span className="text-sm">O que fazer hoje?</span>

@@ -130,7 +130,7 @@ function Seta({
       aria-label={lado === "esquerda" ? "Ver anteriores" : "Ver mais"}
       className={[
         // 36px de alvo: menor que isto o dedo erra, e a fileira tem 30px.
-        "absolute top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-full border border-mata-200 bg-white text-tinta shadow-sm transition hover:bg-mata-50",
+        "absolute top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center border-2 border-carvalho bg-creme text-tinta transition hover:bg-cal-sombra",
         lado === "esquerda" ? "left-0" : "right-0",
       ].join(" ")}
     >

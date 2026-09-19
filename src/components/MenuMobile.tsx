@@ -17,20 +17,20 @@ export default function MenuMobile({
         onClick={() => setAberto((v) => !v)}
         aria-label={aberto ? "Fechar menu" : "Abrir menu"}
         aria-expanded={aberto}
-        className="grid h-10 w-10 place-items-center rounded-lg border border-mata-200 text-mata-700"
+        className="grid h-10 w-10 place-items-center border-2 border-carvalho text-tinta"
       >
         {aberto ? "✕" : "☰"}
       </button>
 
       {aberto && (
-        <div className="absolute top-16 right-0 left-0 border-b border-mata-100 bg-creme p-4 shadow-lg">
+        <div className="absolute top-16 right-0 left-0 border-b-2 border-carvalho bg-creme p-4 shadow-lg">
           <nav className="flex flex-col gap-1">
             {links.map((l) => (
               <Link
                 key={l.href}
                 href={l.href}
                 onClick={() => setAberto(false)}
-                className="rounded-lg px-3 py-3 font-medium text-tinta/80 hover:bg-mata-50"
+                className="px-3 py-3 font-medium text-tinta/80 hover:bg-cal-sombra"
               >
                 {l.texto}
               </Link>
@@ -38,7 +38,7 @@ export default function MenuMobile({
             <Link
               href="/painel"
               onClick={() => setAberto(false)}
-              className="mt-2 rounded-lg bg-mata-600 px-3 py-3 text-center font-semibold text-white"
+              className="mt-2 border-2 border-carvalho bg-carvalho px-3 py-3 text-center font-semibold text-creme"
             >
               Sou um estabelecimento
             </Link>

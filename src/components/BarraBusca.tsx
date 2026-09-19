@@ -33,7 +33,7 @@ export default function BarraBusca({
           placeholder="Pizza, trilha, café..."
           aria-label="Buscar no guia"
           className={[
-            "w-full rounded-full border border-mata-200 bg-white pr-4 pl-11 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100",
+            "w-full border-2 border-carvalho bg-creme pr-4 pl-11 outline-none focus:border-sol-600",
             grande ? "py-4 text-base" : "py-3 text-sm",
           ].join(" ")}
         />
@@ -41,7 +41,7 @@ export default function BarraBusca({
       <button
         type="submit"
         className={[
-          "shrink-0 rounded-full bg-mata-600 font-semibold text-white transition hover:bg-mata-700",
+          "shrink-0 border-2 border-carvalho bg-carvalho font-semibold text-creme transition hover:bg-sol-700 hover:border-sol-700",
           grande ? "px-6 py-4" : "px-5 py-3 text-sm",
         ].join(" ")}
       >

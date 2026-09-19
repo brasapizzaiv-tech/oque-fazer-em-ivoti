@@ -1,6 +1,6 @@
 import { SITE } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
-import { Outfit, Inter } from "next/font/google";
+import { Bricolage_Grotesque, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import Cabecalho from "@/components/Cabecalho";
@@ -10,15 +10,21 @@ import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 import Rodape from "@/components/Rodape";
 import BotaoChat from "@/components/BotaoChat";
 
-const titulo = Outfit({
+// Bricolage Grotesque tem letras construidas, quase de placa pintada de
+// comercio — e larguras variaveis, que combinam com os montantes do enxaimel.
+// Saiu no lugar da Outfit, que e correta e nao diz nada.
+const titulo = Bricolage_Grotesque({
   variable: "--fonte-titulo",
   subsets: ["latin"],
   display: "swap",
 });
 
-const corpo = Inter({
+// IBM Plex Sans no lugar da Inter: tem um ar de coisa desenhada para durar,
+// e segura bem o tamanho pequeno lido no sol, de pe na calcada.
+const corpo = IBM_Plex_Sans({
   variable: "--fonte-corpo",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 

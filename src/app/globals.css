@@ -9,6 +9,8 @@
    ============================================================ */
 
 @theme {
+  /* Verde da mata: continua, mas com UM trabalho so — dizer "aberto agora".
+     Fora disso ele nao pinta mais nada, para o sinal nao se gastar. */
   --color-mata-50: #eefaf4;
   --color-mata-100: #d5f2e4;
   --color-mata-200: #ade4cc;
@@ -21,20 +23,31 @@
   --color-mata-900: #0f4132;
   --color-mata-950: #06251c;
 
-  --color-sol-50: #fff9ed;
-  --color-sol-100: #fff1d4;
-  --color-sol-200: #ffdfa8;
-  --color-sol-300: #ffc670;
-  --color-sol-400: #ffa337;
-  --color-sol-500: #fd8611;
-  --color-sol-600: #ee6a07;
-  --color-sol-700: #c54e08;
-  --color-sol-800: #9c3d0f;
-  --color-sol-900: #7e3410;
-  --color-sol-950: #441806;
+  /* Telha: o barro do Portico e dos telhados do Nucleo Enxaimel. Era um
+     ambar generico; agora e o vermelho-marrom que esta nas nossas proprias
+     fotos da cidade. Mais fundo e mais terroso que o terracota da moda. */
+  --color-sol-50: #fbf1ed;
+  --color-sol-100: #f6e0d7;
+  --color-sol-200: #edc0af;
+  --color-sol-300: #e09b80;
+  --color-sol-400: #ce7355;
+  --color-sol-500: #b85535;
+  --color-sol-600: #a6462e;
+  --color-sol-700: #8a3927;
+  --color-sol-800: #6e2f21;
+  --color-sol-900: #5a281d;
+  --color-sol-950: #321510;
 
-  --color-creme: #fbf8f3;
-  --color-tinta: #1c1a17;
+  /* Cal: a caiacao dos paineis brancos entre as madeiras. Puxa para o
+     verde-cinza, nao para o amarelo — cal nao e creme. */
+  --color-creme: #f2f4f1;
+  /* O painel recuado: e ele que diz "fechado" sem precisar de palavra. */
+  --color-cal-sombra: #e2e6e0;
+  /* Carvalho: a madeira da estrutura. Divide o conteudo como divide a parede. */
+  --color-carvalho: #3b2f2a;
+  --color-carvalho-claro: #6b5850;
+  /* Tinta com o mesmo fundo quente da madeira, em vez de cinza tingido. */
+  --color-tinta: #211c19;
 
   --font-titulo: var(--fonte-titulo), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--fonte-corpo), ui-sans-serif, system-ui, sans-serif;

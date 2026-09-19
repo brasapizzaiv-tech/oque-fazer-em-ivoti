@@ -1,5 +1,6 @@
 import Image from "next/image";
 import TiraRolante from "@/components/TiraRolante";
+import MaoFrancesa from "@/components/MaoFrancesa";
 import Link from "next/link";
 import BarraBusca from "@/components/BarraBusca";
 import CardLocal from "@/components/CardLocal";
@@ -31,73 +32,82 @@ export default async function Home() {
 
   return (
     <>
-      {/* ---------------- topo ---------------- */}
-      <section className="relative overflow-hidden border-b border-mata-100">
-        {/* O Portico e o cartao-postal de quem chega em Ivoti — e a primeira
-            coisa que a pessoa ve no site tambem. O veu por cima garante que o
-            titulo continue legivel em qualquer tela. */}
-        <Image
-          src="/fotos/portico-ivoti.jpg"
-          alt="Pórtico de Ivoti"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        {/* No celular a foto entra num recorte estreito e o texto cai em cima
-            do telhado claro, entao o veu vai mais forte ali. */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-linear-to-b from-mata-950/80 via-mata-950/65 to-mata-950/80 sm:from-mata-950/70 sm:via-mata-950/45 sm:to-mata-950/75"
-        />
+      {/* ---------------- topo ----------------
+          Nao e um cartaz: e a parede enxaimel, com conteudo vivo em cada
+          painel. A foto entra num vao, e nao atras de tudo; a hora, o clima
+          e a contagem ficam em celulas separadas por madeira, no lugar de
+          uma linha unica costurada por pontos medios.
+      */}
+      <section className="bg-creme">
+        <div className="mx-auto max-w-6xl px-4 py-8 sm:py-12">
+          <div className="border-2 border-carvalho bg-creme">
+            <div className="grid sm:grid-cols-[2fr_3fr]">
+              <div className="relative min-h-52 border-b-2 border-carvalho sm:min-h-0 sm:border-r-2 sm:border-b-0">
+                <Image
+                  src="/fotos/portico-ivoti.jpg"
+                  alt="O Pórtico de Ivoti, na entrada da cidade"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 100vw, 40vw"
+                  className="object-cover"
+                />
+              </div>
 
-        <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:py-24">
-          <p className="text-sm font-semibold text-sol-300">
-            {saudacao} É {DIAS[agora.diaSemana].toLowerCase()},{" "}
-            {agora.hhmm} em Ivoti
-            {clima && (
-              <>
-                {" · "}
-                <span title={clima.descricao}>
-                  {clima.graus}°C {clima.emoji}
-                </span>
-              </>
-            )}
-          </p>
-          <h1 className="mt-3 text-4xl leading-tight font-bold text-white drop-shadow-sm sm:text-5xl">
-            O Guia de <span className="text-sol-300">Ivoti</span>
-          </h1>
-          <p className="mx-auto mt-3 max-w-xl text-white/80">
-            Onde comer, beber, passear e se hospedar. Tudo num lugar só — com
-            mapa, horários e um guia que responde suas perguntas.
-          </p>
+              <div className="divide-y-2 divide-carvalho">
+                <div className="grid grid-cols-[1fr_auto] divide-x-2 divide-carvalho">
+                  <p className="px-4 py-2.5 text-sm font-medium">
+                    {saudacao} {DIAS[agora.diaSemana]}, {agora.hhmm}
+                  </p>
+                  {clima && (
+                    <p
+                      className="px-4 py-2.5 text-sm font-medium whitespace-nowrap"
+                      title={clima.descricao}
+                    >
+                      {clima.graus}°C {clima.emoji}
+                    </p>
+                  )}
+                </div>
 
-          <div className="mx-auto mt-7 max-w-xl">
-            <BarraBusca grande />
-          </div>
+                <div className="px-4 py-6 sm:px-6 sm:py-8">
+                  <h1 className="font-[family-name:var(--font-titulo)] text-[2.75rem] leading-[0.95] font-bold tracking-tight text-tinta sm:text-6xl">
+                    O Guia
+                    <br />
+                    de Ivoti
+                  </h1>
+                  <p className="mt-4 max-w-md text-tinta/70">
+                    Onde comer, beber, passear e se hospedar — com horário de
+                    hoje, endereço e rota no mapa.
+                  </p>
+                </div>
 
-          <div className="mt-4 flex flex-wrap justify-center gap-2 text-sm">
-            <Link
-              href="/explorar?aberto=1"
-              className="rounded-full border border-mata-200 bg-white px-3 py-1.5 hover:bg-mata-50"
-            >
-              🟢 Aberto agora
-            </Link>
-            <Link
-              href="/mapa"
-              className="rounded-full border border-mata-200 bg-white px-3 py-1.5 hover:bg-mata-50"
-            >
-              🗺️ Ver no mapa
-            </Link>
-            <Link
-              href="/chat"
-              className="rounded-full bg-mata-600 px-3 py-1.5 font-semibold text-white hover:bg-mata-700"
-            >
-              💬 Pergunte ao Guia
-            </Link>
+                <div className="px-4 py-4 sm:px-6">
+                  <BarraBusca grande />
+                </div>
+              </div>
+            </div>
+
+            {/* A parede baixa: os numeros que respondem "o que da para fazer
+                agora", cada um no seu vao. */}
+            <div className="grid grid-cols-2 divide-x-2 divide-y-2 divide-carvalho border-t-2 border-carvalho sm:grid-cols-4 sm:divide-y-0">
+              <Vao
+                href="/explorar?aberto=1"
+                numero={abertos.length}
+                rotulo={abertos.length === 1 ? "aberto agora" : "abertos agora"}
+                aceso
+              />
+              <Vao
+                href="/explorar"
+                numero={todos.length}
+                rotulo={todos.length === 1 ? "lugar no guia" : "lugares no guia"}
+              />
+              <Vao href="/mapa" rotulo="Ver no mapa" />
+              <Vao href="/chat" rotulo="Perguntar ao Guia" />
+            </div>
           </div>
         </div>
       </section>
+
+      <MaoFrancesa />
 
       {/* ---------------- categorias ---------------- */}
       {principais.length > 0 && (
@@ -108,7 +118,7 @@ export default async function Home() {
               <Link
                 key={c.id}
                 href={`/explorar?categoria=${c.slug}`}
-                className="flex w-32 shrink-0 flex-col items-center gap-2 rounded-2xl border border-mata-100 bg-white p-4 text-center transition hover:-translate-y-0.5 hover:border-mata-300 hover:shadow"
+                className="flex w-32 shrink-0 flex-col items-center gap-2 border-2 border-carvalho bg-creme p-4 text-center transition hover:bg-cal-sombra"
               >
                 <span className="text-3xl">{c.emoji}</span>
                 <span className="text-sm leading-tight font-medium">
@@ -246,5 +256,43 @@ function Secao({
         </div>
       )}
     </section>
+  );
+}
+
+/**
+ * Um vão da parede baixa do topo.
+ *
+ * Com número quando há número a dizer; só com o rótulo quando é um caminho.
+ * O ponto verde aparece em um único lugar no site inteiro — "aberto agora" —
+ * para a cor não se gastar dizendo outras coisas.
+ */
+function Vao({
+  href,
+  numero,
+  rotulo,
+  aceso = false,
+}: {
+  href: string;
+  numero?: number;
+  rotulo: string;
+  aceso?: boolean;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group flex min-h-20 flex-col justify-center px-4 py-3 transition hover:bg-cal-sombra"
+    >
+      {numero !== undefined && (
+        <span className="font-[family-name:var(--font-titulo)] text-3xl leading-none font-bold text-tinta">
+          {numero}
+        </span>
+      )}
+      <span className="mt-1 flex items-center gap-1.5 text-sm text-tinta/70 group-hover:text-tinta">
+        {aceso && (
+          <span className="h-2 w-2 shrink-0 rounded-full bg-mata-600" />
+        )}
+        {rotulo}
+      </span>
+    </Link>
   );
 }
