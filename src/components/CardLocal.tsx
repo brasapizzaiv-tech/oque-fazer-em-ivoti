@@ -32,11 +32,11 @@ export default function CardLocal({
       href={`/local/${local.slug}`}
       className={[
         "group flex flex-col overflow-hidden border-2 border-carvalho transition",
-        aberto ? "bg-creme" : "bg-cal-sombra",
+        aberto ? "bg-creme" : "bg-fechado",
         "hover:border-sol-600",
       ].join(" ")}
     >
-      <div className="relative aspect-[4/3] border-b-2 border-carvalho bg-cal-sombra">
+      <div className="relative aspect-[4/3] border-b-2 border-carvalho bg-fechado">
         {local.capa_url ? (
           <Image
             src={local.capa_url}
@@ -46,7 +46,7 @@ export default function CardLocal({
             className={[
               "object-cover",
               // Fechado tambem desbota a foto: o painel inteiro recua junto.
-              aberto ? "" : "opacity-75 saturate-50",
+              aberto ? "" : "opacity-65 saturate-[.35]",
             ].join(" ")}
           />
         ) : (

@@ -76,29 +76,31 @@ export default function TiraRolante({
   const podeAbrir = aberta || temDireita || temEsquerda;
 
   return (
-    <div className={`relative ${className}`}>
-      <div
-        ref={trilho}
-        className={
-          aberta
-            ? "flex flex-wrap gap-2"
-            : "sem-barra flex gap-2 overflow-x-auto pb-1"
-        }
-      >
-        {children}
-      </div>
+    <div className={className}>
+      <div className="relative">
+        <div
+          ref={trilho}
+          className={
+            aberta
+              ? "flex flex-wrap gap-2"
+              : "sem-barra flex gap-2 overflow-x-auto pb-1"
+          }
+        >
+          {children}
+        </div>
 
-      {/* Esmaecidos: so aparecem do lado onde ainda ha conteudo. Ficam fora
+        {/* Esmaecidos: so aparecem do lado onde ainda ha conteudo. Ficam fora
           do caminho do toque para nao roubarem o arrasto da fileira. */}
-      {temEsquerda && (
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-linear-to-r from-creme to-transparent" />
-      )}
-      {temDireita && (
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-linear-to-l from-creme to-transparent" />
-      )}
+        {temEsquerda && (
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-linear-to-r from-creme to-transparent" />
+        )}
+        {temDireita && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-linear-to-l from-creme to-transparent" />
+        )}
 
-      {temEsquerda && <Seta lado="esquerda" onClick={() => deslizar(-1)} />}
-      {temDireita && <Seta lado="direita" onClick={() => deslizar(1)} />}
+        {temEsquerda && <Seta lado="esquerda" onClick={() => deslizar(-1)} />}
+        {temDireita && <Seta lado="direita" onClick={() => deslizar(1)} />}
+      </div>
 
       {podeAbrir && (
         <button

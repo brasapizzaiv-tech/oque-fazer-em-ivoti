@@ -41,8 +41,12 @@
   /* Cal: a caiacao dos paineis brancos entre as madeiras. Puxa para o
      verde-cinza, nao para o amarelo — cal nao e creme. */
   --color-creme: #f2f4f1;
-  /* O painel recuado: e ele que diz "fechado" sem precisar de palavra. */
-  --color-cal-sombra: #e2e6e0;
+  /* O painel recuado, usado ao passar o mouse. */
+  --color-cal-sombra: #e6e9e4;
+  /* O vao fechado. Mais fundo que a sombra de hover de proposito: a
+     diferenca precisa ser vista de relance, numa grade inteira, sem
+     comparar lado a lado. */
+  --color-fechado: #d6dcd3;
   /* Carvalho: a madeira da estrutura. Divide o conteudo como divide a parede. */
   --color-carvalho: #3b2f2a;
   --color-carvalho-claro: #6b5850;
