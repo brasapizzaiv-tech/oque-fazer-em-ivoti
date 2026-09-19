@@ -11,7 +11,7 @@ export default function FaixaDemonstracao() {
 
   return (
     <div className="bg-sol-500 px-4 py-2 text-center text-xs font-medium text-white">
-      Modo demonstração — os lugares aqui são inventados só pra você ver como
+      Modo demonstração — os lugares aqui são inventados só para você ver como
       o site fica
       {semChat && ", e o guia responde com frases prontas (o de verdade usa IA)"}
       .

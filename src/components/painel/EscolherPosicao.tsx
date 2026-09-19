@@ -40,8 +40,8 @@ export default function EscolherPosicao({
     <div>
       <p className="mb-2 text-sm text-tinta/60">
         {posicao
-          ? "Arraste o pino pra ajustar a posição exata."
-          : "Toque no mapa pra marcar onde fica."}
+          ? "Arraste o pino para ajustar a posição exata."
+          : "Toque no mapa para marcar onde fica."}
       </p>
       <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
         <div className="h-64 overflow-hidden rounded-xl">

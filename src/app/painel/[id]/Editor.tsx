@@ -170,7 +170,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
       {faltando.length > 0 ? (
         <>
           <p className="text-sm font-medium">
-            Falta pouco pra publicar. Ainda precisa de:
+            Falta pouco para publicar. Ainda precisa de:
           </p>
           <ul className="mt-1.5 list-inside list-disc text-sm text-tinta/65">
             {faltando.map((f) => (
@@ -180,7 +180,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
         </>
       ) : (
         <p className="text-sm font-medium">
-          Tudo pronto! Mande pra análise que a gente publica.
+          Tudo pronto! Mande para análise que a gente publica.
         </p>
       )}
 
@@ -252,7 +252,14 @@ function Sobre({
       .eq("id", local.id);
 
     if (error) setErro(error.message);
-    else setSalvo(true);
+    else {
+      setSalvo(true);
+    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+    // horários — o dado ia para o banco, mas a lista e montada no servidor e
+    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+    router.refresh();
+    }
 
     setSalvando(false);
     router.refresh();
@@ -288,7 +295,7 @@ function Sobre({
 
         <Texto
           rotulo="Resumo"
-          dica="Uma frase curta. Ex: “Pizza na lenha e chope gelado, com pátio pra criançada”."
+          dica="Uma frase curta. Ex: “Pizza na lenha e chope gelado, com pátio para a criançada”."
           valor={dados.resumo}
           onChange={mudar("resumo")}
         />
@@ -388,6 +395,11 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
 
     setSalvando(false);
     setSalvo(true);
+    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+    // horários — o dado ia para o banco, mas a lista e montada no servidor e
+    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+    router.refresh();
     router.refresh();
   }
 
@@ -395,7 +407,7 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
     <form onSubmit={salvar}>
       <Bloco
         titulo="Etiquetas"
-        descricao="Marque tudo que se aplica. É assim que o guia acha vocês quando alguém pede “um lugar ao ar livre pra levar as crianças”."
+        descricao="Marque tudo que se aplica. É assim que o guia acha vocês quando alguém pede “um lugar ao ar livre para levar as crianças”."
       >
         <div className="flex flex-wrap gap-2">
           {tags.map((t) => {
@@ -472,7 +484,14 @@ function Endereco({ local }: { local: LocalCompleto }) {
       .eq("id", local.id);
 
     if (error) setErro(error.message);
-    else setSalvo(true);
+    else {
+      setSalvo(true);
+    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+    // horários — o dado ia para o banco, mas a lista e montada no servidor e
+    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+    router.refresh();
+    }
 
     setSalvando(false);
     router.refresh();

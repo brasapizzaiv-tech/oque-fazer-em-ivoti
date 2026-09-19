@@ -133,7 +133,7 @@ export default async function Home() {
       {/* ---------------- aberto agora ---------------- */}
       <Secao
         titulo="Aberto agora"
-        subtitulo="Dá pra ir agora mesmo"
+        subtitulo="Dá para ir agora mesmo"
         verMais="/explorar?aberto=1"
         locais={abertos.slice(0, 8)}
         vazio="Nada aberto neste horário por enquanto."
@@ -151,7 +151,7 @@ export default async function Home() {
 
       {/* ---------------- convite pro chat ---------------- */}
       <section className="mx-auto max-w-6xl px-4 py-12">
-        <div className="relative isolate overflow-hidden rounded-3xl px-6 py-14 text-center text-white sm:px-12">
+        <div className="relative isolate overflow-hidden  px-6 py-14 text-center text-white sm:px-12">
           {/* O letreiro da entrada da cidade quebra o meio da home, que daqui
               pra baixo era tudo claro. O veu escuro segura a leitura do texto
               por cima das flores e do ceu. */}
@@ -179,7 +179,7 @@ export default async function Home() {
           </p>
           <Link
             href="/chat"
-            className="mt-6 inline-block rounded-full bg-white px-6 py-3 font-semibold text-mata-800 transition hover:bg-mata-50"
+            className="mt-6 inline-block rounded-full bg-creme px-6 py-3 font-semibold text-mata-800 transition hover:bg-cal-sombra"
           >
             Conversar com o Guia
           </Link>
@@ -189,7 +189,7 @@ export default async function Home() {
       {/* ---------------- convite pros estabelecimentos ---------------- */}
       {todos.length < 10 && (
         <section className="mx-auto max-w-6xl px-4 pb-12">
-          <div className="rounded-2xl border border-dashed border-mata-300 bg-white p-8 text-center">
+          <div className="border-2 border-dashed border-carvalho/40 bg-creme p-8 text-center">
             <h2 className="text-xl font-semibold">
               Tem um negócio em Ivoti?
             </h2>
@@ -245,7 +245,7 @@ function Secao({
       </div>
 
       {locais.length === 0 ? (
-        <p className="mt-4 rounded-2xl border border-dashed border-mata-200 bg-white p-6 text-center text-sm text-tinta/55">
+        <p className="mt-4 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center text-sm text-tinta/55">
           {vazio}
         </p>
       ) : (
@@ -289,7 +289,7 @@ function Vao({
       )}
       <span className="mt-1 flex items-center gap-1.5 text-sm text-tinta/70 group-hover:text-tinta">
         {aceso && (
-          <span className="h-2 w-2 shrink-0 rounded-full bg-mata-600" />
+          <span className="h-2 w-2 shrink-0 border-2 border-carvalho bg-carvalho" />
         )}
         {rotulo}
       </span>

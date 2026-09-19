@@ -159,7 +159,7 @@ export default async function PaginaLocal({
             href={whats}
             tipo="clique_whatsapp"
             local={local.id}
-            className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             💬 WhatsApp
           </LinkDeContato>
@@ -170,7 +170,7 @@ export default async function PaginaLocal({
             tipo="clique_telefone"
             local={local.id}
             externo={false}
-            className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             📞 {telefoneBonito(local.telefone)}
           </LinkDeContato>
@@ -180,7 +180,7 @@ export default async function PaginaLocal({
             href={`https://instagram.com/${insta}`}
             tipo="clique_instagram"
             local={local.id}
-            className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             📷 @{insta}
           </LinkDeContato>
@@ -190,7 +190,7 @@ export default async function PaginaLocal({
             href={local.site.startsWith("http") ? local.site : `https://${local.site}`}
             tipo="clique_site"
             local={local.id}
-            className="rounded-full border border-mata-200 bg-white px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
           >
             🌐 Site
           </LinkDeContato>
@@ -283,7 +283,7 @@ export default async function PaginaLocal({
                         {secao}
                       </h3>
                     )}
-                    <ul className="mt-2 divide-y divide-mata-50 rounded-xl border border-mata-100 bg-white">
+                    <ul className="mt-2 divide-y divide-mata-50 rounded-xl border border-mata-100 bg-creme">
                       {itens.map((i) => (
                         <li
                           key={i.id}

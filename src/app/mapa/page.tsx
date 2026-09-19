@@ -30,7 +30,7 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
       <h1 className="text-2xl font-bold">Mapa de Ivoti</h1>
       <p className="mt-1 text-sm text-tinta/60">
         {noMapa.length} {noMapa.length === 1 ? "lugar" : "lugares"} no mapa.
-        Toque num pino pra ver os detalhes e traçar a rota.
+        Toque num pino para ver os detalhes e traçar a rota.
       </p>
 
       <TiraRolante className="mt-4" nome="categorias">

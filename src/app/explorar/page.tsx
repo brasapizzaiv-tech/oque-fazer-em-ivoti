@@ -195,7 +195,7 @@ export default async function Explorar({
                 className={`shrink-0 rounded-full px-3.5 py-2 text-sm transition ${
                   quando === p.valor
                     ? "bg-mata-600 font-semibold text-white"
-                    : "border border-mata-200 bg-white hover:bg-mata-50"
+                    : "border border-mata-200 bg-creme hover:bg-mata-50"
                 }`}
               >
                 {p.rotulo}
@@ -204,7 +204,7 @@ export default async function Explorar({
           </TiraRolante>
 
           {eventos.length === 0 ? (
-            <p className="mt-3 rounded-2xl border border-dashed border-mata-200 bg-white px-4 py-6 text-center text-sm text-tinta/55">
+            <p className="mt-3 rounded-2xl border border-dashed border-mata-200 bg-creme px-4 py-6 text-center text-sm text-tinta/55">
               Nada marcado para esse período.
             </p>
           ) : (
@@ -269,7 +269,7 @@ export default async function Explorar({
       </h2>
 
       {locais.length === 0 ? (
-        <div className="mt-4 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+        <div className="mt-4 rounded-2xl border border-dashed border-mata-200 bg-creme p-10 text-center">
           <p className="text-3xl">🤔</p>
           <p className="mt-2 font-semibold">Não achei nada com esses filtros</p>
           <p className="mt-1 text-sm text-tinta/60">

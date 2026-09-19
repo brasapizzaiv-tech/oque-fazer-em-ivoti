@@ -180,7 +180,7 @@ export default function FormularioEvento({
 
       <Bloco
         titulo="Quando"
-        descricao="Horário de Ivoti. O fim é opcional — preencha se o evento tem hora pra acabar."
+        descricao="Horário de Ivoti. O fim é opcional — preencha se o evento tem hora para acabar."
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <Texto

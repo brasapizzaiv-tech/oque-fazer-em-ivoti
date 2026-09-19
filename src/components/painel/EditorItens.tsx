@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Bloco, BotaoSalvar } from "./Campos";
 import type { Item } from "@/lib/tipos";
@@ -16,7 +17,7 @@ export default function EditorItens({
   localId,
   itens,
   titulo = "Cardápio e serviços",
-  descricao = "O que vocês fazem, vendem ou oferecem. Isso é o que o guia usa pra responder “onde como uma pizza de calabresa?”.",
+  descricao = "O que vocês fazem, vendem ou oferecem. Isso é o que o guia usa para responder “onde como uma pizza de calabresa?”.",
 }: {
   localId: string;
   itens: Item[];
@@ -32,6 +33,7 @@ export default function EditorItens({
     })),
   );
   const [salvando, setSalvando] = useState(false);
+  const router = useRouter();
   const [salvo, setSalvo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -77,6 +79,11 @@ export default function EditorItens({
 
     setSalvando(false);
     setSalvo(true);
+    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+    // horários — o dado ia para o banco, mas a lista e montada no servidor e
+    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+    router.refresh();
   }
 
   return (

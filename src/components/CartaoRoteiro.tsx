@@ -68,25 +68,25 @@ export default function CartaoRoteiro({
 
   if (paradas.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-mata-200 bg-white px-4 py-6 text-center text-sm text-tinta/55">
+      <p className="border-2 border-dashed border-carvalho/40 bg-creme px-4 py-6 text-center text-sm text-tinta/55">
         Você tirou todas as paradas. Peça outro roteiro ao Guia.
       </p>
     );
   }
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-mata-200 bg-white">
-      <header className="border-b border-mata-100 bg-mata-50 px-4 py-3">
+    <section className="overflow-hidden border-2 border-carvalho bg-creme">
+      <header className="border-b-2 border-carvalho/20 bg-mata-50 px-4 py-3">
         <h3 className="font-semibold">{titulo}</h3>
         <p className="text-sm text-tinta/60">
           {paradas.length} {paradas.length === 1 ? "parada" : "paradas"} · na ordem
         </p>
       </header>
 
-      <ol className="divide-y divide-mata-50">
+      <ol className="divide-y divide-carvalho/15">
         {paradas.map((p, i) => (
           <li key={p.slug} className="flex items-center gap-3 px-4 py-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-mata-600 text-sm font-semibold text-white">
+            <span className="grid h-7 w-7 shrink-0 place-items-center border-2 border-carvalho bg-carvalho text-sm font-semibold text-white">
               {i + 1}
             </span>
 
@@ -123,14 +123,14 @@ export default function CartaoRoteiro({
         </p>
       )}
 
-      <div className="flex flex-wrap gap-2 border-t border-mata-100 p-4">
+      <div className="flex flex-wrap gap-2 border-t-2 border-carvalho/20 p-4">
         {rota && (
           <a
             href={rota}
             target="_blank"
             rel="noopener noreferrer"
             onClick={aoAbrirRota}
-            className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-mata-700"
+            className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700"
           >
             🗺️ Abrir rota no Google Maps
           </a>
@@ -140,7 +140,7 @@ export default function CartaoRoteiro({
           type="button"
           onClick={() => setWaze((v) => !v)}
           aria-expanded={waze}
-          className="rounded-full border border-mata-200 px-4 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+          className="border-2 border-carvalho px-4 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-cal-sombra"
         >
           Abrir no Waze
         </button>
@@ -150,7 +150,7 @@ export default function CartaoRoteiro({
             type="button"
             onClick={salvar}
             disabled={salvando}
-            className="rounded-full border border-mata-200 px-4 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50 disabled:opacity-50"
+            className="border-2 border-carvalho px-4 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-cal-sombra disabled:opacity-50"
           >
             {salvando ? "Salvando..." : "Salvar e compartilhar"}
           </button>
@@ -158,7 +158,7 @@ export default function CartaoRoteiro({
       </div>
 
       {waze && (
-        <div className="border-t border-mata-100 bg-mata-50/60 px-4 py-3">
+        <div className="border-t-2 border-carvalho/20 bg-mata-50/60 px-4 py-3">
           <p className="text-sm text-tinta/65">
             O Waze abre uma parada por vez. Vá tocando na próxima conforme
             avançar no passeio.
@@ -175,7 +175,7 @@ export default function CartaoRoteiro({
                   contar("clique_rota", { local: parada.id });
                   contar("indicacao", { local: parada.id });
                 }}
-                className="rounded-full border border-mata-200 bg-white px-3 py-1.5 text-sm font-medium"
+                className="border-2 border-carvalho bg-creme px-3 py-1.5 text-sm font-medium"
               >
                 {i + 1}. {parada.nome}
               </a>
@@ -185,7 +185,7 @@ export default function CartaoRoteiro({
       )}
 
       {link && (
-        <div className="border-t border-mata-100 bg-mata-50/60 px-4 py-3">
+        <div className="border-t-2 border-carvalho/20 bg-mata-50/60 px-4 py-3">
           <p className="text-sm font-medium">Roteiro salvo 🎉</p>
           <p className="mt-1 text-sm break-all text-tinta/65">{link}</p>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -193,14 +193,14 @@ export default function CartaoRoteiro({
               href={linkWhatsappDoRoteiro(titulo, link)}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full bg-mata-600 px-4 py-2 text-sm font-semibold text-white"
+              className="border-2 border-carvalho bg-carvalho px-4 py-2 text-sm font-semibold text-white"
             >
               Mandar no WhatsApp
             </a>
             <button
               type="button"
               onClick={() => navigator.clipboard?.writeText(link)}
-              className="rounded-full border border-mata-200 bg-white px-4 py-2 text-sm font-medium"
+              className="border-2 border-carvalho bg-creme px-4 py-2 text-sm font-medium"
             >
               Copiar o link
             </button>

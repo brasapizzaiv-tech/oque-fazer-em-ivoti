@@ -75,7 +75,7 @@ export default async function RoteiroSalvo({
         />
       </div>
 
-      <div className="mt-8 rounded-2xl border border-dashed border-mata-200 bg-white p-6 text-center">
+      <div className="mt-8 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center">
         <p className="font-semibold">Quer montar o seu?</p>
         <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
           Diga ao Guia o que você tem vontade de fazer e ele monta um passeio
@@ -83,7 +83,7 @@ export default async function RoteiroSalvo({
         </p>
         <Link
           href="/chat"
-          className="mt-4 inline-block rounded-full bg-mata-600 px-6 py-3 font-semibold text-white"
+          className="mt-4 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
         >
           Conversar com o Guia
         </Link>

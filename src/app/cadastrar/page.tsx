@@ -11,7 +11,7 @@ const VANTAGENS = [
   ["🔎", "Aparece na busca", "Quem procura pizza, café ou trilha em Ivoti te encontra."],
   ["🗺️", "Pino no mapa", "Com rota pronta no Google Maps num toque."],
   ["🕐", "Horários sempre certos", "O site mostra sozinho se você está aberto agora."],
-  ["💬", "O guia te indica", "O chat do site recomenda seu lugar pra quem pede algo do seu tipo."],
+  ["💬", "O guia te indica", "O chat do site recomenda seu lugar para quem pede algo do seu tipo."],
 ];
 
 export default function Cadastrar() {

@@ -48,7 +48,7 @@ export default function CartaoPromocao({
   }, [promocao.id, promocao.local_id]);
 
   return (
-    <article className="flex gap-3 rounded-2xl border border-sol-200 bg-sol-50 p-4">
+    <article className="flex gap-3 border-2 border-sol-600 bg-sol-50 p-4">
       {promocao.imagem_url && (
         <div className="relative hidden h-20 w-20 shrink-0 overflow-hidden rounded-xl sm:block">
           <Image
@@ -65,7 +65,7 @@ export default function CartaoPromocao({
         <div className="flex flex-wrap items-center gap-2">
           <h3 className="font-semibold">{promocao.titulo}</h3>
           {agora && (
-            <span className="rounded-full bg-mata-600 px-2 py-0.5 text-[11px] font-semibold text-white">
+            <span className="border-2 border-carvalho bg-carvalho px-2 py-0.5 text-[11px] font-semibold text-white">
               agora
             </span>
           )}

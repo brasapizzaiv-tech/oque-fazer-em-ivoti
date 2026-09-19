@@ -76,7 +76,7 @@ export default function FormularioCadastro() {
         <p className="font-semibold">Confira seu e-mail 📬</p>
         <p className="mt-1 text-tinta/70">
           Mandamos um link de confirmação para <strong>{email}</strong>. Clique
-          nele e depois volte aqui pra entrar.
+          nele e depois volte aqui para entrar.
         </p>
         <Link
           href="/entrar"

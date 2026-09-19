@@ -16,9 +16,9 @@ export default function CartaoRoteiroPronto({
   return (
     <Link
       href={`/roteiros/${roteiro.slug}`}
-      className="group flex overflow-hidden rounded-2xl border border-mata-100 bg-white transition hover:border-mata-300"
+      className="group flex overflow-hidden border-2 border-carvalho bg-creme transition hover:border-sol-600"
     >
-      <div className="relative grid h-auto w-28 shrink-0 place-items-center overflow-hidden bg-mata-50 text-3xl">
+      <div className="relative grid h-auto w-28 shrink-0 place-items-center overflow-hidden bg-cal-sombra text-3xl">
         {roteiro.capa_url ? (
           <Image
             src={roteiro.capa_url}

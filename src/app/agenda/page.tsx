@@ -34,7 +34,7 @@ export default async function Agenda() {
       </p>
 
       {eventos.length === 0 ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+        <div className="mt-8 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
           <p className="text-3xl">📅</p>
           <p className="mt-2 font-semibold">Nada marcado por enquanto</p>
           <p className="mt-1 text-sm text-tinta/60">
@@ -43,7 +43,7 @@ export default async function Agenda() {
           </p>
           <Link
             href="/painel"
-            className="mt-5 inline-block rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white"
+            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white"
           >
             Cadastrar um evento
           </Link>
@@ -53,7 +53,7 @@ export default async function Agenda() {
           {eventos.map((e) => (
             <li
               key={e.id}
-              className="flex gap-4 rounded-2xl border border-mata-100 bg-white p-4"
+              className="flex gap-4 border-2 border-carvalho bg-creme p-4"
             >
               <DataCarimbo quando={e.inicio} />
 
@@ -119,7 +119,7 @@ function DataCarimbo({ quando }: { quando: string }) {
   }).format(data);
 
   return (
-    <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-mata-50 leading-none">
+    <div className="grid h-14 w-14 shrink-0 place-items-center border border-carvalho/20 bg-cal-sombra leading-none">
       <div className="text-center">
         <p className="text-lg font-bold text-mata-800">{dia}</p>
         <p className="text-xs text-mata-600 uppercase">

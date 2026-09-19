@@ -47,7 +47,7 @@ export default function ApagarEvento({
   return (
     <div className="rounded-xl border border-red-200 bg-red-50 p-4">
       <p className="text-sm">
-        Apagar <strong>{titulo}</strong> de vez? Não dá pra desfazer.
+        Apagar <strong>{titulo}</strong> de vez? Não dá para desfazer.
       </p>
       <div className="mt-3 flex gap-2">
         <button

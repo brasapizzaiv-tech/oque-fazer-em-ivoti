@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { DIAS, hhmm } from "@/lib/horarios";
 import { Bloco, BotaoSalvar } from "./Campos";
@@ -24,6 +25,7 @@ export default function EditorHorarios({
     ),
   );
   const [salvando, setSalvando] = useState(false);
+  const router = useRouter();
   const [salvo, setSalvo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -78,13 +80,18 @@ export default function EditorHorarios({
 
     setSalvando(false);
     setSalvo(true);
+    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+    // horários — o dado ia para o banco, mas a lista e montada no servidor e
+    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+    router.refresh();
   }
 
   return (
     <form onSubmit={salvar}>
       <Bloco
         titulo="Horários"
-        descricao="É com isso que o site mostra “aberto agora” e o guia sabe pra onde mandar as pessoas. Deixe o dia em branco quando estiver fechado."
+        descricao="É com isso que o site mostra “aberto agora” e o guia sabe para onde mandar as pessoas. Deixe o dia em branco quando estiver fechado."
       >
         <div className="space-y-2">
           {DIAS.map((nome, dia) => (

@@ -57,7 +57,7 @@ export default async function RoteiroPronto({
       )}
 
       {roteiro.paradas.length === 0 ? (
-        <p className="mt-6 rounded-2xl border border-dashed border-mata-200 bg-white px-4 py-8 text-center text-sm text-tinta/55">
+        <p className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme px-4 py-8 text-center text-sm text-tinta/55">
           As paradas deste roteiro saíram do ar. Pergunte ao Guia que ele monta
           um passeio com o que está aberto hoje.
         </p>
@@ -78,13 +78,13 @@ export default async function RoteiroPronto({
           href={linkWhatsappDoRoteiro(roteiro.titulo, endereco)}
           target="_blank"
           rel="noopener noreferrer"
-          className="rounded-full border border-mata-200 bg-white px-4 py-2 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+          className="border-2 border-carvalho bg-creme px-4 py-2 text-sm font-semibold text-mata-700 transition hover:bg-cal-sombra"
         >
           Mandar no WhatsApp
         </a>
       </div>
 
-      <div className="mt-8 rounded-2xl border border-dashed border-mata-200 bg-white p-6 text-center">
+      <div className="mt-8 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center">
         <p className="font-semibold">Quer um passeio do seu jeito?</p>
         <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
           Diga ao Guia quanto tempo você tem e o que gosta de fazer, e ele monta
@@ -92,7 +92,7 @@ export default async function RoteiroPronto({
         </p>
         <Link
           href="/chat"
-          className="mt-4 inline-block rounded-full bg-mata-600 px-6 py-3 font-semibold text-white"
+          className="mt-4 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
         >
           Conversar com o Guia
         </Link>

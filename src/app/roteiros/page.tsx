@@ -26,7 +26,7 @@ export default async function Roteiros() {
       </p>
 
       {roteiros.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
           <p className="text-3xl">🗺️</p>
           <p className="mt-2 font-semibold">Ainda não publicamos nenhum</p>
           <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
@@ -35,7 +35,7 @@ export default async function Roteiros() {
           </p>
           <Link
             href="/chat"
-            className="mt-5 inline-block rounded-full bg-mata-600 px-6 py-3 font-semibold text-white"
+            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
           >
             Conversar com o Guia
           </Link>

@@ -30,7 +30,7 @@ export default function CartaoEvento({ evento }: { evento: EventoNaTela }) {
   const onde = evento.local?.nome ?? evento.local_texto;
 
   return (
-    <article className="flex gap-3 rounded-2xl border border-mata-100 bg-white p-3">
+    <article className="flex gap-3 border-2 border-carvalho bg-creme p-3">
       <Carimbo quando={evento.inicio} />
 
       <div className="min-w-0 flex-1">
@@ -76,7 +76,7 @@ function Carimbo({ quando }: { quando: string }) {
     }).format(data);
 
   return (
-    <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-mata-50 leading-none">
+    <div className="grid h-14 w-14 shrink-0 place-items-center border border-carvalho/20 bg-cal-sombra leading-none">
       <div className="text-center">
         <p className="text-lg font-bold text-mata-800">
           {formatar({ day: "2-digit" })}
