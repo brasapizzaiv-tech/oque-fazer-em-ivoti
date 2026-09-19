@@ -41,8 +41,8 @@ export function GraficoDias({
               <div
                 className={`absolute right-0 bottom-0 left-0 rounded-t-[4px] transition-colors ${
                   d.contagem === 0
-                    ? "bg-mata-100"
-                    : "bg-mata-500 group-hover:bg-mata-700"
+                    ? "bg-carvalho/15"
+                    : "bg-carvalho group-hover:bg-sol-700"
                 }`}
                 style={{ height: `${altura}%` }}
               />
@@ -97,9 +97,9 @@ export function BarrasRanqueadas({
         <li key={i.rotulo} className="grid grid-cols-[1fr_auto] items-center gap-3">
           <div className="min-w-0">
             <p className="truncate text-sm">{i.rotulo}</p>
-            <div className="mt-1 h-1.5 rounded-full bg-mata-50">
+            <div className="mt-1 h-1.5 bg-carvalho/15">
               <div
-                className="h-1.5 rounded-full bg-mata-500"
+                className="h-1.5 bg-carvalho"
                 style={{ width: `${Math.max(3, (i.contagem / maior) * 100)}%` }}
               />
             </div>
@@ -126,21 +126,21 @@ export function Numero({
   return (
     <div
       className={`rounded-2xl p-4 ${
-        destaque ? "bg-mata-600 text-white" : "border border-mata-100 bg-white"
+        destaque ? "bg-carvalho text-creme" : "border-2 border-carvalho/25 bg-creme"
       }`}
     >
       <p
         className={`font-[family-name:var(--fonte-titulo)] text-3xl font-bold tabular-nums ${
-          destaque ? "" : "text-mata-800"
+          destaque ? "" : "text-tinta"
         }`}
       >
         {valor}
       </p>
-      <p className={`text-sm ${destaque ? "text-mata-50" : "text-tinta/60"}`}>
+      <p className={`text-sm ${destaque ? "text-creme/85" : "text-tinta/60"}`}>
         {rotulo}
       </p>
       {dica && (
-        <p className={`mt-0.5 text-xs ${destaque ? "text-mata-100" : "text-tinta/45"}`}>
+        <p className={`mt-0.5 text-xs ${destaque ? "text-creme/65" : "text-tinta/45"}`}>
           {dica}
         </p>
       )}

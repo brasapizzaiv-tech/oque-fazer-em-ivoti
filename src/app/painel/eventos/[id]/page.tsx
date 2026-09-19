@@ -30,7 +30,7 @@ export default async function EditarEvento({
     <>
       <Link
         href="/painel/eventos"
-        className="text-sm text-tinta/55 hover:text-mata-700"
+        className="text-sm text-tinta/55 hover:text-sol-700"
       >
         ← Meus eventos
       </Link>
@@ -50,7 +50,7 @@ export default async function EditarEvento({
         />
       </div>
 
-      <div className="mt-10 border-t border-mata-100 pt-6">
+      <div className="mt-10 border-t-2 border-carvalho/20 pt-6">
         <ApagarEvento id={evento.id} titulo={evento.titulo} />
       </div>
     </>

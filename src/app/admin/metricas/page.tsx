@@ -30,7 +30,7 @@ export default async function MetricasDoSite({
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <Link href="/admin" className="text-sm text-tinta/55 hover:text-mata-700">
+      <Link href="/admin" className="text-sm text-tinta/55 hover:text-sol-700">
         ← Administração
       </Link>
 
@@ -49,8 +49,8 @@ export default async function MetricasDoSite({
               href={`/admin/metricas?dias=${p.dias}`}
               className={`rounded-full px-3 py-1.5 text-sm transition ${
                 dias === p.dias
-                  ? "bg-mata-600 font-semibold text-white"
-                  : "border border-mata-200 bg-white hover:bg-mata-50"
+                  ? "bg-carvalho font-semibold text-creme"
+                  : "border border-carvalho/25 bg-creme hover:bg-cal-sombra"
               }`}
             >
               {p.rotulo}
@@ -73,7 +73,7 @@ export default async function MetricasDoSite({
         />
       </div>
 
-      <section className="mt-6 rounded-2xl border border-mata-100 bg-white p-5">
+      <section className="mt-6 border-2 border-carvalho bg-creme p-5">
         <h2 className="font-semibold">Acessos por dia</h2>
         <p className="text-sm text-tinta/55">
           Passe o dedo ou o mouse numa barra para ver o dia.
@@ -84,7 +84,7 @@ export default async function MetricasDoSite({
       </section>
 
       <div className="mt-6 grid gap-6 sm:grid-cols-2">
-        <section className="rounded-2xl border border-mata-100 bg-white p-5">
+        <section className="border-2 border-carvalho bg-creme p-5">
           <h2 className="font-semibold">Estabelecimentos mais procurados</h2>
           <p className="mb-4 text-sm text-tinta/55">
             Bom argumento na hora de oferecer o plano.
@@ -98,7 +98,7 @@ export default async function MetricasDoSite({
           />
         </section>
 
-        <section className="rounded-2xl border border-mata-100 bg-white p-5">
+        <section className="border-2 border-carvalho bg-creme p-5">
           <h2 className="font-semibold">Páginas mais vistas</h2>
           <p className="mb-4 text-sm text-tinta/55">Do site inteiro.</p>
           <BarrasRanqueadas
@@ -110,7 +110,7 @@ export default async function MetricasDoSite({
         </section>
       </div>
 
-      <section className="mt-6 rounded-2xl border border-mata-100 bg-white p-5">
+      <section className="mt-6 border-2 border-carvalho bg-creme p-5">
         <h2 className="font-semibold">De onde vieram</h2>
         <p className="mb-4 text-sm text-tinta/55">
           &quot;Direto&quot; é quem digitou o endereço ou salvou o site — e

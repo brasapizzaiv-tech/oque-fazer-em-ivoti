@@ -9,7 +9,7 @@ export default async function NovoEvento() {
 
   return (
     <>
-      <Link href="/painel/eventos" className="text-sm text-tinta/55 hover:text-mata-700">
+      <Link href="/painel/eventos" className="text-sm text-tinta/55 hover:text-sol-700">
         ← Meus eventos
       </Link>
       <h1 className="mt-2 mb-6 text-lg font-semibold">Cadastrar evento</h1>

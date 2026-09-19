@@ -31,7 +31,7 @@ export default function Bloqueado({
   );
 
   return (
-    <div className="relative isolate overflow-hidden rounded-2xl border border-mata-100 bg-white">
+    <div className="relative isolate overflow-hidden border-2 border-carvalho bg-creme">
       {children && (
         <div
           aria-hidden
@@ -47,7 +47,7 @@ export default function Bloqueado({
           "grid place-items-center px-6 py-10 text-center",
           children
             ? "absolute inset-0 bg-white/70 backdrop-blur-[2px]"
-            : "bg-mata-50/60",
+            : "bg-cal-sombra/60",
         ].join(" ")}
       >
         <div className="max-w-sm">

@@ -55,7 +55,7 @@ export default function NovoRoteiro() {
       <button
         type="button"
         onClick={() => setAbrindo(true)}
-        className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-mata-700"
+        className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700"
       >
         + Novo roteiro
       </button>
@@ -63,7 +63,7 @@ export default function NovoRoteiro() {
   }
 
   return (
-    <div className="w-full rounded-2xl border border-mata-200 bg-white p-4">
+    <div className="w-full border-2 border-carvalho bg-creme p-4">
       <label className="block">
         <span className="text-sm font-medium">Título do roteiro</span>
         <input
@@ -75,7 +75,7 @@ export default function NovoRoteiro() {
             if (e.key === "Escape") setAbrindo(false);
           }}
           placeholder="Ivoti em um dia"
-          className="mt-1 w-full rounded-xl border border-mata-200 px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+          className="mt-1 w-full border-2 border-carvalho px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
         />
       </label>
 
@@ -90,14 +90,14 @@ export default function NovoRoteiro() {
           type="button"
           onClick={criar}
           disabled={indo || !titulo.trim()}
-          className="rounded-full bg-mata-600 px-5 py-2 text-sm font-semibold text-white disabled:opacity-40"
+          className="border-2 border-carvalho bg-carvalho px-5 py-2 text-sm font-semibold text-white disabled:opacity-40"
         >
           {indo ? "Criando..." : "Criar e montar"}
         </button>
         <button
           type="button"
           onClick={() => setAbrindo(false)}
-          className="rounded-full border border-mata-200 px-4 py-2 text-sm"
+          className="border-2 border-carvalho px-4 py-2 text-sm"
         >
           Cancelar
         </button>

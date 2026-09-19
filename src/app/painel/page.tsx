@@ -101,14 +101,14 @@ export default async function Painel() {
         </h1>
         <Link
           href="/painel/novo"
-          className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-mata-700"
+          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
         >
           + Cadastrar um local
         </Link>
       </div>
 
       {lista.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
           <p className="text-3xl">🏪</p>
           <p className="mt-2 font-semibold">Você ainda não cadastrou nada</p>
           <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
@@ -117,7 +117,7 @@ export default async function Painel() {
           </p>
           <Link
             href="/painel/novo"
-            className="mt-5 inline-block rounded-full bg-mata-600 px-6 py-3 font-semibold text-white"
+            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
           >
             Começar
           </Link>
@@ -134,9 +134,9 @@ export default async function Painel() {
             return (
               <li
                 key={l.id}
-                className="flex items-center gap-4 rounded-2xl border border-mata-100 bg-white p-4"
+                className="flex items-center gap-4 border-2 border-carvalho bg-creme p-4"
               >
-                <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-xl bg-mata-50 text-2xl">
+                <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden border border-carvalho/20 bg-cal-sombra text-2xl">
                   {l.capa_url ? (
                     <Image
                       src={l.capa_url}
@@ -175,14 +175,14 @@ export default async function Painel() {
                   {l.status === "publicado" && (
                     <Link
                       href={`/local/${l.slug}`}
-                      className="rounded-lg border border-mata-200 px-3 py-2 text-center text-sm font-medium hover:bg-mata-50"
+                      className="border-2 border-carvalho px-3 py-2 text-center text-sm font-medium hover:bg-cal-sombra"
                     >
                       Ver no site
                     </Link>
                   )}
                   <Link
                     href={`/painel/${l.id}`}
-                    className="rounded-lg bg-mata-600 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-mata-700"
+                    className="border-2 border-carvalho bg-carvalho px-4 py-2 text-center text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
                   >
                     Editar
                   </Link>

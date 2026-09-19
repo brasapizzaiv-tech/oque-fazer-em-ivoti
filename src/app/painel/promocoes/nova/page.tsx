@@ -11,14 +11,14 @@ export default async function NovaPromocao() {
     <>
       <Link
         href="/painel/promocoes"
-        className="text-sm text-tinta/55 hover:text-mata-700"
+        className="text-sm text-tinta/55 hover:text-sol-700"
       >
         ← Minhas promoções
       </Link>
       <h1 className="mt-2 mb-6 text-lg font-semibold">Cadastrar promoção</h1>
 
       {locais.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-mata-200 bg-white p-8 text-center text-sm text-tinta/60">
+        <p className="border-2 border-dashed border-carvalho/40 bg-creme p-8 text-center text-sm text-tinta/60">
           Cadastre primeiro o seu estabelecimento — a promoção fica ligada a
           ele.
         </p>

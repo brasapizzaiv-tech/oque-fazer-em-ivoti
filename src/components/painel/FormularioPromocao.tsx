@@ -122,7 +122,7 @@ export default function FormularioPromocao({
             <select
               value={localId}
               onChange={(e) => setLocalId(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+              className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
             >
               {locais.map((l) => (
                 <option key={l.id} value={l.id}>
@@ -163,8 +163,8 @@ export default function FormularioPromocao({
                 aria-pressed={marcado}
                 className={`h-11 w-12 rounded-xl text-sm font-semibold transition ${
                   marcado
-                    ? "bg-mata-600 text-white"
-                    : "border border-mata-200 bg-white text-tinta/60 hover:bg-mata-50"
+                    ? "bg-carvalho text-creme"
+                    : "border border-carvalho/25 bg-creme text-tinta/60 hover:bg-cal-sombra"
                 }`}
               >
                 {nome}
@@ -196,7 +196,7 @@ export default function FormularioPromocao({
           dica="Deixe vazio se não tem prazo para acabar."
         />
 
-        <p className="rounded-lg bg-mata-50 px-3 py-2 text-sm">
+        <p className="border border-carvalho/20 bg-cal-sombra px-3 py-2 text-sm">
           Vai aparecer assim:{" "}
           <strong>
             {quandoVale({
@@ -225,12 +225,12 @@ export default function FormularioPromocao({
             type="file"
             accept="image/*"
             onChange={(e) => enviarImagem(e.target.files)}
-            className="block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-mata-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+            className="block w-full text-sm file:mr-3 file:border-2 file:border-carvalho file:bg-carvalho file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
           />
         )}
       </Bloco>
 
-      <label className="flex items-center gap-3 rounded-2xl border border-mata-100 bg-white p-4">
+      <label className="flex items-center gap-3 border-2 border-carvalho bg-creme p-4">
         <input
           type="checkbox"
           checked={ativa}

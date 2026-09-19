@@ -32,7 +32,7 @@ export default async function MontarRoteiro({
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <nav className="text-sm text-tinta/55">
-        <Link href="/admin/roteiros" className="hover:text-mata-700">
+        <Link href="/admin/roteiros" className="hover:text-sol-700">
           Roteiros prontos
         </Link>
       </nav>

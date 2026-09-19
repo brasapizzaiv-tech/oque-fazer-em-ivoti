@@ -15,7 +15,7 @@ export default async function RoteirosDoAdmin() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       <nav className="text-sm text-tinta/55">
-        <Link href="/admin" className="hover:text-mata-700">
+        <Link href="/admin" className="hover:text-sol-700">
           Administração
         </Link>
       </nav>
@@ -31,7 +31,7 @@ export default async function RoteirosDoAdmin() {
       </div>
 
       {roteiros.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
           <p className="text-3xl">🗺️</p>
           <p className="mt-2 font-semibold">Nenhum roteiro ainda</p>
           <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
@@ -67,7 +67,7 @@ function Secao({
         {roteiros.map((r) => (
           <li
             key={r.id}
-            className="flex items-center justify-between gap-3 rounded-xl border border-mata-100 bg-white px-4 py-3"
+            className="flex items-center justify-between gap-3 border-2 border-carvalho/30 bg-creme px-4 py-3"
           >
             <span className="min-w-0">
               <span className="block truncate font-medium">{r.titulo}</span>
@@ -88,7 +88,7 @@ function Secao({
               )}
               <Link
                 href={`/admin/roteiros/${r.id}`}
-                className="rounded-lg bg-mata-600 px-4 py-1.5 text-sm font-semibold text-white"
+                className="border-2 border-carvalho bg-carvalho px-4 py-1.5 text-sm font-semibold text-white"
               >
                 Montar
               </Link>

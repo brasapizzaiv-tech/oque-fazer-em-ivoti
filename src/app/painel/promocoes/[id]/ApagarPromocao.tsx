@@ -65,7 +65,7 @@ export default function ApagarPromocao({
         <button
           type="button"
           onClick={() => setConfirmando(false)}
-          className="rounded-lg border border-mata-200 bg-white px-4 py-2 text-sm font-medium"
+          className="border-2 border-carvalho bg-creme px-4 py-2 text-sm font-medium"
         >
           Cancelar
         </button>

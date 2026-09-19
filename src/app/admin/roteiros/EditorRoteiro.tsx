@@ -132,14 +132,14 @@ export default function EditorRoteiro({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4 rounded-2xl border border-mata-100 bg-white p-4">
+      <div className="space-y-4 border-2 border-carvalho bg-creme p-4">
         <label className="block">
           <span className="text-sm font-medium">Título</span>
           <input
             value={titulo}
             onChange={(e) => setTitulo(e.target.value)}
             placeholder="Ivoti em um dia"
-            className="mt-1 w-full rounded-xl border border-mata-200 px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+            className="mt-1 w-full border-2 border-carvalho px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
           />
         </label>
 
@@ -150,7 +150,7 @@ export default function EditorRoteiro({
             onChange={(e) => setDescricao(e.target.value)}
             rows={3}
             placeholder="Uma ou duas frases dizendo para quem é o passeio e quanto tempo leva."
-            className="mt-1 w-full rounded-xl border border-mata-200 px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+            className="mt-1 w-full border-2 border-carvalho px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
           />
         </label>
 
@@ -160,7 +160,7 @@ export default function EditorRoteiro({
             <input
               value={slug || (enderecoAutomatico ? enderecoCurto(titulo, 60) : "")}
               onChange={(e) => setSlug(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-mata-200 px-4 py-2.5 font-mono text-sm outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+              className="mt-1 w-full border-2 border-carvalho px-4 py-2.5 font-mono text-sm outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
             />
             <span className="mt-1 block text-xs text-tinta/45">
               {SITE_LIMPO}/roteiros/{enderecoFinal || "..."}
@@ -173,7 +173,7 @@ export default function EditorRoteiro({
               type="number"
               value={ordem}
               onChange={(e) => setOrdem(e.target.value)}
-              className="mt-1 w-full rounded-xl border border-mata-200 px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+              className="mt-1 w-full border-2 border-carvalho px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
             />
             <span className="mt-1 block text-xs text-tinta/45">
               menor aparece antes
@@ -183,7 +183,7 @@ export default function EditorRoteiro({
       </div>
 
       {/* ---- as paradas ---- */}
-      <div className="rounded-2xl border border-mata-100 bg-white p-4">
+      <div className="border-2 border-carvalho bg-creme p-4">
         <p className="font-semibold">Paradas ({paradas.length})</p>
         <p className="text-sm text-tinta/55">
           Na ordem em que a pessoa vai visitar. É essa ordem que vira a rota no
@@ -191,16 +191,16 @@ export default function EditorRoteiro({
         </p>
 
         {paradas.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-dashed border-mata-200 px-3 py-6 text-center text-sm text-tinta/50">
+          <p className="mt-3 border-2 border-dashed border-carvalho/40 px-3 py-6 text-center text-sm text-tinta/50">
             Nenhuma parada ainda. Escolha a primeira ali embaixo.
           </p>
         ) : (
-          <ol className="mt-3 divide-y divide-mata-50">
+          <ol className="mt-3 divide-y divide-carvalho/15">
             {paradas.map((id, i) => {
               const l = porId.get(id);
               return (
                 <li key={id} className="flex items-center gap-3 py-2">
-                  <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-mata-600 text-sm font-semibold text-white">
+                  <span className="grid h-7 w-7 shrink-0 place-items-center border-2 border-carvalho bg-carvalho text-sm font-semibold text-white">
                     {i + 1}
                   </span>
                   <span className="min-w-0 flex-1">
@@ -252,7 +252,7 @@ export default function EditorRoteiro({
             onChange={(e) => {
               if (e.target.value) setParadas([...paradas, e.target.value]);
             }}
-            className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
           >
             <option value="">Escolha um lugar...</option>
             {sobrando.map((l) => (
@@ -266,7 +266,7 @@ export default function EditorRoteiro({
       </div>
 
       {/* ---- publicar e salvar ---- */}
-      <div className="rounded-2xl border border-mata-100 bg-white p-4">
+      <div className="border-2 border-carvalho bg-creme p-4">
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
@@ -291,7 +291,7 @@ export default function EditorRoteiro({
           </p>
         )}
         {recado && (
-          <p className="mt-3 rounded-lg bg-mata-50 px-3 py-2 text-sm text-mata-800">
+          <p className="mt-3 border border-mata-200 bg-mata-50 px-3 py-2 text-sm text-mata-800">
             {recado}
           </p>
         )}
@@ -301,7 +301,7 @@ export default function EditorRoteiro({
             type="button"
             onClick={salvar}
             disabled={salvando}
-            className="rounded-full bg-mata-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-mata-700 disabled:opacity-50"
+            className="border-2 border-carvalho bg-carvalho px-6 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700 disabled:opacity-50"
           >
             {salvando ? "Salvando..." : "Salvar"}
           </button>
@@ -330,7 +330,7 @@ function Setinha({
       onClick={onClick}
       disabled={desativada}
       aria-label={rotulo}
-      className="rounded-lg border border-mata-200 px-2 py-1 text-sm transition hover:bg-mata-50 disabled:opacity-25"
+      className="border-2 border-carvalho px-2 py-1 text-sm transition hover:bg-cal-sombra disabled:opacity-25"
     >
       {sinal}
     </button>
@@ -373,7 +373,7 @@ function BotaoExcluir({
       <button
         type="button"
         onClick={() => setPerguntando(false)}
-        className="rounded-lg border border-mata-200 px-3 py-1.5 text-sm"
+        className="border-2 border-carvalho px-3 py-1.5 text-sm"
       >
         Não
       </button>

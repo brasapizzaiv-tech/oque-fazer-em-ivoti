@@ -46,8 +46,8 @@ export default function EscolherLocal({
             href={enderecoDe(l.id)}
             className={`rounded-full px-3 py-1.5 text-sm transition ${
               l.id === escolhido
-                ? "bg-mata-800 font-semibold text-white"
-                : "border border-mata-200 bg-white hover:bg-mata-50"
+                ? "bg-carvalho font-semibold text-creme"
+                : "border border-carvalho/25 bg-creme hover:bg-cal-sombra"
             }`}
           >
             {l.nome}
@@ -63,7 +63,7 @@ export default function EscolherLocal({
       <select
         value={escolhido}
         onChange={(e) => router.push(enderecoDe(e.target.value))}
-        className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+        className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
       >
         {locais.map((l) => (
           <option key={l.id} value={l.id}>

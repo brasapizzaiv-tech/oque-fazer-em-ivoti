@@ -156,7 +156,7 @@ export default function FormularioEvento({
           <select
             value={localId}
             onChange={(e) => setLocalId(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
           >
             {locais.map((l) => (
               <option key={l.id} value={l.id}>
@@ -255,7 +255,7 @@ export default function FormularioEvento({
               type="file"
               accept="image/*"
               onChange={(e) => enviarImagem(e.target.files)}
-              className="mt-2 block w-full text-sm file:mr-3 file:rounded-full file:border-0 file:bg-mata-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+              className="mt-2 block w-full text-sm file:mr-3 file:border-2 file:border-carvalho file:bg-carvalho file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
             />
           )}
         </div>

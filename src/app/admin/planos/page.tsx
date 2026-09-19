@@ -38,7 +38,7 @@ export default async function Planos() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <Link href="/admin" className="text-sm text-tinta/55 hover:text-mata-700">
+      <Link href="/admin" className="text-sm text-tinta/55 hover:text-sol-700">
         ← Administração
       </Link>
 
@@ -53,7 +53,7 @@ export default async function Planos() {
         <span className="rounded-xl bg-sol-50 px-4 py-2.5">
           <strong className="text-lg">{premium.length}</strong> premium
         </span>
-        <span className="rounded-xl bg-mata-50 px-4 py-2.5">
+        <span className="border-2 border-carvalho/25 bg-cal-sombra px-4 py-2.5">
           <strong className="text-lg">{gratuitos.length}</strong> gratuitos
         </span>
       </div>
@@ -90,7 +90,7 @@ function Grupo({
           {locais.map((l) => (
             <li
               key={l.id}
-              className="rounded-2xl border border-mata-100 bg-white p-4"
+              className="border-2 border-carvalho bg-creme p-4"
             >
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <Link href={`/local/${l.slug}`} className="font-semibold">

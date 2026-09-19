@@ -90,7 +90,7 @@ export default function EditorHorarios({
           {DIAS.map((nome, dia) => (
             <div
               key={dia}
-              className="flex flex-wrap items-center gap-2 rounded-xl border border-mata-50 p-2"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-carvalho/15 p-2"
             >
               <span className="w-20 shrink-0 text-sm font-medium">{nome}</span>
 
@@ -101,7 +101,7 @@ export default function EditorHorarios({
                   {semana[dia].map((faixa, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-1 rounded-lg bg-mata-50 px-2 py-1"
+                      className="flex items-center gap-1 border border-carvalho/20 px-2 py-1"
                     >
                       <input
                         type="time"
@@ -153,7 +153,7 @@ export default function EditorHorarios({
                       : { abre: "18:00", fecha: "23:00" },
                   ])
                 }
-                className="ml-auto rounded-lg border border-mata-200 px-2.5 py-1 text-xs font-medium text-mata-700 hover:bg-mata-50"
+                className="ml-auto border-2 border-carvalho px-2.5 py-1 text-xs font-medium text-tinta hover:bg-cal-sombra"
               >
                 + horário
               </button>
@@ -164,7 +164,7 @@ export default function EditorHorarios({
         <button
           type="button"
           onClick={repetirNaSemana}
-          className="text-sm font-medium text-mata-700 underline"
+          className="text-sm font-medium text-sol-700 underline"
         >
           Repetir a segunda de terça a sexta
         </button>

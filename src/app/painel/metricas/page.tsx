@@ -45,7 +45,7 @@ export default async function Metricas({
 
   if (locais.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+      <div className="border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
         <p className="text-3xl">📈</p>
         <p className="mt-2 font-semibold">Nada para medir ainda</p>
         <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
@@ -87,8 +87,8 @@ export default async function Metricas({
               href={`/painel/metricas?local=${local.id}&dias=${p.dias}`}
               className={`rounded-full px-3 py-1.5 text-sm transition ${
                 dias === p.dias
-                  ? "bg-mata-600 font-semibold text-white"
-                  : "border border-mata-200 bg-white hover:bg-mata-50"
+                  ? "bg-carvalho font-semibold text-creme"
+                  : "border border-carvalho/25 bg-creme hover:bg-cal-sombra"
               }`}
             >
               {p.rotulo}
@@ -100,7 +100,7 @@ export default async function Metricas({
       <EscolherLocal locais={locais} escolhido={local.id} dias={dias} />
 
       {vendoComoAdmin && (
-        <p className="mt-4 rounded-xl border border-sol-200 bg-sol-50 px-3 py-2 text-sm text-sol-900">
+        <p className="mt-4 border-2 border-sol-600 bg-sol-50 px-3 py-2 text-sm text-sol-900">
           Você está vendo como administração. {local.nome} está no plano
           gratuito — no painel do próprio estabelecimento, estes números
           aparecem bloqueados.
@@ -151,7 +151,7 @@ export default async function Metricas({
           {/* Quem paga costuma querer os numeros fora daqui: juntar com o
               faturamento, mandar para o contador, guardar o historico antes
               de o periodo sair da tela. */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-mata-100 bg-white px-5 py-4">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-2 border-carvalho bg-creme px-5 py-4">
             <div>
               <p className="font-semibold">Levar para uma planilha</p>
               <p className="text-sm text-tinta/55">
@@ -160,7 +160,7 @@ export default async function Metricas({
             </div>
             <a
               href={`/api/metricas/exportar?local=${local.id}&dias=${dias}`}
-              className="rounded-full border border-mata-300 px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+              className="border-2 border-carvalho px-5 py-2.5 text-sm font-semibold text-tinta transition hover:bg-cal-sombra"
             >
               Baixar planilha
             </a>
@@ -186,7 +186,7 @@ function Detalhes({
 }) {
   return (
     <div className="mt-6 space-y-6">
-      <section className="rounded-2xl border border-mata-100 bg-white p-5">
+      <section className="border-2 border-carvalho bg-creme p-5">
         <h2 className="font-semibold">Acessos por dia</h2>
         <p className="text-sm text-tinta/55">
           Últimos {dias} dias. Passe o dedo ou o mouse numa barra para ver o dia.
@@ -197,7 +197,7 @@ function Detalhes({
       </section>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <section className="rounded-2xl border border-mata-100 bg-white p-5">
+        <section className="border-2 border-carvalho bg-creme p-5">
           <h2 className="font-semibold">Onde as pessoas clicaram</h2>
           <p className="mb-4 text-sm text-tinta/55">
             Cada clique é alguém tentando falar com você.
@@ -211,7 +211,7 @@ function Detalhes({
           />
         </section>
 
-        <section className="rounded-2xl border border-mata-100 bg-white p-5">
+        <section className="border-2 border-carvalho bg-creme p-5">
           <h2 className="font-semibold">Eventos e promoções</h2>
           <p className="mb-4 text-sm text-tinta/55">
             Quantas vezes apareceram para alguém.

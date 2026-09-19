@@ -73,7 +73,7 @@ export default async function Admin() {
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-mata-100 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-carvalho/20 pb-4">
         <div>
           <h1 className="text-xl font-bold">Administração do guia</h1>
           <p className="text-sm text-tinta/55">
@@ -83,13 +83,13 @@ export default async function Admin() {
         <div className="flex gap-2">
           <Link
             href="/admin/metricas"
-            className="rounded-full border border-mata-200 px-4 py-2 text-sm font-medium hover:bg-mata-50"
+            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
           >
             Movimento
           </Link>
           <Link
             href="/admin/roteiros"
-            className="rounded-full border border-mata-200 px-4 py-2 text-sm font-medium hover:bg-mata-50"
+            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
           >
             Roteiros
           </Link>
@@ -101,7 +101,7 @@ export default async function Admin() {
           </Link>
           <Link
             href="/painel"
-            className="rounded-full border border-mata-200 px-4 py-2 text-sm font-medium hover:bg-mata-50"
+            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
           >
             Meu painel
           </Link>
@@ -121,7 +121,7 @@ export default async function Admin() {
         </h2>
 
         {naFila.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-dashed border-mata-200 bg-white p-6 text-center text-sm text-tinta/55">
+          <p className="mt-3 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center text-sm text-tinta/55">
             Nada na fila. 🎉
           </p>
         ) : (
@@ -129,7 +129,7 @@ export default async function Admin() {
             {naFila.map((l) => (
               <li
                 key={l.id}
-                className="rounded-2xl border border-sol-200 bg-white p-4"
+                className="border-2 border-sol-600 bg-creme p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -141,7 +141,7 @@ export default async function Admin() {
                   </div>
                   <Link
                     href={`/painel/${l.id}`}
-                    className="rounded-lg border border-mata-200 px-3 py-1.5 text-sm font-medium hover:bg-mata-50"
+                    className="border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
                   >
                     Ver cadastro
                   </Link>
@@ -165,7 +165,7 @@ export default async function Admin() {
         </h2>
 
         {eventosNaFila.length === 0 ? (
-          <p className="mt-3 rounded-xl border border-dashed border-mata-200 bg-white p-6 text-center text-sm text-tinta/55">
+          <p className="mt-3 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center text-sm text-tinta/55">
             Nenhum evento na fila.
           </p>
         ) : (
@@ -173,7 +173,7 @@ export default async function Admin() {
             {eventosNaFila.map((e) => (
               <li
                 key={e.id}
-                className="rounded-2xl border border-sol-200 bg-white p-4"
+                className="border-2 border-sol-600 bg-creme p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -194,7 +194,7 @@ export default async function Admin() {
                   </div>
                   <Link
                     href={`/painel/eventos/${e.id}`}
-                    className="shrink-0 rounded-lg border border-mata-200 px-3 py-1.5 text-sm font-medium hover:bg-mata-50"
+                    className="shrink-0 border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
                   >
                     Ver / editar
                   </Link>
@@ -218,7 +218,7 @@ export default async function Admin() {
             {noAr.map((l) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 rounded-xl border border-mata-100 bg-white px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-2 border-2 border-carvalho/30 bg-creme px-3 py-2 text-sm"
               >
                 <Link href={`/local/${l.slug}`} className="truncate font-medium">
                   {l.nome}
@@ -226,7 +226,7 @@ export default async function Admin() {
                 <span className="flex shrink-0 items-center gap-2">
                   <Link
                     href={`/painel/${l.id}`}
-                    className="text-xs text-mata-700 underline"
+                    className="text-xs text-sol-700 underline"
                   >
                     editar
                   </Link>
@@ -250,7 +250,7 @@ export default async function Admin() {
             {foraDoAr.map((l) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 rounded-xl border border-dashed border-mata-200 bg-white px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-2 border-2 border-dashed border-carvalho/40 bg-creme px-3 py-2 text-sm"
               >
                 <span className="min-w-0">
                   <span className="block truncate font-medium text-tinta/70">
@@ -282,7 +282,7 @@ export default async function Admin() {
             {(perguntas ?? []).map((p) => (
               <li
                 key={p.id}
-                className="rounded-lg bg-white px-3 py-2 text-tinta/75"
+                className="rounded-lg bg-creme px-3 py-2 text-tinta/75"
               >
                 “{p.pergunta}”
               </li>

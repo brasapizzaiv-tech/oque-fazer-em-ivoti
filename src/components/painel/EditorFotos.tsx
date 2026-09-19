@@ -115,7 +115,7 @@ export default function EditorFotos({
       titulo="Fotos"
       descricao="Foto boa é o que faz a pessoa escolher. Capriche na primeira — ela vira a capa."
     >
-      <label className="block cursor-pointer rounded-xl border-2 border-dashed border-mata-200 bg-mata-50/50 p-6 text-center transition hover:border-mata-400">
+      <label className="block cursor-pointer border-2 border-dashed border-carvalho/40 bg-cal-sombra/60 p-6 text-center transition hover:border-carvalho">
         <input
           type="file"
           accept="image/*"
@@ -144,7 +144,7 @@ export default function EditorFotos({
           {lista.map((foto) => (
             <div
               key={foto.id}
-              className="group relative aspect-[4/3] overflow-hidden rounded-xl border border-mata-100"
+              className="group relative aspect-[4/3] overflow-hidden border-2 border-carvalho/30"
             >
               <Image
                 src={foto.url}
@@ -155,7 +155,7 @@ export default function EditorFotos({
               />
 
               {capaAtual === foto.url && (
-                <span className="absolute top-2 left-2 rounded-full bg-mata-600 px-2 py-0.5 text-[11px] font-semibold text-white">
+                <span className="absolute top-2 left-2 border-2 border-carvalho bg-carvalho px-2 py-0.5 text-[11px] font-semibold text-white">
                   Capa
                 </span>
               )}

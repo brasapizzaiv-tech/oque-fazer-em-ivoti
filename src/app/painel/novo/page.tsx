@@ -9,7 +9,7 @@ export default async function Novo() {
 
   return (
     <div className="mx-auto max-w-lg">
-      <Link href="/painel" className="text-sm text-tinta/55 hover:text-mata-700">
+      <Link href="/painel" className="text-sm text-tinta/55 hover:text-sol-700">
         ← Voltar
       </Link>
       <h1 className="mt-2 text-xl font-semibold">Cadastrar um local</h1>

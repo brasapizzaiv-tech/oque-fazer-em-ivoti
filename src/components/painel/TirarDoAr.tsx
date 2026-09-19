@@ -67,7 +67,7 @@ export default function TirarDoAr({
         type="button"
         onClick={() => mudar("publicado")}
         disabled={indo}
-        className="shrink-0 rounded-lg border border-mata-300 px-3 py-1.5 text-xs font-semibold text-mata-700 transition hover:bg-mata-50 disabled:opacity-50"
+        className="shrink-0 border-2 border-carvalho px-3 py-1.5 text-xs font-semibold text-tinta transition hover:bg-cal-sombra disabled:opacity-50"
       >
         {indo ? "..." : "Voltar ao ar"}
       </button>
@@ -88,7 +88,7 @@ export default function TirarDoAr({
         <button
           type="button"
           onClick={() => setConfirmando(false)}
-          className="rounded-lg border border-mata-200 px-2.5 py-1.5 text-xs"
+          className="border-2 border-carvalho px-2.5 py-1.5 text-xs"
         >
           Não
         </button>

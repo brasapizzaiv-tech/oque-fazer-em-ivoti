@@ -16,7 +16,7 @@ export default function AbasPainel() {
   const caminho = usePathname();
 
   return (
-    <nav className="mt-4 flex gap-1 border-b border-mata-100">
+    <nav className="mt-4 flex gap-1 border-b-2 border-carvalho/20">
       {ABAS.map((aba) => {
         // "/painel" e a aba dos locais: acende em si mesma e nas telas de
         // local, mas nao nas secoes que tem aba propria.
@@ -32,8 +32,8 @@ export default function AbasPainel() {
             href={aba.href}
             className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition ${
               ativa
-                ? "border-mata-600 text-mata-800"
-                : "border-transparent text-tinta/55 hover:text-mata-700"
+                ? "border-sol-600 text-tinta"
+                : "border-transparent text-tinta/55 hover:text-sol-700"
             }`}
           >
             {aba.rotulo}

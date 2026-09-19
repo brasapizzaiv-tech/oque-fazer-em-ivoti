@@ -45,7 +45,7 @@ export default function Editor({
         {local.status === "publicado" && (
           <Link
             href={`/local/${local.slug}`}
-            className="rounded-full border border-mata-200 px-4 py-2 text-sm font-medium hover:bg-mata-50"
+            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
           >
             Ver no site ↗
           </Link>
@@ -54,7 +54,7 @@ export default function Editor({
 
       <BarraPublicacao local={local} />
 
-      <nav className="sem-barra mt-6 flex gap-1 overflow-x-auto border-b border-mata-100">
+      <nav className="sem-barra mt-6 flex gap-1 overflow-x-auto border-b-2 border-carvalho/20">
         {ABAS.map((a) => (
           <button
             key={a.id}
@@ -63,7 +63,7 @@ export default function Editor({
             className={[
               "shrink-0 border-b-2 px-4 py-2.5 text-sm font-medium transition",
               aba === a.id
-                ? "border-mata-600 text-mata-700"
+                ? "border-sol-600 text-tinta"
                 : "border-transparent text-tinta/55 hover:text-tinta",
             ].join(" ")}
           >
@@ -125,7 +125,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
 
   if (local.status === "publicado") {
     return (
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-mata-50 px-4 py-3 text-sm text-mata-900">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-carvalho/25 bg-cal-sombra px-4 py-3 text-sm text-mata-900">
         <span>
           ✅ <strong>No ar.</strong> Toda alteração que você salvar aparece no
           site em poucos minutos.
@@ -140,7 +140,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
   // reabrir. Nada se perde no caminho.
   if (local.status === "inativo") {
     return (
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-dashed border-mata-200 bg-white px-4 py-3 text-sm">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-dashed border-carvalho/40 bg-creme px-4 py-3 text-sm">
         <span className="text-tinta/70">
           <strong>Fora do ar.</strong> Seu estabelecimento não aparece no guia
           agora. Tudo continua guardado: fotos, horários e números.
@@ -160,7 +160,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
   }
 
   return (
-    <div className="mt-4 rounded-xl border border-mata-200 bg-white p-4">
+    <div className="mt-4 border-2 border-carvalho bg-creme p-4">
       {local.status === "rejeitado" && local.motivo_rejeicao && (
         <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
           <strong>Precisa de ajuste:</strong> {local.motivo_rejeicao}
@@ -188,7 +188,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
         type="button"
         onClick={enviar}
         disabled={indo || faltando.length > 0}
-        className="mt-3 rounded-full bg-mata-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-mata-700 disabled:opacity-40"
+        className="mt-3 border-2 border-carvalho bg-carvalho px-6 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700 disabled:opacity-40"
       >
         {indo ? "Enviando..." : "Enviar para análise"}
       </button>
@@ -268,7 +268,7 @@ function Sobre({
           <select
             value={dados.categoria_id}
             onChange={(e) => mudar("categoria_id")(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-2.5 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
           >
             <option value="">Sem categoria</option>
             {principais.map((pai) => (
@@ -305,7 +305,7 @@ function Sobre({
           <select
             value={dados.faixa_preco}
             onChange={(e) => mudar("faixa_preco")(e.target.value)}
-            className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-2.5"
+            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5"
           >
             <option value="">Não informar</option>
             <option value="1">$ — baratinho</option>
@@ -413,8 +413,8 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
                 className={[
                   "rounded-full border px-3 py-1.5 text-sm transition",
                   ativa
-                    ? "border-mata-600 bg-mata-600 text-white"
-                    : "border-mata-200 bg-white text-tinta/70 hover:bg-mata-50",
+                    ? "border-carvalho bg-carvalho text-creme"
+                    : "border-carvalho/25 bg-creme text-tinta/70 hover:bg-cal-sombra",
                 ].join(" ")}
               >
                 {t.emoji} {t.nome}

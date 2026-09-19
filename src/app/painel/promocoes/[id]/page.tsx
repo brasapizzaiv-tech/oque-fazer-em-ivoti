@@ -30,7 +30,7 @@ export default async function EditarPromocao({
     <>
       <Link
         href="/painel/promocoes"
-        className="text-sm text-tinta/55 hover:text-mata-700"
+        className="text-sm text-tinta/55 hover:text-sol-700"
       >
         ← Minhas promoções
       </Link>
@@ -40,7 +40,7 @@ export default async function EditarPromocao({
         <FormularioPromocao promocao={promocao as Promocao} locais={locais} />
       </div>
 
-      <div className="mt-10 border-t border-mata-100 pt-6">
+      <div className="mt-10 border-t-2 border-carvalho/20 pt-6">
         <ApagarPromocao id={promocao.id} titulo={promocao.titulo} />
       </div>
     </>

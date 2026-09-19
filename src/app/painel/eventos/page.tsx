@@ -73,14 +73,14 @@ export default async function MeusEventos() {
         </div>
         <Link
           href="/painel/eventos/novo"
-          className="rounded-full bg-mata-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-mata-700"
+          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
         >
           + Cadastrar evento
         </Link>
       </div>
 
       {total === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-mata-200 bg-white p-10 text-center">
+        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
           <p className="text-3xl">📅</p>
           <p className="mt-2 font-semibold">Nenhum evento cadastrado</p>
           <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
@@ -89,7 +89,7 @@ export default async function MeusEventos() {
           </p>
           <Link
             href="/painel/eventos/novo"
-            className="mt-5 inline-block rounded-full bg-mata-600 px-6 py-3 font-semibold text-white"
+            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
           >
             Cadastrar o primeiro
           </Link>
@@ -130,7 +130,7 @@ function Lista({
             return (
               <li
                 key={e.id}
-                className="flex flex-wrap items-center gap-3 rounded-2xl border border-mata-100 bg-white p-4"
+                className="flex flex-wrap items-center gap-3 border-2 border-carvalho bg-creme p-4"
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold">{e.titulo}</p>
@@ -150,7 +150,7 @@ function Lista({
                 </span>
                 <Link
                   href={`/painel/eventos/${e.id}`}
-                  className="rounded-lg border border-mata-200 px-3 py-1.5 text-sm font-medium hover:bg-mata-50"
+                  className="border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
                 >
                   Editar
                 </Link>

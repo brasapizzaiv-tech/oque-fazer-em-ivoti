@@ -92,26 +92,26 @@ export default function EditorItens({
           {linhas.map((linha, i) => (
             <div
               key={i}
-              className="grid gap-2 rounded-xl border border-mata-50 p-3 sm:grid-cols-[1fr_2fr_1fr_auto]"
+              className="grid gap-2 rounded-xl border border-carvalho/15 p-3 sm:grid-cols-[1fr_2fr_1fr_auto]"
             >
               <input
                 value={linha.secao}
                 onChange={(e) => mudar(i, "secao", e.target.value)}
                 placeholder="Seção (Pizzas)"
-                className="rounded-lg border border-mata-200 px-3 py-2 text-sm"
+                className="border-2 border-carvalho px-3 py-2 text-sm"
               />
               <div className="space-y-2">
                 <input
                   value={linha.nome}
                   onChange={(e) => mudar(i, "nome", e.target.value)}
                   placeholder="Nome do item"
-                  className="w-full rounded-lg border border-mata-200 px-3 py-2 text-sm"
+                  className="w-full border-2 border-carvalho px-3 py-2 text-sm"
                 />
                 <input
                   value={linha.descricao}
                   onChange={(e) => mudar(i, "descricao", e.target.value)}
                   placeholder="Descrição (opcional)"
-                  className="w-full rounded-lg border border-mata-200 px-3 py-2 text-sm"
+                  className="w-full border-2 border-carvalho px-3 py-2 text-sm"
                 />
               </div>
               <input
@@ -119,7 +119,7 @@ export default function EditorItens({
                 onChange={(e) => mudar(i, "preco", e.target.value)}
                 placeholder="Preço"
                 inputMode="decimal"
-                className="h-min rounded-lg border border-mata-200 px-3 py-2 text-sm"
+                className="h-min border-2 border-carvalho px-3 py-2 text-sm"
               />
               <button
                 type="button"
@@ -149,7 +149,7 @@ export default function EditorItens({
               },
             ])
           }
-          className="rounded-lg border border-mata-200 px-4 py-2 text-sm font-medium text-mata-700 hover:bg-mata-50"
+          className="border-2 border-carvalho px-4 py-2 text-sm font-medium text-tinta hover:bg-cal-sombra"
         >
           + Adicionar item
         </button>

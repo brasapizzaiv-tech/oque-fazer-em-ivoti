@@ -80,7 +80,7 @@ export default function FormularioNovo({
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           placeholder="Pizzaria da Esquina"
-          className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-3 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+          className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-3 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
         />
       </label>
 
@@ -90,7 +90,7 @@ export default function FormularioNovo({
           required
           value={categoriaId}
           onChange={(e) => setCategoriaId(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-3 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+          className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-3 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
         >
           <option value="">Escolha...</option>
           {principais.map((pai) => (
@@ -117,7 +117,7 @@ export default function FormularioNovo({
       <button
         type="submit"
         disabled={indo}
-        className="w-full rounded-full bg-mata-600 py-3 font-semibold text-white transition hover:bg-mata-700 disabled:opacity-50"
+        className="w-full border-2 border-carvalho bg-carvalho py-3 font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700 disabled:opacity-50"
       >
         {indo ? "Criando..." : "Criar e continuar"}
       </button>
