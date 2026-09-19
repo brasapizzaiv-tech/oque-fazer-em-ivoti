@@ -1,14 +1,17 @@
 import { SITE } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
-import { Bricolage_Grotesque, IBM_Plex_Sans } from "next/font/google";
+import {
+  Bricolage_Grotesque,
+  DM_Sans,
+  Fraunces,
+  IBM_Plex_Sans,
+} from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
-import Cabecalho from "@/components/Cabecalho";
 import CompletarLogin from "@/components/CompletarLogin";
+import Casca from "@/components/enxaimel/Casca";
 import ContarAcesso from "@/components/ContarAcesso";
 import FaixaDemonstracao from "@/components/FaixaDemonstracao";
-import Rodape from "@/components/Rodape";
-import BotaoChat from "@/components/BotaoChat";
 
 // Bricolage Grotesque tem letras construidas, quase de placa pintada de
 // comercio — e larguras variaveis, que combinam com os montantes do enxaimel.
@@ -25,6 +28,23 @@ const corpo = IBM_Plex_Sans({
   variable: "--fonte-corpo",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
+// As fontes do redesenho. Entram no layout raiz porque as telas novas ja
+// comecam a substituir as antigas — enquanto a migracao nao termina, as
+// quatro convivem. As duas de cima saem junto com a ultima tela antiga.
+const tituloNovo = Fraunces({
+  variable: "--fonte-titulo-nova",
+  subsets: ["latin"],
+  weight: ["700"],
+  display: "swap",
+});
+
+const corpoNovo = DM_Sans({
+  variable: "--fonte-corpo-nova",
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
   display: "swap",
 });
 
@@ -51,7 +71,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="pt-BR"
-      className={`${titulo.variable} ${corpo.variable} h-full`}
+      className={`${titulo.variable} ${corpo.variable} ${tituloNovo.variable} ${corpoNovo.variable} h-full`}
     >
       <body className="flex min-h-full flex-col font-sans">
         {/* Rede de seguranca do link de confirmacao de e-mail: se ele cair
@@ -67,10 +87,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ContarAcesso />
         </Suspense>
         <FaixaDemonstracao />
-        <Cabecalho />
-        <main className="flex-1">{children}</main>
-        <Rodape />
-        <BotaoChat />
+        <Casca>{children}</Casca>
       </body>
     </html>
   );

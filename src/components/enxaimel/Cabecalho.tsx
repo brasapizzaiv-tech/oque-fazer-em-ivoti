@@ -28,7 +28,10 @@ export default function Cabecalho({
   altura?: string;
 }) {
   return (
-    <header className="relative isolate overflow-hidden" style={{ minHeight: altura }}>
+    <header
+      className="relative isolate overflow-hidden"
+      style={{ minHeight: altura }}
+    >
       <Image
         src={foto}
         alt={alt}

@@ -80,7 +80,9 @@
   --color-petunia-garganta: #7e2a6b;
   --color-petunia-miolo: #f7e7a6;
   --color-petunia-clara: #e7b3d0;
-  --color-creme: #f4ede0;
+  /* O creme claro sobre fundo escuro do documento. Nome proprio para nao
+     colidir com o --color-creme da paleta atual, que ainda pinta o site. */
+  --color-creme-claro: #f4ede0;
   --color-creme-fundo: #c9bba2;
   --color-trelica: #e9e0cf;
 

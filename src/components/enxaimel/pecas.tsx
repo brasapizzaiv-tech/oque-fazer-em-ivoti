@@ -1,4 +1,5 @@
 import { CasaEnxaimel, Petunia, Torii } from "./icones";
+import { ASSINATURA, NOME_DO_SITE } from "@/lib/marca";
 
 /**
  * As peças menores do sistema: selos, faixa, pílulas, botões e logo.
@@ -44,11 +45,7 @@ export function SeloHanko({
         color: "var(--color-superficie)",
       }}
     >
-      {evento ? (
-        <Torii tamanho={15} />
-      ) : (
-        <CasaEnxaimel tamanho={15} />
-      )}
+      {evento ? <Torii tamanho={15} /> : <CasaEnxaimel tamanho={15} />}
     </span>
   );
 }
@@ -65,8 +62,11 @@ export function TituloSecao({
 }) {
   return (
     <h2
-      className={`flex items-center gap-2 font-[family-name:var(--fonte-titulo-nova)] text-[22px] leading-tight font-bold ${className}`}
-      style={{ color: "var(--color-texto)" }}
+      className={`flex items-center gap-2 text-[22px] leading-tight font-bold ${className}`}
+      style={{
+        color: "var(--color-texto)",
+        fontFamily: "var(--fonte-titulo-nova)",
+      }}
     >
       {selo && <SeloHanko tipo={selo} />}
       {children}
@@ -256,23 +256,27 @@ export function Botao({
  * para "O Guia de Ivoti" em 15/09/2026, e o domínio no ar é esse.
  */
 export function Logo({
-  nome = "O que fazer em Ivoti",
+  nome = NOME_DO_SITE,
   claro = false,
 }: {
   nome?: string;
   /** Sobre o cabeçalho escuro, o texto e os ícones viram creme. */
   claro?: boolean;
 }) {
-  const tinta = claro ? "var(--color-creme)" : "var(--color-madeira)";
+  const tinta = claro ? "var(--color-creme-claro)" : "var(--color-madeira)";
 
   return (
     <span className="flex items-center gap-2.5">
-      <Torii tamanho={34} className="shrink-0" style={{ color: "var(--color-torii)" }} />
+      <Torii
+        tamanho={34}
+        className="shrink-0"
+        style={{ color: "var(--color-torii)" }}
+      />
 
       <span className="flex flex-col items-center leading-none">
         <span
-          className="font-[family-name:var(--fonte-titulo-nova)] text-[17px] font-bold"
-          style={{ color: tinta }}
+          className=" text-[17px] font-bold"
+          style={{ color: tinta, fontFamily: "var(--fonte-titulo-nova)" }}
         >
           {nome}
         </span>
@@ -285,7 +289,7 @@ export function Logo({
                 : "var(--color-petunia)",
             }}
           >
-            A cidade das flores
+            {ASSINATURA}
           </span>
           <Petunia tamanho={11} />
         </span>
