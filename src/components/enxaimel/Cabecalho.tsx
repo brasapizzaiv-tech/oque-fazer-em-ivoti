@@ -29,7 +29,9 @@ export default function Cabecalho({
 }) {
   return (
     <header
-      className="relative isolate overflow-hidden"
+      // No computador quem manda e a barra unica da casca: cabecalho que
+      // muda de pagina para pagina faz a pessoa reprocurar o mesmo botao.
+      className="relative isolate overflow-hidden lg:hidden"
       style={{ minHeight: altura }}
     >
       <Image

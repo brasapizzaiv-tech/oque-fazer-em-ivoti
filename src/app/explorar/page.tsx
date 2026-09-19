@@ -7,6 +7,12 @@ import { Chip, FaixaEnxaimel } from "@/components/enxaimel/pecas";
 import { CasaEnxaimel } from "@/components/enxaimel/icones";
 import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
 import { distancia } from "@/lib/geo";
+import Mapa from "@/components/Mapa";
+import CardMadeira from "@/components/enxaimel/CardMadeira";
+import { eventosVisiveis } from "@/lib/eventos";
+import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
+import { hojeEmIvoti } from "@/lib/planos";
+import { quandoPorExtenso } from "@/lib/horarios";
 
 export const revalidate = 60;
 
@@ -44,11 +50,14 @@ export default async function Explorar({
   const tags = lista(params.tag);
   const posicao = lerPosicao(texto(params.perto));
 
-  const [categorias, todasTags, locais] = await Promise.all([
-    listarCategorias(),
-    listarTags(),
-    buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
-  ]);
+  const [categorias, todasTags, locais, eventosDeHoje, promocoes] =
+    await Promise.all([
+      listarCategorias(),
+      listarTags(),
+      buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
+      eventosVisiveis({ ate: hojeEmIvoti(), limite: 4 }),
+      promocoesDeHoje(3),
+    ]);
 
   const principais = categorias.filter((c) => c.pai_id === null);
 
@@ -110,8 +119,49 @@ export default async function Explorar({
         </div>
       </Cabecalho>
 
-      <div className="pt-4">
-        <Fileira>
+      {/* No computador o cabecalho de tela nao existe, entao o titulo e a
+          busca aparecem aqui. */}
+      <div className="mx-auto hidden max-w-[1440px] px-16 pt-8 lg:block">
+        <div className="flex items-center gap-2">
+          <h1
+            className="text-[30px] leading-none font-bold"
+            style={{
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            Explorar
+          </h1>
+          <CasaEnxaimel
+            tamanho={30}
+            style={{ color: "var(--color-madeira)" }}
+          />
+        </div>
+        <form action="/explorar" className="mt-4 flex max-w-lg gap-2">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Pizza, trilha, café..."
+            aria-label="Buscar no guia"
+            className="h-12 flex-1 rounded-[11px] px-4 text-[14px] outline-none"
+            style={{
+              backgroundColor: "var(--color-superficie)",
+              border: "2px solid var(--color-madeira)",
+              color: "var(--color-texto)",
+            }}
+          />
+          <button
+            type="submit"
+            className="h-12 shrink-0 rounded-[11px] px-6 text-[14px] font-bold"
+            style={{ backgroundColor: "var(--color-torii)", color: "#fff7ea" }}
+          >
+            Buscar
+          </button>
+        </form>
+      </div>
+
+      <div className="pt-4 lg:mx-auto lg:max-w-[1440px] lg:px-16">
+        <Fileira semRolagemNoComputador>
           <Chip href={url({ categoria: undefined })} ativo={!categoria}>
             Todos
           </Chip>
@@ -128,8 +178,8 @@ export default async function Explorar({
         </Fileira>
       </div>
 
-      <div className="pt-2">
-        <Fileira>
+      <div className="pt-2 lg:mx-auto lg:max-w-[1440px] lg:px-16">
+        <Fileira semRolagemNoComputador>
           <Chip
             href={url({ aberto: aberto ? undefined : "1" })}
             ativo={aberto}
@@ -160,33 +210,114 @@ export default async function Explorar({
         <FaixaEnxaimel />
       </div>
 
-      <div className="flex items-start justify-between gap-3 px-4 pt-4">
-        <p className="text-[14px]" style={{ color: "var(--color-texto-suave)" }}>
-          <strong style={{ color: "var(--color-texto)" }}>
-            {locais.length}
-          </strong>{" "}
-          {locais.length === 1 ? "lugar" : "lugares"} em Ivoti
-        </p>
-        <Suspense>
-          <PertoDeMim ativo={posicao !== null} />
-        </Suspense>
-      </div>
+      <div className="lg:mx-auto lg:max-w-[1440px] lg:px-16">
+        <div className="lg:grid lg:grid-cols-12 lg:gap-8">
+          <div className="lg:col-span-7">
+            <div className="flex items-start justify-between gap-3 px-4 pt-4 lg:px-0">
+              <p
+                className="text-[14px]"
+                style={{ color: "var(--color-texto-suave)" }}
+              >
+                <strong style={{ color: "var(--color-texto)" }}>
+                  {locais.length}
+                </strong>{" "}
+                {locais.length === 1 ? "lugar" : "lugares"} em Ivoti
+              </p>
+              <Suspense>
+                <PertoDeMim ativo={posicao !== null} />
+              </Suspense>
+            </div>
 
-      <div className="space-y-3 px-4 pt-3 pb-8">
-        {comDistancia.length === 0 ? (
-          <Vazio>
-            Nada encontrado com esses filtros. Tente afrouxar a busca.
-          </Vazio>
-        ) : (
-          comDistancia.map(({ local, metros }, i) => (
-            <CardLugar
-              key={local.id}
-              local={local}
-              distancia={metros ?? undefined}
-              variante={i % 2 === 0 ? 1 : 2}
-            />
-          ))
-        )}
+            <div className="space-y-3 px-4 pt-3 pb-8 lg:px-0">
+              {comDistancia.length === 0 ? (
+                <Vazio>
+                  Nada encontrado com esses filtros. Tente afrouxar a busca.
+                </Vazio>
+              ) : (
+                comDistancia.map(({ local, metros }, i) => (
+                  <CardLugar
+                    key={local.id}
+                    local={local}
+                    distancia={metros ?? undefined}
+                    variante={i % 2 === 0 ? 1 : 2}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+
+          {/* A coluna da direita acompanha a rolagem: quem varre uma lista
+              longa quer o mapa sempre a vista, nao ter de voltar ao topo. */}
+          <aside className="hidden lg:col-span-5 lg:block">
+            <div className="sticky top-6 space-y-4 pt-4">
+              <CardMadeira variante={1} maosFrancesas={false}>
+                <Mapa locais={locais} altura="h-[380px]" />
+              </CardMadeira>
+
+              <div
+                className="rounded-[4px] p-4"
+                style={{ backgroundColor: "var(--color-madeira)" }}
+              >
+                <p
+                  className="text-[11px] font-bold tracking-[0.12em] uppercase"
+                  style={{ color: "var(--color-petunia-clara)" }}
+                >
+                  Acontece hoje
+                </p>
+
+                {eventosDeHoje.length === 0 && promocoes.length === 0 ? (
+                  <p
+                    className="mt-2 text-[13px]"
+                    style={{ color: "var(--color-creme-fundo)" }}
+                  >
+                    Nada marcado para hoje.
+                  </p>
+                ) : (
+                  <ul className="mt-3 space-y-3">
+                    {eventosDeHoje.map((ev) => (
+                      <li key={ev.id}>
+                        <p
+                          className="text-[14px] leading-tight font-bold"
+                          style={{
+                            color: "var(--color-creme-claro)",
+                            fontFamily: "var(--fonte-titulo-nova)",
+                          }}
+                        >
+                          {ev.titulo}
+                        </p>
+                        <p
+                          className="text-[12px]"
+                          style={{ color: "var(--color-creme-fundo)" }}
+                        >
+                          {quandoPorExtenso(ev.inicio)}
+                        </p>
+                      </li>
+                    ))}
+                    {promocoes.map((pr) => (
+                      <li key={pr.id}>
+                        <p
+                          className="text-[14px] leading-tight font-bold"
+                          style={{
+                            color: "var(--color-creme-claro)",
+                            fontFamily: "var(--fonte-titulo-nova)",
+                          }}
+                        >
+                          {pr.titulo}
+                        </p>
+                        <p
+                          className="text-[12px]"
+                          style={{ color: "var(--color-creme-fundo)" }}
+                        >
+                          {pr.local?.nome ?? "Promoção de hoje"}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </aside>
+        </div>
       </div>
     </div>
   );

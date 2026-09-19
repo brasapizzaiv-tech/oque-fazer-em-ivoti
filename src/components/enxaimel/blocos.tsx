@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import CardMadeira from "./CardMadeira";
-import { Trelica } from "./icones";
+import { CasaEnxaimel, Petunia, Torii, Trelica } from "./icones";
 import { Botao, Legenda, SeloStatus } from "./pecas";
 import { quandoPorExtenso, situacao } from "@/lib/horarios";
 import { formatarDistancia } from "@/lib/geo";
@@ -208,18 +208,28 @@ export function BlocoRoteiro() {
 export function Fileira({
   children,
   className = "",
+  semRolagemNoComputador = false,
 }: {
   children: React.ReactNode;
   className?: string;
+  /** Na tela grande os filtros cabem em linha; rolar seria esconder de graça. */
+  semRolagemNoComputador?: boolean;
 }) {
   return (
     <div className={`relative ${className}`}>
-      <div className="sem-barra flex gap-3 overflow-x-auto px-4 pb-1">
+      <div
+        className={[
+          "sem-barra flex gap-3 overflow-x-auto px-4 pb-1",
+          semRolagemNoComputador
+            ? "lg:flex-wrap lg:gap-2 lg:overflow-x-visible lg:px-0"
+            : "",
+        ].join(" ")}
+      >
         {children}
       </div>
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 w-12"
+        className={`pointer-events-none absolute inset-y-0 right-0 w-12 ${semRolagemNoComputador ? "lg:hidden" : ""}`}
         style={{
           backgroundImage:
             "linear-gradient(to left, var(--color-reboco), transparent)",
@@ -227,7 +237,7 @@ export function Fileira({
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute top-1/2 right-2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-[15px]"
+        className={`pointer-events-none absolute top-1/2 right-2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-full text-[15px] ${semRolagemNoComputador ? "lg:hidden" : ""}`}
         style={{
           backgroundColor: "var(--color-superficie)",
           border: "1.5px solid var(--color-madeira)",
@@ -476,6 +486,111 @@ export function ConviteAoGuia({ nome }: { nome?: string }) {
         >
           Falar com o Guia
         </Link>
+      </div>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Fileira de petunias                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A fileira de petúnias que separa a capa do conteúdo, no computador.
+ *
+ * É o único enfeite puro do site, e tem razão de ser: Ivoti se chama cidade
+ * das flores, e a flor precisava aparecer em algum lugar além de um ícone de
+ * 11px ao lado do nome. Fica numa linha só, pequena, e não se repete.
+ */
+export function FileiraDePetunias() {
+  return (
+    <div
+      aria-hidden
+      className="hidden items-center justify-center gap-6 py-5 lg:flex"
+    >
+      {Array.from({ length: 9 }).map((_, i) => (
+        <Petunia key={i} tamanho={i % 2 === 0 ? 18 : 13} />
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Sobre Ivoti                                                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * As três identidades da cidade, em três cards.
+ *
+ * Cada uma com o seu símbolo, que é o mesmo vocabulário usado no resto do
+ * site: a casa do enxaimel, o torii da colônia japonesa, a petúnia das
+ * flores. Quem chega aqui depois de rolar a página inteira já viu os três
+ * separados; aqui eles aparecem juntos e explicados.
+ */
+export function SobreIvoti() {
+  const blocos = [
+    {
+      titulo: "Herança alemã",
+      texto:
+        "As casas enxaimel do Núcleo, as ruas de picada e a Feitoria — a colonização alemã ainda desenha a cidade.",
+      Icone: CasaEnxaimel,
+      cor: "var(--color-madeira)",
+    },
+    {
+      titulo: "Colônia japonesa",
+      texto:
+        "O Memorial e o torii contam a chegada das famílias japonesas, que trouxeram outra cultura para o mesmo vale.",
+      Icone: Torii,
+      cor: "var(--color-torii)",
+    },
+    {
+      titulo: "Cidade das Flores",
+      texto:
+        "A petúnia é o símbolo, e as praças e os canteiros fazem o título valer o ano inteiro.",
+      Icone: null,
+      cor: "var(--color-petunia)",
+    },
+  ];
+
+  return (
+    <section className="mx-auto max-w-[1440px] px-4 py-10 lg:px-16">
+      <h2
+        className="text-[22px] font-bold lg:text-[28px]"
+        style={{
+          color: "var(--color-texto)",
+          fontFamily: "var(--fonte-titulo-nova)",
+        }}
+      >
+        Sobre Ivoti
+      </h2>
+
+      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        {blocos.map((b, i) => (
+          <CardMadeira key={b.titulo} variante={i % 2 === 0 ? 1 : 2}>
+            <div className="p-5">
+              {b.Icone ? (
+                <b.Icone tamanho={34} style={{ color: b.cor }} />
+              ) : (
+                <Petunia tamanho={30} />
+              )}
+              <p
+                className="mt-3 text-[18px] font-bold"
+                style={{
+                  color: "var(--color-texto)",
+                  fontFamily: "var(--fonte-titulo-nova)",
+                }}
+              >
+                {b.titulo}
+              </p>
+              <p
+                className="mt-1.5 text-[14px]"
+                style={{ color: "var(--color-texto-suave)" }}
+              >
+                {b.texto}
+              </p>
+            </div>
+          </CardMadeira>
+        ))}
       </div>
     </section>
   );

@@ -48,7 +48,9 @@ export async function generateMetadata({
 async function promocoesDoLocal(localId: string) {
   if (!SUPABASE_CONFIGURADO) return [];
   const supabase = await createClient();
-  const { data } = await supabase.rpc("promocoes_de_hoje", { p_local: localId });
+  const { data } = await supabase.rpc("promocoes_de_hoje", {
+    p_local: localId,
+  });
   return (data ?? []) as PromocaoNaTela[];
 }
 
@@ -96,185 +98,187 @@ export default async function PaginaLocal({
 
   return (
     <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <ContarAcesso local={local.id} />
+      <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-10">
+        <ContarAcesso local={local.id} />
 
-      <div className="relative h-[250px]">
-        {local.capa_url ? (
-          <Image
-            src={local.capa_url}
-            alt={local.nome}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        ) : (
-          <Trelica />
-        )}
+        <div className="relative h-[250px]">
+          {local.capa_url ? (
+            <Image
+              src={local.capa_url}
+              alt={local.nome}
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover"
+            />
+          ) : (
+            <Trelica />
+          )}
 
-        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-          <Link
-            href="/explorar"
-            aria-label="Voltar"
-            className="grid h-11 w-11 place-items-center rounded-full text-[19px]"
+          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+            <Link
+              href="/explorar"
+              aria-label="Voltar"
+              className="grid h-11 w-11 place-items-center rounded-full text-[19px]"
+              style={{
+                backgroundColor: "rgba(46, 26, 16, 0.72)",
+                color: "var(--color-creme-claro)",
+              }}
+            >
+              ‹
+            </Link>
+            <Favoritar slug={local.slug} />
+          </div>
+        </div>
+
+        <div className="px-4 pt-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+            <span
+              className="text-[13px]"
+              style={{ color: "var(--color-texto-suave)" }}
+            >
+              {textoDoHorario}
+            </span>
+          </div>
+
+          <h1
+            className="mt-2 text-[26px] leading-tight font-bold"
             style={{
-              backgroundColor: "rgba(46, 26, 16, 0.72)",
-              color: "var(--color-creme-claro)",
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
             }}
           >
-            ‹
-          </Link>
-          <Favoritar slug={local.slug} />
-        </div>
-      </div>
+            {local.nome}
+          </h1>
 
-      <div className="px-4 pt-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
-          <span
-            className="text-[13px]"
+          <p
+            className="mt-1 text-[14px]"
             style={{ color: "var(--color-texto-suave)" }}
           >
-            {textoDoHorario}
-          </span>
+            {local.categoria?.nome}
+            {endereco ? ` · ${endereco}` : ""}
+          </p>
+
+          {local.resumo && (
+            <p
+              className="mt-3 text-[14px]"
+              style={{ color: "var(--color-texto)" }}
+            >
+              {local.resumo}
+            </p>
+          )}
+
+          <div className="mt-4">
+            <AcoesDoLocal acoes={acoes} />
+          </div>
         </div>
 
-        <h1
-          className="mt-2 text-[26px] leading-tight font-bold"
-          style={{
-            color: "var(--color-texto)",
-            fontFamily: "var(--fonte-titulo-nova)",
-          }}
-        >
-          {local.nome}
-        </h1>
-
-        <p
-          className="mt-1 text-[14px]"
-          style={{ color: "var(--color-texto-suave)" }}
-        >
-          {local.categoria?.nome}
-          {endereco ? ` · ${endereco}` : ""}
-        </p>
-
-        {local.resumo && (
-          <p
-            className="mt-3 text-[14px]"
-            style={{ color: "var(--color-texto)" }}
-          >
-            {local.resumo}
-          </p>
+        {promocoes.length > 0 && (
+          <section className="px-4 pt-6">
+            <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
+            <div className="mt-3 space-y-3">
+              {promocoes.map((p, i) => (
+                <CardPromocao
+                  key={p.id}
+                  promocao={p}
+                  variante={i % 2 === 0 ? 1 : 2}
+                />
+              ))}
+            </div>
+          </section>
         )}
 
-        <div className="mt-4">
-          <AcoesDoLocal acoes={acoes} />
+        <div className="pt-6">
+          <FaixaEnxaimel />
         </div>
-      </div>
 
-      {promocoes.length > 0 && (
-        <section className="px-4 pt-6">
-          <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
-          <div className="mt-3 space-y-3">
-            {promocoes.map((p, i) => (
-              <CardPromocao
-                key={p.id}
-                promocao={p}
-                variante={i % 2 === 0 ? 1 : 2}
-              />
-            ))}
-          </div>
-        </section>
-      )}
+        {local.descricao && (
+          <section className="px-4 pt-5">
+            <TituloSecao>Sobre</TituloSecao>
+            <p
+              className="mt-2 text-[14px] whitespace-pre-line"
+              style={{ color: "var(--color-texto)" }}
+            >
+              {local.descricao}
+            </p>
+          </section>
+        )}
 
-      <div className="pt-6">
-        <FaixaEnxaimel />
-      </div>
+        {semana.some((d) => !d.fechado) && (
+          <section className="px-4 pt-6">
+            <TituloSecao>Horários</TituloSecao>
+            <dl className="mt-2">
+              {semana.map((d) => (
+                <div
+                  key={d.dia}
+                  className="flex justify-between border-b py-1.5 text-[14px] last:border-b-0"
+                  style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
+                >
+                  <dt style={{ color: "var(--color-texto)" }}>{d.nome}</dt>
+                  <dd style={{ color: "var(--color-texto-suave)" }}>
+                    {d.fechado ? "Fechado" : d.faixas.join(", ")}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
 
-      {local.descricao && (
-        <section className="px-4 pt-5">
-          <TituloSecao>Sobre</TituloSecao>
-          <p
-            className="mt-2 text-[14px] whitespace-pre-line"
-            style={{ color: "var(--color-texto)" }}
-          >
-            {local.descricao}
-          </p>
-        </section>
-      )}
+        {eventos.length > 0 && (
+          <section className="px-4 pt-6">
+            <TituloSecao selo="evento">Próximos eventos</TituloSecao>
+            <div className="mt-3 space-y-3">
+              {eventos.map((e) => (
+                <LinhaEvento key={e.id} evento={e} />
+              ))}
+            </div>
+          </section>
+        )}
 
-      {semana.some((d) => !d.fechado) && (
-        <section className="px-4 pt-6">
-          <TituloSecao>Horários</TituloSecao>
-          <dl className="mt-2">
-            {semana.map((d) => (
-              <div
-                key={d.dia}
-                className="flex justify-between border-b py-1.5 text-[14px] last:border-b-0"
-                style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
-              >
-                <dt style={{ color: "var(--color-texto)" }}>{d.nome}</dt>
-                <dd style={{ color: "var(--color-texto-suave)" }}>
-                  {d.fechado ? "Fechado" : d.faixas.join(", ")}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      )}
-
-      {eventos.length > 0 && (
-        <section className="px-4 pt-6">
-          <TituloSecao selo="evento">Próximos eventos</TituloSecao>
-          <div className="mt-3 space-y-3">
-            {eventos.map((e) => (
-              <LinhaEvento key={e.id} evento={e} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {(local.itens ?? []).length > 0 && (
-        <section id="cardapio" className="px-4 pt-6">
-          <TituloSecao>Cardápio</TituloSecao>
-          <ul className="mt-2">
-            {local.itens.map((item) => (
-              <li
-                key={item.id}
-                className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
-                style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
-              >
-                <span>
-                  <span
-                    className="block font-medium"
-                    style={{ color: "var(--color-texto)" }}
-                  >
-                    {item.nome}
-                  </span>
-                  {item.descricao && (
+        {(local.itens ?? []).length > 0 && (
+          <section id="cardapio" className="px-4 pt-6">
+            <TituloSecao>Cardápio</TituloSecao>
+            <ul className="mt-2">
+              {local.itens.map((item) => (
+                <li
+                  key={item.id}
+                  className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
+                  style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
+                >
+                  <span>
                     <span
-                      className="block text-[13px]"
-                      style={{ color: "var(--color-texto-suave)" }}
+                      className="block font-medium"
+                      style={{ color: "var(--color-texto)" }}
                     >
-                      {item.descricao}
+                      {item.nome}
+                    </span>
+                    {item.descricao && (
+                      <span
+                        className="block text-[13px]"
+                        style={{ color: "var(--color-texto-suave)" }}
+                      >
+                        {item.descricao}
+                      </span>
+                    )}
+                  </span>
+                  {item.preco != null && (
+                    <span
+                      className="shrink-0 font-bold"
+                      style={{ color: "var(--color-texto)" }}
+                    >
+                      R$ {Number(item.preco).toFixed(2).replace(".", ",")}
                     </span>
                   )}
-                </span>
-                {item.preco != null && (
-                  <span
-                    className="shrink-0 font-bold"
-                    style={{ color: "var(--color-texto)" }}
-                  >
-                    R$ {Number(item.preco).toFixed(2).replace(".", ",")}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
-      <div className="pt-7">
-        <ConviteAoGuia nome={local.nome} />
+        <div className="pt-7">
+          <ConviteAoGuia nome={local.nome} />
+        </div>
       </div>
     </div>
   );

@@ -132,7 +132,7 @@ export default function ChatDoGuia() {
       // Desconta a barra de baixo, que so existe no celular: sem isso a
       // conversa fica mais alta do que o espaco disponivel e o campo de
       // escrever some por tras dela.
-      className="flex min-h-[calc(100dvh-72px)] flex-col md:min-h-[100dvh]"
+      className="mx-auto flex min-h-[calc(100dvh-72px)] flex-col lg:min-h-[calc(100dvh-84px)] lg:max-w-[760px]"
       style={{ backgroundColor: "var(--color-reboco)" }}
     >
       <Cabecalho />
@@ -172,7 +172,7 @@ export default function ChatDoGuia() {
           e.preventDefault();
           enviar(texto);
         }}
-        className="sticky bottom-[72px] flex gap-2 px-4 py-3 md:bottom-0"
+        className="sticky bottom-[72px] flex gap-2 px-4 py-3 lg:bottom-0"
         style={{
           backgroundColor: "var(--color-reboco)",
           borderTop: "2px solid var(--color-madeira)",

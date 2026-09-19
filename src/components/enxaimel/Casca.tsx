@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import CabecalhoAntigo from "@/components/Cabecalho";
+import CabecalhoDesktop from "./CabecalhoDesktop";
 import RodapeAntigo from "@/components/Rodape";
 import BotaoChat from "@/components/BotaoChat";
 import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
@@ -48,8 +49,9 @@ export default function Casca({ children }: { children: React.ReactNode }) {
       {/* O fundo vai aqui e nao so na pagina: o body ainda pinta o creme
           da paleta antiga, e ele aparecia abaixo do conteudo quando a pagina
           era mais curta que a tela. */}
+      <CabecalhoDesktop />
       <main
-        className="flex-1 pb-[72px]"
+        className="flex-1 pb-[72px] lg:pb-0"
         style={{ backgroundColor: "var(--color-reboco)" }}
       >
         {children}
@@ -76,7 +78,7 @@ const ITENS = [
 function NavegacaoInferior({ caminho }: { caminho: string }) {
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-40 flex md:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 flex lg:hidden"
       style={{
         backgroundColor: "var(--color-superficie)",
         borderTop: "2px solid var(--color-madeira)",

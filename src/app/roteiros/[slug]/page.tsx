@@ -42,103 +42,105 @@ export default async function RoteiroPronto({
 
   return (
     <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <ContarAcesso />
+      <div className="mx-auto lg:max-w-[760px] lg:px-8 lg:pb-10">
+        <ContarAcesso />
 
-      <header
-        className="px-4 pt-5 pb-6"
-        style={{ backgroundColor: "var(--color-madeira)" }}
-      >
-        <Legenda cor="var(--color-petunia-clara)">Roteiro pronto</Legenda>
-
-        <div className="mt-1.5 flex items-start gap-2">
-          <h1
-            className="text-[26px] leading-tight font-bold"
-            style={{
-              color: "var(--color-creme-claro)",
-              fontFamily: "var(--fonte-titulo-nova)",
-            }}
-          >
-            {roteiro.titulo}
-          </h1>
-          <CasaEnxaimel
-            tamanho={28}
-            className="mt-1 shrink-0"
-            style={{ color: "var(--color-creme-claro)" }}
-          />
-        </div>
-
-        <p
-          className="mt-2 text-[13px]"
-          style={{ color: "var(--color-creme-fundo)" }}
+        <header
+          className="px-4 pt-5 pb-6"
+          style={{ backgroundColor: "var(--color-madeira)" }}
         >
-          {resumoDoPasseio(roteiro.paradas)}
-        </p>
+          <Legenda cor="var(--color-petunia-clara)">Roteiro pronto</Legenda>
 
-        {roteiro.descricao && (
-          <p
-            className="mt-3 text-[14px]"
-            style={{ color: "var(--color-creme-claro)" }}
-          >
-            {roteiro.descricao}
-          </p>
-        )}
-      </header>
-
-      {roteiro.paradas.length === 0 ? (
-        <p
-          className="px-4 py-10 text-center text-[14px]"
-          style={{ color: "var(--color-texto-suave)" }}
-        >
-          As paradas deste roteiro saíram do ar. Peça outro ao Guia, com o que
-          está aberto hoje.
-        </p>
-      ) : (
-        <>
-          <div className="px-4 pt-6">
-            <ListaDeParadas paradas={roteiro.paradas} />
-          </div>
-
-          <div className="pt-7">
-            <FaixaEnxaimel />
-          </div>
-
-          {/* O rodapé acompanha a rolagem porque é o que a pessoa vem fazer:
-              ela lê as paradas e sai andando. Ter de voltar ao topo para
-              achar a rota seria atrito no pior momento. */}
-          <div
-            className="sticky bottom-0 z-30 flex gap-2 px-4 py-3"
-            style={{
-              backgroundColor: "var(--color-reboco)",
-              borderTop: "2px solid var(--color-madeira)",
-            }}
-          >
-            {rota && (
-              <a
-                href={rota}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-12 flex-1 items-center justify-center rounded-[11px] px-4 text-center text-[14px] font-bold"
-                style={{
-                  backgroundColor: "var(--color-torii)",
-                  color: "#fff7ea",
-                }}
-              >
-                Abrir rota no Google Maps
-              </a>
-            )}
-            <Link
-              href="/chat"
-              className="flex h-12 shrink-0 items-center justify-center rounded-[11px] px-4 text-[14px] font-bold"
+          <div className="mt-1.5 flex items-start gap-2">
+            <h1
+              className="text-[26px] leading-tight font-bold"
               style={{
-                border: "2px solid var(--color-madeira)",
-                color: "var(--color-madeira)",
+                color: "var(--color-creme-claro)",
+                fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
-              Editar paradas
-            </Link>
+              {roteiro.titulo}
+            </h1>
+            <CasaEnxaimel
+              tamanho={28}
+              className="mt-1 shrink-0"
+              style={{ color: "var(--color-creme-claro)" }}
+            />
           </div>
-        </>
-      )}
+
+          <p
+            className="mt-2 text-[13px]"
+            style={{ color: "var(--color-creme-fundo)" }}
+          >
+            {resumoDoPasseio(roteiro.paradas)}
+          </p>
+
+          {roteiro.descricao && (
+            <p
+              className="mt-3 text-[14px]"
+              style={{ color: "var(--color-creme-claro)" }}
+            >
+              {roteiro.descricao}
+            </p>
+          )}
+        </header>
+
+        {roteiro.paradas.length === 0 ? (
+          <p
+            className="px-4 py-10 text-center text-[14px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            As paradas deste roteiro saíram do ar. Peça outro ao Guia, com o que
+            está aberto hoje.
+          </p>
+        ) : (
+          <>
+            <div className="px-4 pt-6">
+              <ListaDeParadas paradas={roteiro.paradas} />
+            </div>
+
+            <div className="pt-7">
+              <FaixaEnxaimel />
+            </div>
+
+            {/* O rodapé acompanha a rolagem porque é o que a pessoa vem fazer:
+              ela lê as paradas e sai andando. Ter de voltar ao topo para
+              achar a rota seria atrito no pior momento. */}
+            <div
+              className="sticky bottom-0 z-30 flex gap-2 px-4 py-3"
+              style={{
+                backgroundColor: "var(--color-reboco)",
+                borderTop: "2px solid var(--color-madeira)",
+              }}
+            >
+              {rota && (
+                <a
+                  href={rota}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-12 flex-1 items-center justify-center rounded-[11px] px-4 text-center text-[14px] font-bold"
+                  style={{
+                    backgroundColor: "var(--color-torii)",
+                    color: "#fff7ea",
+                  }}
+                >
+                  Abrir rota no Google Maps
+                </a>
+              )}
+              <Link
+                href="/chat"
+                className="flex h-12 shrink-0 items-center justify-center rounded-[11px] px-4 text-[14px] font-bold"
+                style={{
+                  border: "2px solid var(--color-madeira)",
+                  color: "var(--color-madeira)",
+                }}
+              >
+                Editar paradas
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
