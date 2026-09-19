@@ -53,6 +53,37 @@
   /* Tinta com o mesmo fundo quente da madeira, em vez de cinza tingido. */
   --color-tinta: #211c19;
 
+
+  /* ============================================================
+     Paleta do redesenho (mockup aprovado em 19/09/2026)
+     ============================================================
+     Entra ao lado da paleta atual, nao no lugar dela: as telas vao
+     migrando uma a uma, e ate a ultima migrar o site no ar precisa
+     continuar de pe. Quando a migracao terminar, a paleta antiga sai.
+
+     As tres identidades de Ivoti, em cor:
+       alema    -> reboco, madeira, telha, veneziana
+       japonesa -> torii
+       flores   -> petunia
+     ============================================================ */
+  --color-reboco: #f4ede0;
+  --color-superficie: #fffdf7;
+  --color-madeira: #3b2418;
+  --color-madeira-funda: #1e1008;
+  --color-texto: #2b1b12;
+  --color-texto-suave: #6b5647;
+  --color-torii: #c8362b;
+  --color-telha: #b5533a;
+  --color-telha-funda: #8e3e2b;
+  --color-veneziana: #2f6b4f;
+  --color-petunia: #b94a8c;
+  --color-petunia-garganta: #7e2a6b;
+  --color-petunia-miolo: #f7e7a6;
+  --color-petunia-clara: #e7b3d0;
+  --color-creme: #f4ede0;
+  --color-creme-fundo: #c9bba2;
+  --color-trelica: #e9e0cf;
+
   --font-titulo: var(--fonte-titulo), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--fonte-corpo), ui-sans-serif, system-ui, sans-serif;
 }
@@ -89,4 +120,55 @@ h4 {
    devolve a fonte padrao deles so dentro do mapa. */
 .gm-style {
   font-family: ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ============================================================
+   Madeira do redesenho
+   ============================================================
+   Textura desenhada em CSS, sem imagem: acompanha qualquer tamanho de card
+   sem esticar nem pesar no carregamento, e muda de tom junto com os tokens.
+
+   Sao duas classes porque veio de madeira tem direcao. Na viga deitada os
+   veios correm na horizontal; na viga em pe, na vertical. Usar a mesma nas
+   quatro bordas denuncia na hora que e textura falsa.
+
+   As faixas tem larguras irregulares de proposito — madeira nao aplainada
+   nao tem ritmo regular — e os dois pontos escuros sao nos.
+   ============================================================ */
+.madeira-deitada {
+  background-color: #2a170d;
+  background-image:
+    radial-gradient(ellipse 18px 6px at 18% 62%, #150a04 0%, transparent 72%),
+    radial-gradient(ellipse 13px 5px at 72% 30%, #150a04 0%, transparent 72%),
+    repeating-linear-gradient(
+      2deg,
+      #47301f 0 3px, #2c1a0f 3px 7px, #1c0e06 7px 9px,
+      #3d2716 9px 14px, #23130a 14px 17px, #503722 17px 19px,
+      #2a170d 19px 25px
+    );
+}
+
+.madeira-empe {
+  background-color: #2a170d;
+  background-image:
+    radial-gradient(ellipse 6px 18px at 64% 22%, #150a04 0%, transparent 72%),
+    radial-gradient(ellipse 5px 13px at 30% 74%, #150a04 0%, transparent 72%),
+    repeating-linear-gradient(
+      92deg,
+      #47301f 0 3px, #2c1a0f 3px 7px, #1c0e06 7px 9px,
+      #3d2716 9px 14px, #23130a 14px 17px, #503722 17px 19px,
+      #2a170d 19px 25px
+    );
+}
+
+/* A faixa de enxaimel que separa as secoes: reboco entre duas vigas, com as
+   diagonais cruzadas a 62 graus, como na parede de verdade. */
+.faixa-enxaimel {
+  height: 14px;
+  background-color: var(--color-superficie);
+  border-top: 2px solid var(--color-madeira);
+  border-bottom: 2px solid var(--color-madeira);
+  background-image:
+    repeating-linear-gradient(62deg, var(--color-madeira) 0 3px, transparent 3px 26px),
+    repeating-linear-gradient(-62deg, var(--color-madeira) 0 3px, transparent 3px 26px);
 }
