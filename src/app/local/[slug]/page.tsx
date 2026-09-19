@@ -1,26 +1,29 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import CardLocal from "@/components/CardLocal";
 import ContarAcesso from "@/components/ContarAcesso";
-import CartaoPromocao, { type PromocaoNaTela } from "@/components/CartaoPromocao";
-import LinkDeContato from "@/components/LinkDeContato";
-import Mapa from "@/components/Mapa";
-import SeloAberto from "@/components/SeloAberto";
-import Galeria from "@/components/Galeria";
-import { localPorSlug, locaisParecidos } from "@/lib/locais";
-import { porDia, quandoPorExtenso } from "@/lib/horarios";
+import type { PromocaoNaTela } from "@/components/CartaoPromocao";
+import Favoritar from "@/components/enxaimel/Favoritar";
+import {
+  AcoesDoLocal,
+  CardPromocao,
+  ConviteAoGuia,
+  LinhaEvento,
+} from "@/components/enxaimel/blocos";
+import { Trelica } from "@/components/enxaimel/icones";
+import {
+  FaixaEnxaimel,
+  SeloStatus,
+  TituloSecao,
+} from "@/components/enxaimel/pecas";
+import { localPorSlug } from "@/lib/locais";
+import { porDia, situacao } from "@/lib/horarios";
 import { createClient } from "@/lib/supabase/server";
 import { eventosVisiveis } from "@/lib/eventos";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
-import {
-  faixaPreco,
-  linkWhatsapp,
-  reais,
-  telefoneBonito,
-  usuarioInstagram,
-} from "@/lib/texto";
+import { linkWhatsapp, usuarioInstagram } from "@/lib/texto";
 
 export const revalidate = 120;
 
@@ -33,10 +36,7 @@ export async function generateMetadata({
 
   return {
     title: local.nome,
-    description:
-      local.resumo ??
-      local.descricao?.slice(0, 160) ??
-      `${local.nome} em Ivoti, RS.`,
+    description: local.resumo ?? undefined,
     openGraph: {
       title: local.nome,
       description: local.resumo ?? undefined,
@@ -45,27 +45,11 @@ export async function generateMetadata({
   };
 }
 
-type EventoDoLocal = {
-  id: string;
-  titulo: string;
-  inicio: string;
-  descricao: string | null;
-};
-
-/**
- * Os proximos eventos deste local, pra quem abriu a pagina saber que tem
- * coisa marcada — e nao so o horario de funcionamento de sempre.
- */
-/** As promoções que valem hoje neste local. A regra do dia mora no banco. */
-async function promocoesDeHoje(localId: string) {
+async function promocoesDoLocal(localId: string) {
   if (!SUPABASE_CONFIGURADO) return [];
   const supabase = await createClient();
   const { data } = await supabase.rpc("promocoes_de_hoje", { p_local: localId });
   return (data ?? []) as PromocaoNaTela[];
-}
-
-async function proximosDoLocal(localId: string): Promise<EventoDoLocal[]> {
-  return eventosVisiveis({ local: localId, limite: 5 });
 }
 
 export default async function PaginaLocal({
@@ -76,316 +60,222 @@ export default async function PaginaLocal({
 
   if (!local || local.status !== "publicado") notFound();
 
-  const [parecidos, eventos, promocoes] = await Promise.all([
-    locaisParecidos(local),
-    proximosDoLocal(local.id),
-    promocoesDeHoje(local.id),
+  const [eventos, promocoes] = await Promise.all([
+    eventosVisiveis({ local: local.id, limite: 5 }),
+    promocoesDoLocal(local.id),
   ]);
-  const semana = porDia(local.horarios);
-  const whats = linkWhatsapp(
-    local.whatsapp,
-    `Oi! Vi vocês no Guia de Ivoti.`,
-  );
-  const insta = usuarioInstagram(local.instagram);
+
+  const { aberto, texto: textoDoHorario } = situacao(local.horarios ?? []);
+  const semana = porDia(local.horarios ?? []);
   const endereco = [local.endereco, local.numero, local.bairro]
     .filter(Boolean)
     .join(", ");
 
-  // Cardápio / serviços agrupados por seção.
-  const secoes = new Map<string, typeof local.itens>();
-  for (const item of local.itens) {
-    const chave = item.secao ?? "";
-    if (!secoes.has(chave)) secoes.set(chave, []);
-    secoes.get(chave)!.push(item);
-  }
+  // Só entra o que o estabelecimento preencheu: botão que não leva a lugar
+  // nenhum ensina a pessoa a desconfiar dos outros.
+  const whats = linkWhatsapp(local.whatsapp, "Oi! Vi vocês no guia da cidade.");
+  const insta = usuarioInstagram(local.instagram);
+  const acoes = [
+    whats && { rotulo: "WhatsApp", href: whats, icone: "💬" },
+    (local.lat != null || local.endereco) && {
+      rotulo: "Como chegar",
+      href: linkRota(local),
+      icone: "🧭",
+    },
+    insta && {
+      rotulo: "Instagram",
+      href: `https://instagram.com/${insta}`,
+      icone: "📷",
+    },
+    (local.itens ?? []).length > 0 && {
+      rotulo: "Cardápio",
+      href: "#cardapio",
+      icone: "📋",
+    },
+  ].filter(Boolean) as { rotulo: string; href: string; icone: string }[];
 
   return (
-    <article className="mx-auto max-w-5xl px-4 py-6">
+    <div style={{ backgroundColor: "var(--color-reboco)" }}>
       <ContarAcesso local={local.id} />
-      <nav className="text-sm text-tinta/50">
-        <Link href="/explorar" className="hover:text-mata-700">
-          Explorar
-        </Link>
-        {local.categoria && (
-          <>
-            {" · "}
-            <Link
-              href={`/explorar?categoria=${local.categoria.slug}`}
-              className="hover:text-mata-700"
-            >
-              {local.categoria.nome}
-            </Link>
-          </>
+
+      <div className="relative h-[250px]">
+        {local.capa_url ? (
+          <Image
+            src={local.capa_url}
+            alt={local.nome}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        ) : (
+          <Trelica />
         )}
-      </nav>
 
-      <Galeria
-        capa={local.capa_url}
-        fotos={local.fotos}
-        nome={local.nome}
-        emoji={local.categoria?.emoji ?? "📍"}
-      />
-
-      <header className="mt-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-bold">{local.nome}</h1>
-            <p className="mt-1 text-sm text-tinta/55">
-              {local.categoria?.nome}
-              {local.bairro ? `   ${local.bairro}` : ""}
-              {local.faixa_preco ? `   ${faixaPreco(local.faixa_preco)}` : ""}
-            </p>
-          </div>
-          <SeloAberto horarios={local.horarios} />
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+          <Link
+            href="/explorar"
+            aria-label="Voltar"
+            className="grid h-11 w-11 place-items-center rounded-full text-[19px]"
+            style={{
+              backgroundColor: "rgba(46, 26, 16, 0.72)",
+              color: "var(--color-creme-claro)",
+            }}
+          >
+            ‹
+          </Link>
+          <Favoritar slug={local.slug} />
         </div>
+      </div>
+
+      <div className="px-4 pt-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+          <span
+            className="text-[13px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            {textoDoHorario}
+          </span>
+        </div>
+
+        <h1
+          className="mt-2 text-[26px] leading-tight font-bold"
+          style={{
+            color: "var(--color-texto)",
+            fontFamily: "var(--fonte-titulo-nova)",
+          }}
+        >
+          {local.nome}
+        </h1>
+
+        <p
+          className="mt-1 text-[14px]"
+          style={{ color: "var(--color-texto-suave)" }}
+        >
+          {local.categoria?.nome}
+          {endereco ? ` · ${endereco}` : ""}
+        </p>
 
         {local.resumo && (
-          <p className="mt-3 text-lg text-tinta/75">{local.resumo}</p>
-        )}
-      </header>
-
-      {/* ---- botões de ação ---- */}
-      <div className="mt-5 flex flex-wrap gap-2">
-        <LinkDeContato
-          href={linkRota(local)}
-          tipo="clique_rota"
-          local={local.id}
-          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-creme transition hover:border-sol-700 hover:bg-sol-700"
-        >
-          🧭 Como chegar
-        </LinkDeContato>
-        {whats && (
-          <LinkDeContato
-            href={whats}
-            tipo="clique_whatsapp"
-            local={local.id}
-            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
+          <p
+            className="mt-3 text-[14px]"
+            style={{ color: "var(--color-texto)" }}
           >
-            💬 WhatsApp
-          </LinkDeContato>
+            {local.resumo}
+          </p>
         )}
-        {local.telefone && (
-          <LinkDeContato
-            href={`tel:${local.telefone.replace(/\D/g, "")}`}
-            tipo="clique_telefone"
-            local={local.id}
-            externo={false}
-            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
-          >
-            📞 {telefoneBonito(local.telefone)}
-          </LinkDeContato>
-        )}
-        {insta && (
-          <LinkDeContato
-            href={`https://instagram.com/${insta}`}
-            tipo="clique_instagram"
-            local={local.id}
-            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
-          >
-            📷 @{insta}
-          </LinkDeContato>
-        )}
-        {local.site && (
-          <LinkDeContato
-            href={local.site.startsWith("http") ? local.site : `https://${local.site}`}
-            tipo="clique_site"
-            local={local.id}
-            className="rounded-full border border-mata-200 bg-creme px-5 py-2.5 text-sm font-semibold text-mata-700 transition hover:bg-mata-50"
-          >
-            🌐 Site
-          </LinkDeContato>
-        )}
-      </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_320px]">
-        <div className="space-y-8">
-          {local.descricao && (
-            <section>
-              <h2 className="text-lg font-semibold">Sobre</h2>
-              <p className="mt-2 whitespace-pre-wrap text-tinta/75">
-                {local.descricao}
-              </p>
-            </section>
-          )}
-
-          {local.tags.length > 0 && (
-            <section>
-              <h2 className="text-lg font-semibold">O que tem por lá</h2>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {local.tags.map((t) => (
-                  <span
-                    key={t.id}
-                    className="border border-carvalho/25 px-3 py-1.5 text-sm text-tinta/75"
-                  >
-                    {t.emoji} {t.nome}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {promocoes.length > 0 && (
-            <section>
-              <h2 className="text-lg font-semibold">Promoções de hoje</h2>
-              <div className="mt-3 space-y-2">
-                {promocoes.map((p) => (
-                  <CartaoPromocao key={p.id} promocao={p} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {eventos.length > 0 && (
-            <section>
-              <h2 className="text-lg font-semibold">Tem coisa marcada</h2>
-              <ul className="mt-3 space-y-2">
-                {eventos.map((e) => (
-                  <li
-                    key={e.id}
-                    className="flex gap-3 rounded-xl border border-sol-200 bg-sol-50 p-3"
-                  >
-                    <span className="text-xl">📅</span>
-                    <div className="min-w-0">
-                      <p className="font-semibold">{e.titulo}</p>
-                      <p className="text-sm text-tinta/60">
-                        {quandoPorExtenso(e.inicio)}
-                      </p>
-                      {e.descricao && (
-                        <p className="mt-1 line-clamp-2 text-sm text-tinta/70">
-                          {e.descricao}
-                        </p>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/agenda"
-                className="mt-2 inline-block text-sm font-semibold text-mata-700 hover:underline"
-              >
-                Ver a agenda da cidade →
-              </Link>
-            </section>
-          )}
-
-          {local.itens.length > 0 && (
-            <section>
-              <h2 className="text-lg font-semibold">
-                {local.categoria?.slug === "hospedagem"
-                  ? "Acomodações"
-                  : "Cardápio e serviços"}
-              </h2>
-              <div className="mt-3 space-y-5">
-                {[...secoes.entries()].map(([secao, itens]) => (
-                  <div key={secao}>
-                    {secao && (
-                      <h3 className="text-sm font-semibold text-mata-700 uppercase">
-                        {secao}
-                      </h3>
-                    )}
-                    <ul className="mt-2 divide-y divide-mata-50 rounded-xl border border-mata-100 bg-creme">
-                      {itens.map((i) => (
-                        <li
-                          key={i.id}
-                          className="flex items-start justify-between gap-4 p-3"
-                        >
-                          <div>
-                            <p className="font-medium">{i.nome}</p>
-                            {i.descricao && (
-                              <p className="text-sm text-tinta/60">
-                                {i.descricao}
-                              </p>
-                            )}
-                          </div>
-                          {i.preco != null && (
-                            <span className="shrink-0 font-semibold text-mata-700">
-                              {reais(Number(i.preco))}
-                            </span>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
+        <div className="mt-4">
+          <AcoesDoLocal acoes={acoes} />
         </div>
-
-        {/* ---- coluna lateral ---- */}
-        <aside className="space-y-6">
-          <section className="border-2 border-carvalho bg-creme p-4">
-            <h2 className="font-semibold">Horários</h2>
-            {local.horarios.length === 0 ? (
-              <p className="mt-2 text-sm text-tinta/55">
-                Ainda não informaram.
-              </p>
-            ) : (
-              <ul className="mt-2 space-y-1 text-sm">
-                {semana.map((d) => (
-                  <li key={d.dia} className="flex justify-between gap-3">
-                    <span className="text-tinta/60">{d.nome}</span>
-                    <span
-                      className={
-                        d.fechado ? "text-tinta/35" : "font-medium text-tinta"
-                      }
-                    >
-                      {d.fechado ? "Fechado" : d.faixas.join(" · ")}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          {endereco && (
-            <section className="border-2 border-carvalho bg-creme p-4">
-              <h2 className="font-semibold">Endereço</h2>
-              <p className="mt-1 text-sm text-tinta/70">
-                {endereco}
-                <br />
-                {local.cidade} · {local.uf}
-              </p>
-              {local.lat != null && local.lng != null && (
-                <div className="mt-3">
-                  <Mapa
-                    locais={[local]}
-                    altura="h-48"
-                    focoSlug={local.slug}
-                  />
-                </div>
-              )}
-              <a
-                href={linkRota(local)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 block rounded-lg bg-mata-50 py-2 text-center text-sm font-semibold text-mata-700"
-              >
-                Abrir rota no Google Maps
-              </a>
-            </section>
-          )}
-        </aside>
       </div>
 
-      {parecidos.length > 0 && (
-        <section className="mt-12">
-          <h2 className="text-lg font-semibold">Parecidos com esse</h2>
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {parecidos.map((l) => (
-              <CardLocal key={l.id} local={l} />
+      {promocoes.length > 0 && (
+        <section className="px-4 pt-6">
+          <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
+          <div className="mt-3 space-y-3">
+            {promocoes.map((p, i) => (
+              <CardPromocao
+                key={p.id}
+                promocao={p}
+                variante={i % 2 === 0 ? 1 : 2}
+              />
             ))}
           </div>
         </section>
       )}
 
-      <p className="mt-10 text-center text-xs text-tinta/40">
-        É o dono desse lugar?{" "}
-        <Link href="/painel" className="underline hover:text-mata-700">
-          Assuma o perfil e mantenha as informações em dia
-        </Link>
-        .
-      </p>
-    </article>
+      <div className="pt-6">
+        <FaixaEnxaimel />
+      </div>
+
+      {local.descricao && (
+        <section className="px-4 pt-5">
+          <TituloSecao>Sobre</TituloSecao>
+          <p
+            className="mt-2 text-[14px] whitespace-pre-line"
+            style={{ color: "var(--color-texto)" }}
+          >
+            {local.descricao}
+          </p>
+        </section>
+      )}
+
+      {semana.some((d) => !d.fechado) && (
+        <section className="px-4 pt-6">
+          <TituloSecao>Horários</TituloSecao>
+          <dl className="mt-2">
+            {semana.map((d) => (
+              <div
+                key={d.dia}
+                className="flex justify-between border-b py-1.5 text-[14px] last:border-b-0"
+                style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
+              >
+                <dt style={{ color: "var(--color-texto)" }}>{d.nome}</dt>
+                <dd style={{ color: "var(--color-texto-suave)" }}>
+                  {d.fechado ? "Fechado" : d.faixas.join(", ")}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {eventos.length > 0 && (
+        <section className="px-4 pt-6">
+          <TituloSecao selo="evento">Próximos eventos</TituloSecao>
+          <div className="mt-3 space-y-3">
+            {eventos.map((e) => (
+              <LinhaEvento key={e.id} evento={e} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(local.itens ?? []).length > 0 && (
+        <section id="cardapio" className="px-4 pt-6">
+          <TituloSecao>Cardápio</TituloSecao>
+          <ul className="mt-2">
+            {local.itens.map((item) => (
+              <li
+                key={item.id}
+                className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
+                style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
+              >
+                <span>
+                  <span
+                    className="block font-medium"
+                    style={{ color: "var(--color-texto)" }}
+                  >
+                    {item.nome}
+                  </span>
+                  {item.descricao && (
+                    <span
+                      className="block text-[13px]"
+                      style={{ color: "var(--color-texto-suave)" }}
+                    >
+                      {item.descricao}
+                    </span>
+                  )}
+                </span>
+                {item.preco != null && (
+                  <span
+                    className="shrink-0 font-bold"
+                    style={{ color: "var(--color-texto)" }}
+                  >
+                    R$ {Number(item.preco).toFixed(2).replace(".", ",")}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <div className="pt-7">
+        <ConviteAoGuia nome={local.nome} />
+      </div>
+    </div>
   );
 }

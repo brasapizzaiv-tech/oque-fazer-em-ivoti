@@ -338,3 +338,145 @@ export function CardLugar({
     </CardMadeira>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Acoes do estabelecimento                                             */
+/* ------------------------------------------------------------------ */
+
+/**
+ * As quatro ações em grade: o que a pessoa veio fazer.
+ *
+ * Só aparece o que o estabelecimento preencheu — botão que não leva a lugar
+ * nenhum ensina a pessoa a não confiar nos outros. Com dois ou menos, a grade
+ * vira uma linha só.
+ */
+export function AcoesDoLocal({
+  acoes,
+}: {
+  acoes: { rotulo: string; href: string; icone: string }[];
+}) {
+  if (acoes.length === 0) return null;
+
+  return (
+    <div
+      className={`grid gap-2 ${acoes.length <= 2 ? "grid-cols-2" : "grid-cols-2"}`}
+    >
+      {acoes.map((a) => (
+        <a
+          key={a.rotulo}
+          href={a.href}
+          target={a.href.startsWith("http") ? "_blank" : undefined}
+          rel={a.href.startsWith("http") ? "noopener noreferrer" : undefined}
+          className="flex h-12 items-center justify-center gap-2 rounded-[11px] text-[14px] font-bold"
+          style={{
+            backgroundColor: "var(--color-superficie)",
+            border: "2px solid var(--color-madeira)",
+            color: "var(--color-texto)",
+          }}
+        >
+          <span aria-hidden>{a.icone}</span>
+          {a.rotulo}
+        </a>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Evento na lista do estabelecimento                                   */
+/* ------------------------------------------------------------------ */
+
+/** Data em destaque à esquerda, título e horário à direita. */
+export function LinhaEvento({ evento }: { evento: EventoNaTela }) {
+  const quando = new Date(evento.inicio);
+  const dia = quando.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  });
+  const mes = quando
+    .toLocaleDateString("pt-BR", { month: "short", timeZone: "America/Sao_Paulo" })
+    .replace(".", "");
+
+  return (
+    <CardMadeira variante={1} maosFrancesas={false}>
+      <div className="flex items-center gap-3 p-3">
+        <span
+          className="flex h-[52px] w-[52px] shrink-0 flex-col items-center justify-center rounded-[6px]"
+          style={{
+            backgroundColor: "var(--color-torii)",
+            color: "#fff7ea",
+          }}
+        >
+          <span
+            className="text-[20px] leading-none font-bold"
+            style={{ fontFamily: "var(--fonte-titulo-nova)" }}
+          >
+            {dia}
+          </span>
+          <span className="text-[10px] tracking-[0.1em] uppercase">{mes}</span>
+        </span>
+
+        <span className="min-w-0">
+          <span
+            className="block text-[15px] leading-tight font-bold"
+            style={{
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            {evento.titulo}
+          </span>
+          <span
+            className="mt-0.5 block text-[13px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            {quandoPorExtenso(evento.inicio)}
+          </span>
+        </span>
+      </div>
+    </CardMadeira>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Convite ao Guia                                                      */
+/* ------------------------------------------------------------------ */
+
+/** O bloco escuro que chama o assistente, no pé da página do lugar. */
+export function ConviteAoGuia({ nome }: { nome?: string }) {
+  return (
+    <section
+      className="px-4 py-7 text-center"
+      style={{ backgroundColor: "var(--color-madeira)" }}
+    >
+      <p
+        className="text-[20px] leading-tight font-bold"
+        style={{
+          color: "var(--color-creme-claro)",
+          fontFamily: "var(--fonte-titulo-nova)",
+        }}
+      >
+        Pergunte ao Guia
+      </p>
+      <p
+        className="mx-auto mt-2 max-w-[300px] text-[14px]"
+        style={{ color: "var(--color-creme-fundo)" }}
+      >
+        {nome ? `O que pedir no ${nome}` : "O que pedir aqui"}, ou peça um
+        roteiro pela cidade.
+      </p>
+      <div className="mt-5 flex justify-center">
+        <Link
+          href="/chat"
+          className="inline-flex h-12 items-center justify-center rounded-[11px] px-6 text-[14px] font-bold"
+          style={{
+            backgroundColor: "var(--color-torii)",
+            color: "#fff7ea",
+          }}
+        >
+          Falar com o Guia
+        </Link>
+      </div>
+    </section>
+  );
+}
