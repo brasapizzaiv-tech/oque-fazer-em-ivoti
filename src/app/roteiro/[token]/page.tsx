@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import CartaoRoteiro from "@/components/CartaoRoteiro";
 import ContarAcesso from "@/components/ContarAcesso";
+import ListaDeParadas from "@/components/enxaimel/ListaDeParadas";
+import { Petunia } from "@/components/enxaimel/icones";
+import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
-import type { Parada } from "@/lib/roteiro";
+import { linkGoogleMaps, resumoDoPasseio, type Parada } from "@/lib/roteiro";
 
 export const dynamic = "force-dynamic";
 
@@ -62,33 +64,112 @@ export default async function RoteiroSalvo({
 
   if (!roteiro) notFound();
 
+  const rota = linkGoogleMaps(roteiro.paradas);
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <ContarAcesso />
+    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+      <div className="mx-auto lg:max-w-[760px] lg:px-8 lg:pb-10">
+        <ContarAcesso />
 
-      <p className="text-sm text-tinta/55">Roteiro compartilhado</p>
-      <h1 className="mt-1 text-2xl font-bold">{roteiro.titulo}</h1>
-
-      <div className="mt-5">
-        <CartaoRoteiro
-          titulo={roteiro.titulo}
-          paradas={roteiro.paradas}
-          compartilhavel={false}
-        />
-      </div>
-
-      <div className="mt-8 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center">
-        <p className="font-semibold">Quer montar o seu?</p>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
-          Diga ao Guia o que você tem vontade de fazer e ele monta um passeio
-          com horário e rota.
-        </p>
-        <Link
-          href="/chat"
-          className="mt-4 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
+        <header
+          className="px-4 pt-5 pb-6"
+          style={{ backgroundColor: "var(--color-madeira)" }}
         >
-          Conversar com o Guia
-        </Link>
+          <Legenda cor="var(--color-petunia-clara)">
+            Roteiro compartilhado
+          </Legenda>
+
+          <div className="mt-1.5 flex items-start gap-2">
+            <h1
+              className="text-[26px] leading-tight font-bold"
+              style={{
+                color: "var(--color-creme-claro)",
+                fontFamily: "var(--fonte-titulo-nova)",
+              }}
+            >
+              {roteiro.titulo}
+            </h1>
+            <Petunia tamanho={22} className="mt-1.5 shrink-0" />
+          </div>
+
+          <p
+            className="mt-2 text-[13px]"
+            style={{ color: "var(--color-creme-fundo)" }}
+          >
+            {resumoDoPasseio(roteiro.paradas)}
+          </p>
+        </header>
+
+        {roteiro.paradas.length === 0 ? (
+          <p
+            className="px-4 py-10 text-center text-[14px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            As paradas deste roteiro saíram do ar. Peça outro ao Guia, com o que
+            está aberto hoje.
+          </p>
+        ) : (
+          <div className="px-4 pt-6">
+            <ListaDeParadas paradas={roteiro.paradas} />
+          </div>
+        )}
+
+        <div className="pt-7">
+          <FaixaEnxaimel />
+        </div>
+
+        {/* O convite fecha a página: quem recebeu o link de um amigo é
+            justamente quem ainda não sabe que dá para montar o próprio. */}
+        <section className="px-4 py-8 text-center">
+          <p
+            className="text-[18px] font-bold"
+            style={{
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            Quer montar o seu?
+          </p>
+          <p
+            className="mx-auto mt-1.5 max-w-[42ch] text-[14px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            Diga ao Guia o que você tem vontade de fazer e ele monta um passeio
+            com horário e rota.
+          </p>
+          <Link
+            href="/chat"
+            className="mt-5 inline-flex h-12 items-center rounded-[11px] px-6 text-[14px] font-bold"
+            style={{ backgroundColor: "var(--color-torii)", color: "#fff7ea" }}
+          >
+            Conversar com o Guia
+          </Link>
+        </section>
+
+        {/* O rodapé acompanha a rolagem: a pessoa lê as paradas e sai andando,
+            e voltar ao topo para achar a rota seria atrito no pior momento. */}
+        {rota && (
+          <div
+            className="sticky bottom-0 z-30 px-4 py-3"
+            style={{
+              backgroundColor: "var(--color-reboco)",
+              borderTop: "2px solid var(--color-madeira)",
+            }}
+          >
+            <a
+              href={rota}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-12 items-center justify-center rounded-[11px] px-4 text-center text-[14px] font-bold"
+              style={{
+                backgroundColor: "var(--color-torii)",
+                color: "#fff7ea",
+              }}
+            >
+              Abrir rota no Google Maps
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

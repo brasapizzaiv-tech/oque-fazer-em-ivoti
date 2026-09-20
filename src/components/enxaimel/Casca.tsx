@@ -2,46 +2,21 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import CabecalhoAntigo from "@/components/Cabecalho";
 import CabecalhoDesktop from "./CabecalhoDesktop";
-import RodapeAntigo from "@/components/Rodape";
-import BotaoChat from "@/components/BotaoChat";
 import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
 
 /**
- * A casca do site durante a migração.
+ * A casca do site.
  *
- * O redesenho troca as telas uma a uma, e as duas linguagens precisam
- * conviver até a última virar. O problema é que a casca antiga mora no layout
- * raiz: sem isto, uma tela nova aparecia com dois cabeçalhos, o dela e o
- * velho por cima.
+ * Durante a migração esta era a ponte entre dois desenhos: tela migrada
+ * recebia a casca nova, tela velha continuava com o cabeçalho e o rodapé de
+ * antes. A lista de telas migradas esvaziou, e com ela a casca antiga saiu —
+ * junto com os doze componentes que só ela usava.
  *
- * Então a regra é uma lista: rota migrada recebe a navegação de baixo do
- * desenho novo; rota ainda antiga continua com o cabeçalho, o rodapé e o
- * botão flutuante de sempre. A lista encolhe a cada tela migrada e o arquivo
- * inteiro some quando ela esvaziar.
- */
-// Comeca com barra e nao termina: "/local" cobre /local/qualquer-coisa.
-const MIGRADAS = [
-  "/",
-  "/explorar",
-  "/chat",
-  "/agenda",
-  "/mapa",
-  "/entrar",
-  "/cadastrar",
-  "/recuperar-senha",
-  "/nova-senha",
-];
-const PREFIXOS_MIGRADOS = ["/local/", "/roteiros"];
-
-/**
- * As areas que trazem a propria casca inteira.
- *
- * O painel e a administracao tem cabecalho, abas e largura proprios. Recebiam
- * o cabecalho do site por cima disso, e a barra de baixo com "Explorar" e
- * "Roteiros" por baixo — navegacao de quem passeia, empilhada na tela de quem
- * esta editando o proprio cadastro.
+ * Sobrou uma regra: o painel e a administração trazem a própria casca
+ * inteira. Recebiam o cabeçalho do site por cima da própria barra, e a barra
+ * de baixo do celular — "Explorar", "Roteiros" — sob a tela de quem está
+ * editando o próprio cadastro.
  */
 const CASCA_PROPRIA = ["/painel", "/admin"];
 
@@ -51,27 +26,12 @@ export default function Casca({ children }: { children: React.ReactNode }) {
   if (CASCA_PROPRIA.some((p) => caminho === p || caminho.startsWith(p + "/")))
     return <main className="flex-1">{children}</main>;
 
-  const nova =
-    MIGRADAS.includes(caminho) ||
-    PREFIXOS_MIGRADOS.some((p) => caminho.startsWith(p));
-
-  if (!nova) {
-    return (
-      <>
-        <CabecalhoAntigo />
-        <main className="flex-1">{children}</main>
-        <RodapeAntigo />
-        <BotaoChat />
-      </>
-    );
-  }
-
   return (
     <>
       {/* O espaço embaixo é do tamanho da barra: sem ele o último bloco da
           página fica escondido atrás dela. */}
-      {/* O fundo vai aqui e nao so na pagina: o body ainda pinta o creme
-          da paleta antiga, e ele aparecia abaixo do conteudo quando a pagina
+      {/* O fundo vai aqui e não só na página: o body ainda pinta o creme
+          da paleta antiga, e ele aparecia abaixo do conteúdo quando a página
           era mais curta que a tela. */}
       <CabecalhoDesktop />
       <main
