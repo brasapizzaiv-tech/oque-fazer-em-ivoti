@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SubTitulo, TituloPainel } from "@/components/painel/pecas";
 import ControlePlano from "./ControlePlano";
 import { createClient } from "@/lib/supabase/server";
 import { planoAtivo } from "@/lib/planos";
@@ -37,23 +38,19 @@ export default async function Planos() {
   );
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <Link href="/admin" className="text-sm text-tinta/55 hover:text-sol-700">
-        ← Administração
-      </Link>
-
-      <h1 className="mt-2 text-xl font-bold">Planos</h1>
-      <p className="text-sm text-tinta/55">
+    <div>
+      <TituloPainel>Planos</TituloPainel>
+      <p className="mt-1 text-[14px] texto-suave">
         Você combina o pagamento fora do site e marca aqui até quando vale.
         Quando a data passa, o plano volta para gratuito sozinho — nada é
         apagado, só fica bloqueado.
       </p>
 
       <div className="mt-6 flex gap-3 text-sm">
-        <span className="rounded-xl bg-sol-50 px-4 py-2.5">
+        <span className="aviso-painel px-4 py-2.5">
           <strong className="text-lg">{premium.length}</strong> premium
         </span>
-        <span className="border-2 border-carvalho/25 bg-cal-sombra px-4 py-2.5">
+        <span className="border-2 border-[color:var(--color-madeira)]/25 bg-[color:var(--color-reboco)] px-4 py-2.5">
           <strong className="text-lg">{gratuitos.length}</strong> gratuitos
         </span>
       </div>
@@ -79,19 +76,19 @@ function Grupo({
 }) {
   return (
     <section className="mt-8">
-      <h2 className="text-sm font-semibold text-tinta/60">{titulo}</h2>
+      <SubTitulo>{titulo}</SubTitulo>
 
       {locais.length === 0 ? (
-        <p className="mt-2 text-sm text-tinta/50">{vazio}</p>
+        <p className="mt-2 text-sm texto-suave">{vazio}</p>
       ) : (
         <ul className="mt-3 space-y-3">
           {locais.map((l) => (
-            <li key={l.id} className="border-2 border-carvalho bg-creme p-4">
+            <li key={l.id} className="caixa-painel p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <Link href={`/local/${l.slug}`} className="font-semibold">
                   {l.nome}
                 </Link>
-                <span className="text-sm text-tinta/50">
+                <span className="text-sm texto-suave">
                   {l.categoria?.nome}
                   {l.bairro ? ` · ${l.bairro}` : ""}
                 </span>

@@ -55,7 +55,7 @@ export default function NovoRoteiro() {
       <button
         type="button"
         onClick={() => setAbrindo(true)}
-        className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700"
+        className="botao-cheio px-5 py-2.5 text-[14px] transition"
       >
         + Novo roteiro
       </button>
@@ -63,7 +63,7 @@ export default function NovoRoteiro() {
   }
 
   return (
-    <div className="w-full border-2 border-carvalho bg-creme p-4">
+    <div className="w-full caixa-painel p-4">
       <label className="block">
         <span className="text-sm font-medium">Título do roteiro</span>
         <input
@@ -75,12 +75,12 @@ export default function NovoRoteiro() {
             if (e.key === "Escape") setAbrindo(false);
           }}
           placeholder="Ivoti em um dia"
-          className="mt-1 w-full border-2 border-carvalho px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+          className="campo-painel mt-1 w-full px-3.5 py-2.5 text-[15px]"
         />
       </label>
 
       {erro && (
-        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
           {erro}
         </p>
       )}
@@ -90,14 +90,14 @@ export default function NovoRoteiro() {
           type="button"
           onClick={criar}
           disabled={indo || !titulo.trim()}
-          className="border-2 border-carvalho bg-carvalho px-5 py-2 text-sm font-semibold text-white disabled:opacity-40"
+          className="botao-cheio px-5 py-2.5 text-[14px] disabled:opacity-40"
         >
           {indo ? "Criando..." : "Criar e montar"}
         </button>
         <button
           type="button"
           onClick={() => setAbrindo(false)}
-          className="border-2 border-carvalho px-4 py-2 text-sm"
+          className="botao-vazado px-4 py-2.5 text-[14px]"
         >
           Cancelar
         </button>

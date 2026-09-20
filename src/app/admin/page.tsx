@@ -1,9 +1,9 @@
 import Link from "next/link";
+import { TituloBloco, TituloPainel } from "@/components/painel/pecas";
 import { createClient } from "@/lib/supabase/server";
 import AcoesAdmin from "./AcoesAdmin";
 import AcoesEvento from "./AcoesEvento";
 import TirarDoAr from "@/components/painel/TirarDoAr";
-import BotaoSair from "@/components/BotaoSair";
 import { quandoPorExtenso } from "@/lib/horarios";
 
 export const dynamic = "force-dynamic";
@@ -74,73 +74,44 @@ export default async function Admin() {
   const eventosNaFila = (eventos ?? []) as unknown as EventoNaFila[];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-carvalho/20 pb-4">
-        <div>
-          <h1 className="text-xl font-bold">Administração do guia</h1>
-          <p className="text-sm text-tinta/55">
-            Aprove os cadastros e acompanhe o que o pessoal está procurando.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Link
-            href="/admin/metricas"
-            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
-          >
-            Movimento
-          </Link>
-          <Link
-            href="/admin/roteiros"
-            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
-          >
-            Roteiros
-          </Link>
-          <Link
-            href="/admin/planos"
-            className="rounded-full border border-sol-300 bg-sol-50 px-4 py-2 text-sm font-semibold text-sol-900 hover:bg-sol-100"
-          >
-            Planos
-          </Link>
-          <Link
-            href="/painel"
-            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
-          >
-            Meu painel
-          </Link>
-          <BotaoSair />
-        </div>
-      </div>
+    <div>
+      <TituloPainel apoio="Aprove os cadastros e acompanhe o que o pessoal está procurando.">
+        Administração do guia
+      </TituloPainel>
 
       {/* ---- fila de aprovação ---- */}
       <section className="mt-6">
-        <h2 className="font-semibold">
+        <TituloBloco>
           Esperando aprovação{" "}
           {naFila.length > 0 && (
-            <span className="ml-1 rounded-full bg-sol-500 px-2 py-0.5 text-xs text-white">
+            <span className="ml-1 rounded-full bg-[color:var(--color-torii)] px-2 py-0.5 text-[11px] font-bold text-[#fff7ea]">
               {naFila.length}
             </span>
           )}
-        </h2>
+        </TituloBloco>
 
         {naFila.length === 0 ? (
-          <p className="mt-3 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center text-sm text-tinta/55">
+          <p className="mt-3 caixa-painel border-dashed p-6 text-center text-sm texto-suave">
             Nada na fila. 🎉
           </p>
         ) : (
           <ul className="mt-3 space-y-3">
             {naFila.map((l) => (
-              <li key={l.id} className="border-2 border-sol-600 bg-creme p-4">
+              <li
+                key={l.id}
+                className="caixa-painel border-[color:var(--color-petunia)] p-4"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold">{l.nome}</p>
-                    <p className="text-sm text-tinta/55">
+                    <p className="text-sm texto-suave">
                       {l.resumo ?? "Sem resumo"}
                       {l.bairro ? ` · ${l.bairro}` : ""}
                     </p>
                   </div>
                   <Link
                     href={`/painel/${l.id}`}
-                    className="border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
+                    className="botao-vazado px-3.5 py-2 text-[14px]"
                   >
                     Ver cadastro
                   </Link>
@@ -154,27 +125,30 @@ export default async function Admin() {
 
       {/* ---- eventos esperando ---- */}
       <section className="mt-10">
-        <h2 className="font-semibold">
+        <TituloBloco>
           Eventos esperando aprovação{" "}
           {eventosNaFila.length > 0 && (
-            <span className="ml-1 rounded-full bg-sol-500 px-2 py-0.5 text-xs text-white">
+            <span className="ml-1 rounded-full bg-[color:var(--color-torii)] px-2 py-0.5 text-[11px] font-bold text-[#fff7ea]">
               {eventosNaFila.length}
             </span>
           )}
-        </h2>
+        </TituloBloco>
 
         {eventosNaFila.length === 0 ? (
-          <p className="mt-3 border-2 border-dashed border-carvalho/40 bg-creme p-6 text-center text-sm text-tinta/55">
+          <p className="mt-3 caixa-painel border-dashed p-6 text-center text-sm texto-suave">
             Nenhum evento na fila.
           </p>
         ) : (
           <ul className="mt-3 space-y-3">
             {eventosNaFila.map((e) => (
-              <li key={e.id} className="border-2 border-sol-600 bg-creme p-4">
+              <li
+                key={e.id}
+                className="caixa-painel border-[color:var(--color-petunia)] p-4"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold">{e.titulo}</p>
-                    <p className="text-sm text-tinta/55">
+                    <p className="text-sm texto-suave">
                       {quandoPorExtenso(e.inicio)}
                       {e.local?.nome
                         ? ` · ${e.local.nome}`
@@ -183,14 +157,14 @@ export default async function Admin() {
                           : ""}
                     </p>
                     {e.descricao && (
-                      <p className="mt-1 line-clamp-2 text-sm text-tinta/70">
+                      <p className="mt-1 line-clamp-2 text-sm texto-suave">
                         {e.descricao}
                       </p>
                     )}
                   </div>
                   <Link
                     href={`/painel/eventos/${e.id}`}
-                    className="shrink-0 border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
+                    className="shrink-0 botao-vazado px-3.5 py-2 text-[14px]"
                   >
                     Ver / editar
                   </Link>
@@ -204,9 +178,9 @@ export default async function Admin() {
 
       {/* ---- no ar ---- */}
       <section className="mt-10">
-        <h2 className="font-semibold">No ar ({noAr.length})</h2>
+        <TituloBloco>No ar ({noAr.length})</TituloBloco>
         {noAr.length === 0 ? (
-          <p className="mt-3 text-sm text-tinta/55">
+          <p className="mt-3 text-sm texto-suave">
             Nenhum local publicado ainda.
           </p>
         ) : (
@@ -214,7 +188,7 @@ export default async function Admin() {
             {noAr.map((l) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 border-2 border-carvalho/30 bg-creme px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-2 border-2 border-[color:var(--color-madeira)]/30 bg-[color:var(--color-superficie)] px-3 py-2 text-[14px]"
               >
                 <Link
                   href={`/local/${l.slug}`}
@@ -225,7 +199,7 @@ export default async function Admin() {
                 <span className="flex shrink-0 items-center gap-2">
                   <Link
                     href={`/painel/${l.id}`}
-                    className="text-xs text-sol-700 underline"
+                    className="text-[12px] font-semibold text-[color:var(--color-torii)] underline"
                   >
                     editar
                   </Link>
@@ -240,8 +214,8 @@ export default async function Admin() {
       {/* ---- fora do ar ---- */}
       {foraDoAr.length > 0 && (
         <section className="mt-10">
-          <h2 className="font-semibold">Fora do ar ({foraDoAr.length})</h2>
-          <p className="text-sm text-tinta/55">
+          <TituloBloco>Fora do ar ({foraDoAr.length})</TituloBloco>
+          <p className="text-sm texto-suave">
             Nao aparecem no guia. O cadastro, as fotos e as metricas continuam
             guardados.
           </p>
@@ -249,14 +223,14 @@ export default async function Admin() {
             {foraDoAr.map((l) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 border-2 border-dashed border-carvalho/40 bg-creme px-3 py-2 text-sm"
+                className="flex items-center justify-between gap-2 caixa-painel border-dashed px-3 py-2 text-sm"
               >
                 <span className="min-w-0">
-                  <span className="block truncate font-medium text-tinta/70">
+                  <span className="block truncate font-medium texto-suave">
                     {l.nome}
                   </span>
                   {l.desativado_em && (
-                    <span className="text-xs text-tinta/45">
+                    <span className="text-xs texto-suave">
                       desde{" "}
                       {new Date(l.desativado_em).toLocaleDateString("pt-BR")}
                     </span>
@@ -271,18 +245,18 @@ export default async function Admin() {
 
       {/* ---- o que perguntam pro guia ---- */}
       <section className="mt-10">
-        <h2 className="font-semibold">Últimas perguntas ao guia</h2>
-        <p className="text-sm text-tinta/55">
+        <TituloBloco>Últimas perguntas ao guia</TituloBloco>
+        <p className="text-sm texto-suave">
           Bom termômetro do que falta cadastrar na cidade.
         </p>
         {(perguntas ?? []).length === 0 ? (
-          <p className="mt-3 text-sm text-tinta/55">Ninguém perguntou ainda.</p>
+          <p className="mt-3 text-sm texto-suave">Ninguém perguntou ainda.</p>
         ) : (
           <ul className="mt-3 space-y-1 text-sm">
             {(perguntas ?? []).map((p) => (
               <li
                 key={p.id}
-                className="rounded-lg bg-creme px-3 py-2 text-tinta/75"
+                className="rounded-[9px] bg-[color:var(--color-superficie)] px-3 py-2 texto-suave"
               >
                 “{p.pergunta}”
               </li>

@@ -17,12 +17,12 @@ export default function AcoesEvento({ id }: { id: string }) {
   }
 
   return (
-    <div className="mt-3 flex gap-2 border-t border-carvalho/15 pt-3">
+    <div className="mt-3 flex gap-2 border-t border-[color:var(--color-madeira)]/20 pt-3">
       <button
         type="button"
         onClick={() => mudar("publicado")}
         disabled={indo}
-        className="border-2 border-carvalho bg-carvalho px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        className="botao-cheio px-5 py-2.5 text-[14px] disabled:opacity-50"
       >
         {indo ? "..." : "Publicar na agenda"}
       </button>
@@ -30,7 +30,7 @@ export default function AcoesEvento({ id }: { id: string }) {
         type="button"
         onClick={() => mudar("rejeitado")}
         disabled={indo}
-        className="border-2 border-carvalho px-4 py-2 text-sm font-medium disabled:opacity-50"
+        className="botao-vazado px-4 py-2.5 text-[14px] disabled:opacity-50"
       >
         Devolver
       </button>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TituloPainel } from "@/components/painel/pecas";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import EditorRoteiro from "../EditorRoteiro";
@@ -30,13 +31,13 @@ export default async function MontarRoteiro({
   if (!roteiro || !roteiro.curado) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <nav className="text-sm text-tinta/55">
-        <Link href="/admin/roteiros" className="hover:text-sol-700">
-          Roteiros prontos
-        </Link>
+    <div>
+      <nav className="text-[13px] texto-suave">
+        <Link href="/admin/roteiros">← Roteiros prontos</Link>
       </nav>
-      <h1 className="mt-1 mb-6 text-xl font-bold">{roteiro.titulo}</h1>
+      <div className="mt-1 mb-6">
+        <TituloPainel>{roteiro.titulo}</TituloPainel>
+      </div>
 
       <EditorRoteiro
         roteiro={{

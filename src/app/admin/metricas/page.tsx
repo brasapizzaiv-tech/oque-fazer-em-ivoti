@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TituloBloco, TituloPainel } from "@/components/painel/pecas";
 import { createClient } from "@/lib/supabase/server";
 import { resumoDoSite } from "@/lib/metricas-resumo";
 import {
@@ -37,18 +38,13 @@ export default async function MetricasDoSite({
   const nomePorId = new Map((locais ?? []).map((l) => [l.id, l]));
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <Link href="/admin" className="text-sm text-tinta/55 hover:text-sol-700">
-        ← Administração
-      </Link>
-
-      <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold">Movimento do guia</h1>
-          <p className="text-sm text-tinta/55">
-            O que aconteceu no site inteiro nos últimos {dias} dias.
-          </p>
-        </div>
+    <div>
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <TituloPainel
+          apoio={`O que aconteceu no site inteiro nos últimos ${dias} dias.`}
+        >
+          Movimento do guia
+        </TituloPainel>
 
         <div className="flex gap-1.5">
           {PERIODOS.map((p) => (
@@ -56,9 +52,7 @@ export default async function MetricasDoSite({
               key={p.dias}
               href={`/admin/metricas?dias=${p.dias}`}
               className={`rounded-full px-3 py-1.5 text-sm transition ${
-                dias === p.dias
-                  ? "bg-carvalho font-semibold text-creme"
-                  : "border border-carvalho/25 bg-creme hover:bg-cal-sombra"
+                dias === p.dias ? "pilula-ativa" : "pilula"
               }`}
             >
               {p.rotulo}
@@ -81,9 +75,9 @@ export default async function MetricasDoSite({
         />
       </div>
 
-      <section className="mt-6 border-2 border-carvalho bg-creme p-5">
-        <h2 className="font-semibold">Acessos por dia</h2>
-        <p className="text-sm text-tinta/55">
+      <section className="mt-6 caixa-painel p-5">
+        <TituloBloco>Acessos por dia</TituloBloco>
+        <p className="text-sm texto-suave">
           Passe o dedo ou o mouse numa barra para ver o dia.
         </p>
         <div className="mt-4">
@@ -92,9 +86,9 @@ export default async function MetricasDoSite({
       </section>
 
       <div className="mt-6 grid gap-6 sm:grid-cols-2">
-        <section className="border-2 border-carvalho bg-creme p-5">
-          <h2 className="font-semibold">Estabelecimentos mais procurados</h2>
-          <p className="mb-4 text-sm text-tinta/55">
+        <section className="caixa-painel p-5">
+          <TituloBloco>Estabelecimentos mais procurados</TituloBloco>
+          <p className="mb-4 text-sm texto-suave">
             Bom argumento na hora de oferecer o plano.
           </p>
           <BarrasRanqueadas
@@ -106,9 +100,9 @@ export default async function MetricasDoSite({
           />
         </section>
 
-        <section className="border-2 border-carvalho bg-creme p-5">
-          <h2 className="font-semibold">Páginas mais vistas</h2>
-          <p className="mb-4 text-sm text-tinta/55">Do site inteiro.</p>
+        <section className="caixa-painel p-5">
+          <TituloBloco>Páginas mais vistas</TituloBloco>
+          <p className="mb-4 text-sm texto-suave">Do site inteiro.</p>
           <BarrasRanqueadas
             itens={resumo.paginas.slice(0, 10).map((p) => ({
               rotulo: p.chave === "/" ? "Início" : p.chave,
@@ -118,9 +112,9 @@ export default async function MetricasDoSite({
         </section>
       </div>
 
-      <section className="mt-6 border-2 border-carvalho bg-creme p-5">
-        <h2 className="font-semibold">De onde vieram</h2>
-        <p className="mb-4 text-sm text-tinta/55">
+      <section className="mt-6 caixa-painel p-5">
+        <TituloBloco>De onde vieram</TituloBloco>
+        <p className="mb-4 text-sm texto-suave">
           &quot;Direto&quot; é quem digitou o endereço ou salvou o site — e
           também quem veio de aplicativo de mensagem, que não informa a origem.
         </p>

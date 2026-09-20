@@ -37,14 +37,14 @@ export default function AcoesAdmin({ id }: { id: string }) {
   }
 
   return (
-    <div className="mt-3 border-t border-carvalho/15 pt-3">
+    <div className="mt-3 border-t border-[color:var(--color-madeira)]/20 pt-3">
       {pedindoMotivo ? (
         <div className="flex flex-wrap gap-2">
           <input
             value={motivo}
             onChange={(e) => setMotivo(e.target.value)}
             placeholder="O que precisa ser ajustado?"
-            className="min-w-56 flex-1 border-2 border-carvalho px-3 py-2 text-sm"
+            className="min-w-56 flex-1 campo-painel px-3 py-2 text-[14px]"
           />
           <button
             type="button"
@@ -57,7 +57,7 @@ export default function AcoesAdmin({ id }: { id: string }) {
           <button
             type="button"
             onClick={() => setPedindoMotivo(false)}
-            className="border-2 border-carvalho px-4 py-2 text-sm"
+            className="botao-vazado px-4 py-2.5 text-[14px]"
           >
             Cancelar
           </button>
@@ -68,14 +68,14 @@ export default function AcoesAdmin({ id }: { id: string }) {
             type="button"
             onClick={publicar}
             disabled={indo}
-            className="border-2 border-carvalho bg-carvalho px-5 py-2 text-sm font-semibold text-white disabled:opacity-50"
+            className="botao-cheio px-5 py-2.5 text-[14px] disabled:opacity-50"
           >
             {indo ? "..." : "Publicar"}
           </button>
           <button
             type="button"
             onClick={() => setPedindoMotivo(true)}
-            className="border-2 border-carvalho px-4 py-2 text-sm font-medium"
+            className="botao-vazado px-4 py-2.5 text-[14px]"
           >
             Pedir ajuste
           </button>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TituloBloco, TituloPainel } from "@/components/painel/pecas";
 import { listarRoteirosCurados } from "@/lib/roteiros-curados";
 import NovoRoteiro from "./NovoRoteiro";
 
@@ -13,28 +14,19 @@ export default async function RoteirosDoAdmin() {
   const rascunhos = roteiros.filter((r) => !r.publicado);
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <nav className="text-sm text-tinta/55">
-        <Link href="/admin" className="hover:text-sol-700">
-          Administração
-        </Link>
-      </nav>
-
-      <div className="mt-1 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold">Roteiros prontos</h1>
-          <p className="text-sm text-tinta/55">
-            Os passeios que aparecem no Explorar. As paradas viram rota no mapa.
-          </p>
-        </div>
-        <NovoRoteiro />
-      </div>
+    <div>
+      <TituloPainel
+        apoio="Os passeios que aparecem no Explorar. As paradas viram rota no mapa."
+        acao={<NovoRoteiro />}
+      >
+        Roteiros prontos
+      </TituloPainel>
 
       {roteiros.length === 0 ? (
-        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
+        <div className="mt-6 caixa-painel border-dashed p-10 text-center">
           <p className="text-3xl">🗺️</p>
           <p className="mt-2 font-semibold">Nenhum roteiro ainda</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
+          <p className="mx-auto mt-1 max-w-sm text-sm texto-suave">
             Um bom primeiro: &ldquo;Ivoti em um dia&rdquo;, com o Memorial, um
             almoço e a Igreja São Pedro.
           </p>
@@ -60,18 +52,18 @@ function Secao({
 
   return (
     <section className="mt-8">
-      <h2 className="font-semibold">
+      <TituloBloco>
         {titulo} ({roteiros.length})
-      </h2>
+      </TituloBloco>
       <ul className="mt-3 space-y-2">
         {roteiros.map((r) => (
           <li
             key={r.id}
-            className="flex items-center justify-between gap-3 border-2 border-carvalho/30 bg-creme px-4 py-3"
+            className="flex items-center justify-between gap-3 border-2 border-[color:var(--color-madeira)]/30 bg-[color:var(--color-superficie)] px-4 py-3"
           >
             <span className="min-w-0">
               <span className="block truncate font-medium">{r.titulo}</span>
-              <span className="text-sm text-tinta/50">
+              <span className="text-sm texto-suave">
                 {r.quantas} {r.quantas === 1 ? "parada" : "paradas"}
                 {r.slug ? ` · /roteiros/${r.slug}` : " · sem endereço"}
               </span>
@@ -81,14 +73,14 @@ function Secao({
               {r.publicado && r.slug && (
                 <Link
                   href={`/roteiros/${r.slug}`}
-                  className="text-xs text-tinta/50 underline"
+                  className="text-xs texto-suave underline"
                 >
                   ver
                 </Link>
               )}
               <Link
                 href={`/admin/roteiros/${r.id}`}
-                className="border-2 border-carvalho bg-carvalho px-4 py-1.5 text-sm font-semibold text-white"
+                className="botao-cheio px-4 py-2 text-[14px]"
               >
                 Montar
               </Link>
