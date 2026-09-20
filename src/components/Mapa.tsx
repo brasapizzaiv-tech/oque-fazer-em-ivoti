@@ -12,12 +12,13 @@ import {
   useMap,
 } from "@vis.gl/react-google-maps";
 import MapaPrevia from "./MapaPrevia";
+import TracoNoMapa from "./TracoNoMapa";
+import type { Caminho } from "@/dados/caminhos";
 import { IVOTI, distancia, formatarDistancia, linkRota } from "@/lib/geo";
 import type { LocalCompleto } from "@/lib/tipos";
 import { MAP_ID, PINO_MODERNO } from "@/lib/mapa-config";
 
 const CHAVE = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? "";
-
 
 export type PontoNoMapa = Pick<
   LocalCompleto,
@@ -30,10 +31,16 @@ export default function Mapa({
   locais,
   altura = "h-[60vh]",
   focoSlug,
+  caminho,
+  caminhos,
 }: {
   locais: PontoNoMapa[];
   altura?: string;
   focoSlug?: string;
+  /** Um caminho rural desenhado por cima, com o mapa enquadrado nele. */
+  caminho?: Caminho;
+  /** Vários caminhos desenhados juntos, sem reenquadrar o mapa. */
+  caminhos?: Caminho[];
 }) {
   const [pronto, setPronto] = useState(false);
 
@@ -49,16 +56,25 @@ export default function Mapa({
 
   return (
     <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
-      <div className={`relative ${altura} overflow-hidden rounded-2xl bg-mata-50`}>
+      <div
+        className={`relative ${altura} overflow-hidden rounded-2xl`}
+        style={{ backgroundColor: "var(--color-reboco)" }}
+      >
         {/* Enquanto os ladrilhos do Google nao chegam, a area fica cinza e
             vazia — em conexao lenta isso passa de dez segundos e parece
             defeito. Este aviso cobre o vazio e some sozinho quando o mapa
             desenha. */}
         {!pronto && (
-          <div className="absolute inset-0 z-10 grid place-items-center bg-mata-50 text-center">
+          <div
+            className="absolute inset-0 z-10 grid place-items-center text-center"
+            style={{ backgroundColor: "var(--color-reboco)" }}
+          >
             <div>
               <p className="text-2xl">🗺️</p>
-              <p className="mt-2 text-sm font-medium text-tinta/60">
+              <p
+                className="mt-2 text-[14px] font-medium"
+                style={{ color: "var(--color-texto-suave)" }}
+              >
                 Carregando o mapa...
               </p>
             </div>
@@ -76,7 +92,15 @@ export default function Mapa({
           fullscreenControl={false}
           className="h-full w-full"
         >
-          <Conteudo locais={comCoordenada} focoSlug={focoSlug} />
+          {caminho && <TracoNoMapa caminho={caminho} />}
+          {caminhos?.map((c) => (
+            <TracoNoMapa key={c.slug} caminho={c} enquadrar={false} />
+          ))}
+          <Conteudo
+            locais={comCoordenada}
+            focoSlug={focoSlug}
+            enquadrarNosPinos={!caminho}
+          />
         </Map>
       </div>
     </APIProvider>
@@ -87,7 +111,7 @@ export default function Mapa({
 const PINO_SIMPLES = {
   path: 0 as google.maps.SymbolPath, // google.maps.SymbolPath.CIRCLE
   scale: 16,
-  fillColor: "#147a59",
+  fillColor: "#2f6b4f",
   fillOpacity: 1,
   strokeColor: "#ffffff",
   strokeWeight: 2,
@@ -96,9 +120,12 @@ const PINO_SIMPLES = {
 function Conteudo({
   locais,
   focoSlug,
+  enquadrarNosPinos = true,
 }: {
   locais: PontoNoMapa[];
   focoSlug?: string;
+  /** Desligado quando há um caminho: o enquadramento dele é que vale. */
+  enquadrarNosPinos?: boolean;
 }) {
   const mapa = useMap();
   const [aberto, setAberto] = useState<PontoNoMapa | null>(null);
@@ -108,7 +135,7 @@ function Conteudo({
 
   // Enquadra todos os pinos assim que o mapa carrega.
   useEffect(() => {
-    if (!mapa || locais.length === 0) return;
+    if (!mapa || locais.length === 0 || !enquadrarNosPinos) return;
 
     if (focoSlug) {
       const alvo = locais.find((l) => l.slug === focoSlug);
@@ -128,7 +155,7 @@ function Conteudo({
     const limites = new google.maps.LatLngBounds();
     for (const l of locais) limites.extend({ lat: l.lat!, lng: l.lng! });
     mapa.fitBounds(limites, 48);
-  }, [mapa, locais, focoSlug]);
+  }, [mapa, locais, focoSlug, enquadrarNosPinos]);
 
   function ondeEstou() {
     if (!navigator.geolocation) return;
@@ -160,7 +187,13 @@ function Conteudo({
             clickable
             onClick={() => setAberto(l)}
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
+            <span
+              className="grid h-9 w-9 place-items-center rounded-full border-2 text-base shadow-md"
+              style={{
+                borderColor: "#fff7ea",
+                backgroundColor: "var(--color-veneziana)",
+              }}
+            >
               {l.categoria?.emoji ?? "📍"}
             </span>
           </AdvancedMarker>
@@ -179,7 +212,13 @@ function Conteudo({
       {euEstou &&
         (PINO_MODERNO ? (
           <AdvancedMarker position={euEstou} title="Voce esta aqui">
-            <span className="block h-4 w-4 rounded-full border-2 border-white bg-sol-500 shadow" />
+            <span
+              className="block h-4 w-4 rounded-full border-2 shadow"
+              style={{
+                borderColor: "#fff7ea",
+                backgroundColor: "var(--color-petunia)",
+              }}
+            />
           </AdvancedMarker>
         ) : (
           <Marker position={euEstou} title="Voce esta aqui" />
@@ -204,7 +243,10 @@ function Conteudo({
               </div>
             )}
             <p className="text-sm leading-tight font-semibold">{aberto.nome}</p>
-            <p className="mt-0.5 text-xs text-tinta/55">
+            <p
+              className="mt-0.5 text-xs"
+              style={{ color: "var(--color-texto-suave)" }}
+            >
               {aberto.categoria?.nome}
               {aberto.bairro ? ` · ${aberto.bairro}` : ""}
               {euEstou
@@ -216,7 +258,11 @@ function Conteudo({
             <div className="mt-2 flex gap-2">
               <Link
                 href={`/local/${aberto.slug}`}
-                className="flex-1 rounded-lg bg-mata-600 px-2 py-1.5 text-center text-xs font-semibold text-white"
+                className="flex-1 rounded-[9px] px-2 py-1.5 text-center text-xs font-bold"
+                style={{
+                  backgroundColor: "var(--color-torii)",
+                  color: "#fff7ea",
+                }}
               >
                 Ver
               </Link>
@@ -224,7 +270,11 @@ function Conteudo({
                 href={linkRota(aberto)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 rounded-lg border border-mata-200 px-2 py-1.5 text-center text-xs font-semibold text-mata-700"
+                className="flex-1 rounded-[9px] px-2 py-1.5 text-center text-xs font-bold"
+                style={{
+                  border: "2px solid var(--color-madeira)",
+                  color: "var(--color-madeira)",
+                }}
               >
                 Rota
               </a>
@@ -236,7 +286,12 @@ function Conteudo({
       <button
         type="button"
         onClick={ondeEstou}
-        className="absolute bottom-4 left-4 rounded-full bg-white px-3 py-2 text-xs font-semibold shadow-lg"
+        className="absolute bottom-4 left-4 rounded-full px-3.5 py-2 text-xs font-bold shadow-lg"
+        style={{
+          backgroundColor: "var(--color-superficie)",
+          border: "2px solid var(--color-madeira)",
+          color: "var(--color-madeira)",
+        }}
       >
         📍 Onde eu estou
       </button>

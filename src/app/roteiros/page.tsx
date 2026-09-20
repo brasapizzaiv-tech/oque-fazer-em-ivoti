@@ -8,6 +8,12 @@ import { Trelica } from "@/components/enxaimel/icones";
 import { CasaEnxaimel } from "@/components/enxaimel/icones";
 import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
 import { listarRoteirosCurados } from "@/lib/roteiros-curados";
+import {
+  CAMINHOS,
+  extensaoPorExtenso,
+  tempoAPe,
+  tempoDeCarro,
+} from "@/lib/caminhos";
 
 export const revalidate = 300;
 
@@ -67,6 +73,8 @@ export default async function Roteiros() {
         >
           Passeios já montados, com as paradas na ordem e a rota pronta para
           abrir no mapa. Dá para tirar uma parada que não combina antes de sair.
+          Mais abaixo estão os caminhos do interior, que são estrada e não lista
+          de endereços.
         </p>
 
         <div className="pt-5">
@@ -79,8 +87,9 @@ export default async function Roteiros() {
               className="text-[14px]"
               style={{ color: "var(--color-texto-suave)" }}
             >
-              Ainda não publicamos nenhum. Enquanto isso, o Guia monta um
-              passeio do seu jeito — é só dizer quanto tempo você tem.
+              Ainda não montamos nenhum passeio por paradas. Logo abaixo estão
+              os caminhos do interior, e o Guia monta um do seu jeito — é só
+              dizer quanto tempo você tem.
             </p>
             <Link
               href="/chat"
@@ -137,6 +146,59 @@ export default async function Roteiros() {
               </CardMadeira>
             ))}
           </div>
+        )}
+
+        {CAMINHOS.length > 0 && (
+          <section className="px-4 pb-10 lg:px-0">
+            <div className="pb-6">
+              <FaixaEnxaimel />
+            </div>
+
+            <h2
+              className="text-[22px] font-bold"
+              style={{
+                color: "var(--color-texto)",
+                fontFamily: "var(--fonte-titulo-nova)",
+              }}
+            >
+              Caminhos do interior
+            </h2>
+            <p
+              className="mt-1 text-[14px]"
+              style={{ color: "var(--color-texto-suave)" }}
+            >
+              As estradas de chão entre as casas enxaimel. Todas saem e voltam
+              no mesmo ponto, e dá para fazer a pé, de bicicleta ou de carro.
+            </p>
+
+            <div className="mt-4 space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
+              {CAMINHOS.map((c, i) => (
+                <CardMadeira key={c.slug} variante={i % 2 === 0 ? 2 : 1}>
+                  <Link href={`/caminhos/${c.slug}`} className="block p-4">
+                    <Legenda cor="var(--color-veneziana)">
+                      {c.circuito ? "Circuito" : "Percurso"}
+                    </Legenda>
+                    <span
+                      className="mt-1 block text-[18px] leading-tight font-bold"
+                      style={{
+                        color: "var(--color-texto)",
+                        fontFamily: "var(--fonte-titulo-nova)",
+                      }}
+                    >
+                      {c.nome}
+                    </span>
+                    <span
+                      className="mt-1 block text-[14px]"
+                      style={{ color: "var(--color-texto-suave)" }}
+                    >
+                      {extensaoPorExtenso(c.metros)} · {tempoAPe(c.metros)} a pé
+                      · {tempoDeCarro(c.metros)} de carro
+                    </span>
+                  </Link>
+                </CardMadeira>
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>

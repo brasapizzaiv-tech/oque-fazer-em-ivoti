@@ -7,6 +7,7 @@ import { CasaEnxaimel } from "@/components/enxaimel/icones";
 import { Chip, FaixaEnxaimel } from "@/components/enxaimel/pecas";
 import Mapa from "@/components/Mapa";
 import { buscarLocais, listarCategorias } from "@/lib/locais";
+import { CAMINHOS, extensaoPorExtenso } from "@/lib/caminhos";
 
 export const revalidate = 300;
 
@@ -77,7 +78,8 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
             {noMapa.length}
           </strong>{" "}
           {noMapa.length === 1 ? "lugar" : "lugares"} no mapa. Toque num pino
-          para ver os detalhes e traçar a rota.
+          para ver os detalhes e traçar a rota. As linhas vermelhas são os
+          caminhos do interior.
         </p>
 
         <div className="pt-3 lg:px-0">
@@ -104,9 +106,38 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
 
         <div className="px-4 pt-4 lg:px-0">
           <CardMadeira variante={1} maosFrancesas={false}>
-            <Mapa locais={noMapa} altura="h-[62vh] lg:h-[620px]" />
+            <Mapa
+              locais={noMapa}
+              caminhos={CAMINHOS}
+              altura="h-[62vh] lg:h-[620px]"
+            />
           </CardMadeira>
         </div>
+
+        <section className="px-4 pt-5 lg:px-0">
+          <h2
+            className="text-[11px] font-bold tracking-[0.12em] uppercase"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            Os caminhos desenhados no mapa
+          </h2>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {CAMINHOS.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/caminhos/${c.slug}`}
+                className="rounded-full px-3.5 py-2 text-[13px] font-semibold"
+                style={{
+                  border: "2px solid var(--color-torii)",
+                  color: "var(--color-torii)",
+                }}
+              >
+                {c.nome.replace(/^Caminho /, "")} ·{" "}
+                {extensaoPorExtenso(c.metros)}
+              </Link>
+            ))}
+          </div>
+        </section>
 
         {semPosicao > 0 && (
           <p

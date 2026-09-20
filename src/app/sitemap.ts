@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { SITE } from "@/lib/site";
+import { CAMINHOS } from "@/lib/caminhos";
 
 // O mapa do site se refaz de hora em hora. Cadastro novo nao precisa esperar
 // um deploy para o Google saber que existe.
@@ -27,6 +28,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/roteiros`, changeFrequency: "weekly", priority: 0.8 },
     { url: `${SITE}/chat`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE}/cadastrar`, changeFrequency: "monthly", priority: 0.5 },
+    // Os caminhos sao codigo, nao banco: entram junto com as fixas.
+    ...CAMINHOS.map((c) => ({
+      url: `${SITE}/caminhos/${c.slug}`,
+      changeFrequency: "yearly" as const,
+      priority: 0.7,
+    })),
   ];
 
   if (!SUPABASE_CONFIGURADO) return fixas;

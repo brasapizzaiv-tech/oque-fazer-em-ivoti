@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "migrate": "node scripts/migrate.mjs",
-    "og": "node scripts/gerar-og.mjs"
+    "og": "node scripts/gerar-og.mjs",
+    "caminhos": "node scripts/gerar-caminhos.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.0",
