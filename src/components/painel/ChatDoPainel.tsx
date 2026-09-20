@@ -34,10 +34,20 @@ export default function ChatDoPainel({
   ]);
   const [texto, setTexto] = useState("");
   const [pensando, setPensando] = useState(false);
-  const fim = useRef<HTMLDivElement>(null);
+  const quadro = useRef<HTMLDivElement>(null);
 
+  // Rola a conversa, nao a pagina.
+  //
+  // Com scrollIntoView, abrir a aba do assistente arrastava a tela inteira
+  // ate o fim do quadro: o cabecalho e o titulo sumiam antes de a pessoa ler
+  // qualquer coisa. E acontecia tambem no plano gratuito, onde o quadro esta
+  // borrado atras do aviso — a tela pulava para um lugar que nem da para ler.
+  //
+  // A primeira mensagem tambem nao pede rolagem: ela ja esta no topo.
   useEffect(() => {
-    fim.current?.scrollIntoView({ behavior: "smooth" });
+    if (mensagens.length <= 1) return;
+    const q = quadro.current;
+    if (q) q.scrollTop = q.scrollHeight;
   }, [mensagens]);
 
   async function enviar(pergunta: string) {
@@ -98,8 +108,8 @@ export default function ChatDoPainel({
   const soAbertura = mensagens.length === 1;
 
   return (
-    <div className="flex h-[70vh] min-h-96 flex-col overflow-hidden border-2 border-carvalho bg-creme">
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+    <div className="flex h-[70vh] min-h-96 flex-col overflow-hidden caixa-painel">
+      <div ref={quadro} className="flex-1 space-y-3 overflow-y-auto p-4">
         {mensagens.map((m, i) => (
           <div
             key={i}
@@ -109,13 +119,11 @@ export default function ChatDoPainel({
               className={[
                 "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap",
                 m.papel === "pessoa"
-                  ? "bg-carvalho text-creme"
-                  : "bg-cal-sombra text-tinta",
+                  ? "bg-[color:var(--color-madeira)] text-[color:var(--color-creme-claro)]"
+                  : "bg-[color:var(--color-reboco)] text-tinta",
               ].join(" ")}
             >
-              {m.texto || (
-                <span className="text-tinta/40">escrevendo...</span>
-              )}
+              {m.texto || <span className="texto-suave">escrevendo...</span>}
             </div>
           </div>
         ))}
@@ -127,15 +135,13 @@ export default function ChatDoPainel({
                 key={s}
                 type="button"
                 onClick={() => enviar(s)}
-                className="border-2 border-carvalho px-3 py-1.5 text-sm text-tinta/75 transition hover:bg-cal-sombra"
+                className="botao-vazado px-3.5 py-2 text-[14px] transition"
               >
                 {s}
               </button>
             ))}
           </div>
         )}
-
-        <div ref={fim} />
       </div>
 
       <form
@@ -143,18 +149,18 @@ export default function ChatDoPainel({
           e.preventDefault();
           enviar(texto);
         }}
-        className="flex gap-2 border-t-2 border-carvalho/20 p-3"
+        className="flex gap-2 border-t-2 border-[color:var(--color-madeira)]/20 p-3"
       >
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           placeholder="Pergunte alguma coisa sobre o seu negócio..."
-          className="flex-1 border-2 border-carvalho px-4 py-2.5 text-sm outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+          className="campo-painel flex-1 px-4 py-2.5 text-[15px]"
         />
         <button
           type="submit"
           disabled={pensando || !texto.trim()}
-          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700 disabled:opacity-40"
+          className="botao-cheio px-5 py-2.5 text-[14px] transition disabled:opacity-40"
         >
           Enviar
         </button>

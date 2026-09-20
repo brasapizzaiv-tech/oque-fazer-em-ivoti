@@ -23,7 +23,10 @@ export default function ApagarPromocao({
 
   async function apagar() {
     setIndo(true);
-    const { error } = await createClient().from("promocoes").delete().eq("id", id);
+    const { error } = await createClient()
+      .from("promocoes")
+      .delete()
+      .eq("id", id);
     if (error) {
       setIndo(false);
       return;
@@ -37,7 +40,7 @@ export default function ApagarPromocao({
       <button
         type="button"
         onClick={() => setConfirmando(true)}
-        className="text-sm font-medium text-red-700 underline"
+        className="text-sm font-medium text-[color:var(--color-telha-funda)] underline"
       >
         Apagar esta promoção
       </button>
@@ -49,7 +52,7 @@ export default function ApagarPromocao({
       <p className="text-sm">
         Apagar <strong>{titulo}</strong> de vez? Não dá para desfazer.
       </p>
-      <p className="mt-1 text-sm text-tinta/60">
+      <p className="mt-1 text-sm texto-suave">
         Se for só para tirar do ar por um tempo, desmarque “Promoção no ar” lá
         em cima — assim ela fica guardada para religar depois.
       </p>
@@ -65,7 +68,7 @@ export default function ApagarPromocao({
         <button
           type="button"
           onClick={() => setConfirmando(false)}
-          className="border-2 border-carvalho bg-creme px-4 py-2 text-sm font-medium"
+          className="caixa-painel px-4 py-2 text-sm font-medium"
         >
           Cancelar
         </button>

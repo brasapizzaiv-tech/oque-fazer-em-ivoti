@@ -34,7 +34,9 @@ export default function EditorFotos({
 
     for (const arquivo of Array.from(arquivos)) {
       if (arquivo.size > TAMANHO_MAXIMO) {
-        setErro(`"${arquivo.name}" passa de 8 MB. Diminua a foto e tente de novo.`);
+        setErro(
+          `"${arquivo.name}" passa de 8 MB. Diminua a foto e tente de novo.`,
+        );
         continue;
       }
 
@@ -115,7 +117,7 @@ export default function EditorFotos({
       titulo="Fotos"
       descricao="Foto boa é o que faz a pessoa escolher. Capriche na primeira — ela vira a capa."
     >
-      <label className="block cursor-pointer border-2 border-dashed border-carvalho/40 bg-cal-sombra/60 p-6 text-center transition hover:border-carvalho">
+      <label className="block cursor-pointer border-2 border-dashed border-[color:var(--color-madeira)]/40 bg-[color:var(--color-reboco)]/60 p-6 text-center transition hover:border-carvalho">
         <input
           type="file"
           accept="image/*"
@@ -130,11 +132,11 @@ export default function EditorFotos({
         <p className="mt-1 text-sm font-medium">
           {enviando ? "Enviando..." : "Escolher fotos"}
         </p>
-        <p className="text-xs text-tinta/50">JPG ou PNG, até 8 MB cada</p>
+        <p className="text-xs texto-suave">JPG ou PNG, até 8 MB cada</p>
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
           {erro}
         </p>
       )}
@@ -144,7 +146,7 @@ export default function EditorFotos({
           {lista.map((foto) => (
             <div
               key={foto.id}
-              className="group relative aspect-[4/3] overflow-hidden border-2 border-carvalho/30"
+              className="group relative aspect-[4/3] overflow-hidden border-2 border-[color:var(--color-madeira)]/30"
             >
               <Image
                 src={foto.url}
@@ -155,12 +157,12 @@ export default function EditorFotos({
               />
 
               {capaAtual === foto.url && (
-                <span className="absolute top-2 left-2 border-2 border-carvalho bg-carvalho px-2 py-0.5 text-[11px] font-semibold text-white">
+                <span className="absolute top-2 left-2 botao-cheio px-2 py-0.5 text-[11px]">
                   Capa
                 </span>
               )}
 
-              <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-linear-to-t from-tinta/70 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+              <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-linear-to-t from-[color:var(--color-madeira)]/80 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
                 {capaAtual !== foto.url && (
                   <button
                     type="button"
@@ -173,7 +175,7 @@ export default function EditorFotos({
                 <button
                   type="button"
                   onClick={() => void apagar(foto)}
-                  className="ml-auto rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold text-red-700"
+                  className="ml-auto rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold text-[color:var(--color-telha-funda)]"
                 >
                   Apagar
                 </button>

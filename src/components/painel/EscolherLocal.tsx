@@ -45,9 +45,7 @@ export default function EscolherLocal({
             key={l.id}
             href={enderecoDe(l.id)}
             className={`rounded-full px-3 py-1.5 text-sm transition ${
-              l.id === escolhido
-                ? "bg-carvalho font-semibold text-creme"
-                : "border border-carvalho/25 bg-creme hover:bg-cal-sombra"
+              l.id === escolhido ? "pilula-ativa" : "pilula"
             }`}
           >
             {l.nome}
@@ -63,7 +61,7 @@ export default function EscolherLocal({
       <select
         value={escolhido}
         onChange={(e) => router.push(enderecoDe(e.target.value))}
-        className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+        className="mt-1 w-full caixa-painel px-4 py-2.5 outline-none"
       >
         {locais.map((l) => (
           <option key={l.id} value={l.id}>
@@ -71,7 +69,7 @@ export default function EscolherLocal({
           </option>
         ))}
       </select>
-      <span className="mt-1 block text-xs text-tinta/45">
+      <span className="mt-1 block text-xs texto-suave">
         {locais.length} locais no guia
       </span>
     </label>

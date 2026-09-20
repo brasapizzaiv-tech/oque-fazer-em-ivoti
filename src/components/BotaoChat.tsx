@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { NOME_DO_SITE } from "@/lib/marca";
 import { useState } from "react";
 import Chat from "./Chat";
 
@@ -29,7 +30,7 @@ export default function BotaoChat() {
             <div className="flex items-center gap-2 border-b-2 border-carvalho bg-carvalho px-4 py-3 text-creme">
               <span className="text-lg">🌿</span>
               <div className="leading-tight">
-                <p className="text-sm font-semibold">Guia de Ivoti</p>
+                <p className="text-sm font-semibold">{NOME_DO_SITE}</p>
                 <p className="text-xs text-mata-100">
                   Pergunte o que fazer hoje
                 </p>

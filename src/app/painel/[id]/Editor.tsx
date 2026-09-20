@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import TirarDoAr from "@/components/painel/TirarDoAr";
-import { AreaTexto, Bloco, BotaoSalvar, Texto } from "@/components/painel/Campos";
+import {
+  AreaTexto,
+  Bloco,
+  BotaoSalvar,
+  Texto,
+} from "@/components/painel/Campos";
 import EditorFotos from "@/components/painel/EditorFotos";
 import EditorHorarios from "@/components/painel/EditorHorarios";
 import EditorItens from "@/components/painel/EditorItens";
@@ -37,15 +42,23 @@ export default function Editor({
     <div className="mt-3">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">{local.nome}</h1>
-          <p className="text-sm text-tinta/55">
+          <h1
+            className="text-[22px] font-bold sm:text-[26px]"
+            style={{
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            {local.nome}
+          </h1>
+          <p className="text-sm texto-suave">
             {local.categoria?.nome ?? "Sem categoria"}
           </p>
         </div>
         {local.status === "publicado" && (
           <Link
             href={`/local/${local.slug}`}
-            className="border-2 border-carvalho px-4 py-2 text-sm font-medium hover:bg-cal-sombra"
+            className="botao-vazado px-4 py-2.5 text-[14px]"
           >
             Ver no site ↗
           </Link>
@@ -54,18 +67,28 @@ export default function Editor({
 
       <BarraPublicacao local={local} />
 
-      <nav className="sem-barra mt-6 flex gap-1 overflow-x-auto border-b-2 border-carvalho/20">
+      {/* Quebra em duas linhas no celular em vez de rolar de lado: com cinco
+          abas, quem nao adivinha que da para arrastar nunca acha o "Cardapio".
+          Mesma decisao das abas do painel. */}
+      <nav
+        className="mt-6 flex flex-wrap gap-x-1 gap-y-0.5 sm:flex-nowrap"
+        style={{ borderBottom: "2px solid var(--color-madeira)" }}
+        aria-label="Partes do cadastro"
+      >
         {ABAS.map((a) => (
           <button
             key={a.id}
             type="button"
             onClick={() => setAba(a.id)}
-            className={[
-              "shrink-0 border-b-2 px-4 py-2.5 text-sm font-medium transition",
-              aba === a.id
-                ? "border-sol-600 text-tinta"
-                : "border-transparent text-tinta/55 hover:text-tinta",
-            ].join(" ")}
+            aria-current={aba === a.id ? "true" : undefined}
+            className="-mb-[2px] px-3 py-2.5 text-[14px] font-semibold whitespace-nowrap transition sm:px-4"
+            style={{
+              borderBottom: `3px solid ${aba === a.id ? "var(--color-torii)" : "transparent"}`,
+              color:
+                aba === a.id
+                  ? "var(--color-texto)"
+                  : "var(--color-texto-suave)",
+            }}
           >
             {a.nome}
           </button>
@@ -125,7 +148,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
 
   if (local.status === "publicado") {
     return (
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-carvalho/25 bg-cal-sombra px-4 py-3 text-sm text-mata-900">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-[color:var(--color-madeira)]/25 bg-[color:var(--color-reboco)] px-4 py-3 text-sm text-mata-900">
         <span>
           ✅ <strong>No ar.</strong> Toda alteração que você salvar aparece no
           site em poucos minutos.
@@ -140,8 +163,8 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
   // reabrir. Nada se perde no caminho.
   if (local.status === "inativo") {
     return (
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-dashed border-carvalho/40 bg-creme px-4 py-3 text-sm">
-        <span className="text-tinta/70">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 caixa-painel border-dashed px-4 py-3 text-sm">
+        <span className="texto-suave">
           <strong>Fora do ar.</strong> Seu estabelecimento não aparece no guia
           agora. Tudo continua guardado: fotos, horários e números.
         </span>
@@ -152,7 +175,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
 
   if (local.status === "em_analise") {
     return (
-      <div className="mt-4 rounded-xl bg-sol-50 px-4 py-3 text-sm text-sol-900">
+      <div className="mt-4 aviso-painel px-4 py-3 text-[14px]">
         ⏳ <strong>Em análise.</strong> Recebemos seu cadastro — logo publicamos
         no guia. Você pode continuar editando enquanto isso.
       </div>
@@ -160,9 +183,9 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
   }
 
   return (
-    <div className="mt-4 border-2 border-carvalho bg-creme p-4">
+    <div className="mt-4 caixa-painel p-4">
       {local.status === "rejeitado" && local.motivo_rejeicao && (
-        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
           <strong>Precisa de ajuste:</strong> {local.motivo_rejeicao}
         </p>
       )}
@@ -172,7 +195,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
           <p className="text-sm font-medium">
             Falta pouco para publicar. Ainda precisa de:
           </p>
-          <ul className="mt-1.5 list-inside list-disc text-sm text-tinta/65">
+          <ul className="mt-1.5 list-inside list-disc text-sm texto-suave">
             {faltando.map((f) => (
               <li key={f}>{f}</li>
             ))}
@@ -188,7 +211,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
         type="button"
         onClick={enviar}
         disabled={indo || faltando.length > 0}
-        className="mt-3 border-2 border-carvalho bg-carvalho px-6 py-2.5 text-sm font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700 disabled:opacity-40"
+        className="botao-cheio mt-3 px-6 py-3 text-[14px] transition disabled:opacity-40"
       >
         {indo ? "Enviando..." : "Enviar para análise"}
       </button>
@@ -254,11 +277,11 @@ function Sobre({
     if (error) setErro(error.message);
     else {
       setSalvo(true);
-    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
-    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
-    // horários — o dado ia para o banco, mas a lista e montada no servidor e
-    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
-    router.refresh();
+      // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+      // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+      // horários — o dado ia para o banco, mas a lista e montada no servidor e
+      // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+      router.refresh();
     }
 
     setSalvando(false);
@@ -267,7 +290,10 @@ function Sobre({
 
   return (
     <form onSubmit={salvar} className="space-y-5">
-      <Bloco titulo="Identidade" descricao="É o que aparece na busca e nos cards.">
+      <Bloco
+        titulo="Identidade"
+        descricao="É o que aparece na busca e nos cards."
+      >
         <Texto rotulo="Nome" valor={dados.nome} onChange={mudar("nome")} />
 
         <label className="block">
@@ -275,7 +301,7 @@ function Sobre({
           <select
             value={dados.categoria_id}
             onChange={(e) => mudar("categoria_id")(e.target.value)}
-            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+            className="mt-1 w-full caixa-painel px-4 py-2.5 outline-none"
           >
             <option value="">Sem categoria</option>
             {principais.map((pai) => (
@@ -312,7 +338,7 @@ function Sobre({
           <select
             value={dados.faixa_preco}
             onChange={(e) => mudar("faixa_preco")(e.target.value)}
-            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5"
+            className="mt-1 w-full caixa-painel px-4 py-2.5"
           >
             <option value="">Não informar</option>
             <option value="1">$ — baratinho</option>
@@ -358,7 +384,7 @@ function Sobre({
         </div>
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
             {erro}
           </p>
         )}
@@ -425,8 +451,8 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
                 className={[
                   "rounded-full border px-3 py-1.5 text-sm transition",
                   ativa
-                    ? "border-carvalho bg-carvalho text-creme"
-                    : "border-carvalho/25 bg-creme text-tinta/70 hover:bg-cal-sombra",
+                    ? "pilula-ativa"
+                    : "pilula bg-[color:var(--color-superficie)] texto-suave ",
                 ].join(" ")}
               >
                 {t.emoji} {t.nome}
@@ -461,10 +487,11 @@ function Endereco({ local }: { local: LocalCompleto }) {
   const [erro, setErro] = useState<string | null>(null);
   const router = useRouter();
 
-  const mudar = (campo: "endereco" | "numero" | "bairro" | "cep") => (v: string) => {
-    setDados((a) => ({ ...a, [campo]: v }));
-    setSalvo(false);
-  };
+  const mudar =
+    (campo: "endereco" | "numero" | "bairro" | "cep") => (v: string) => {
+      setDados((a) => ({ ...a, [campo]: v }));
+      setSalvo(false);
+    };
 
   async function salvar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -486,11 +513,11 @@ function Endereco({ local }: { local: LocalCompleto }) {
     if (error) setErro(error.message);
     else {
       setSalvo(true);
-    // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
-    // "Ainda precisa de: os horários" continuava na tela depois de salvar os
-    // horários — o dado ia para o banco, mas a lista e montada no servidor e
-    // ficava velha. O comerciante lia que nao salvou e tentava de novo.
-    router.refresh();
+      // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
+      // "Ainda precisa de: os horários" continuava na tela depois de salvar os
+      // horários — o dado ia para o banco, mas a lista e montada no servidor e
+      // ficava velha. O comerciante lia que nao salvou e tentava de novo.
+      router.refresh();
     }
 
     setSalvando(false);
@@ -536,7 +563,7 @@ function Endereco({ local }: { local: LocalCompleto }) {
         />
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
             {erro}
           </p>
         )}

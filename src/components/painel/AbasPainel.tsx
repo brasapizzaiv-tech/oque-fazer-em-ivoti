@@ -11,35 +11,53 @@ const ABAS = [
   { href: "/painel/assistente", rotulo: "Assistente" },
 ];
 
-/** Navegação entre as seções do painel do estabelecimento. */
+/**
+ * Navegação entre as seções do painel.
+ *
+ * No celular as cinco abas quebram em duas linhas em vez de rolarem de lado.
+ * Fileira que rola esconde o que não coube, e quem não adivinha que dá para
+ * arrastar nunca encontra a última aba — foi reclamação real na barra do
+ * Explorar. Duas linhas custam 40px e não escondem nada.
+ *
+ * A régua embaixo só existe a partir de `sm`, quando tudo cabe numa linha:
+ * em duas linhas ela cortaria a fileira no meio.
+ */
 export default function AbasPainel() {
   const caminho = usePathname();
 
   return (
-    <nav className="mt-4 flex gap-1 border-b-2 border-carvalho/20">
-      {ABAS.map((aba) => {
-        // "/painel" e a aba dos locais: acende em si mesma e nas telas de
-        // local, mas nao nas secoes que tem aba propria.
-        const secoes = ABAS.filter((a) => a.href !== "/painel");
-        const ativa =
-          aba.href === "/painel"
-            ? !secoes.some((s) => caminho.startsWith(s.href))
-            : caminho.startsWith(aba.href);
+    <nav aria-label="Seções do painel">
+      <div
+        className="flex flex-wrap gap-x-1 gap-y-0.5 sm:flex-nowrap"
+        style={{ borderBottom: "2px solid var(--color-madeira)" }}
+      >
+        {ABAS.map((aba) => {
+          // "/painel" e a aba dos locais: acende em si mesma e nas telas de
+          // local, mas nao nas secoes que tem aba propria.
+          const secoes = ABAS.filter((a) => a.href !== "/painel");
+          const ativa =
+            aba.href === "/painel"
+              ? !secoes.some((s) => caminho.startsWith(s.href))
+              : caminho.startsWith(aba.href);
 
-        return (
-          <Link
-            key={aba.href}
-            href={aba.href}
-            className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition ${
-              ativa
-                ? "border-sol-600 text-tinta"
-                : "border-transparent text-tinta/55 hover:text-sol-700"
-            }`}
-          >
-            {aba.rotulo}
-          </Link>
-        );
-      })}
+          return (
+            <Link
+              key={aba.href}
+              href={aba.href}
+              aria-current={ativa ? "page" : undefined}
+              className="-mb-[2px] px-3 py-2.5 text-[14px] font-semibold whitespace-nowrap transition sm:px-4"
+              style={{
+                borderBottom: `3px solid ${ativa ? "var(--color-torii)" : "transparent"}`,
+                color: ativa
+                  ? "var(--color-texto)"
+                  : "var(--color-texto-suave)",
+              }}
+            >
+              {aba.rotulo}
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

@@ -122,7 +122,7 @@ export default function FormularioPromocao({
             <select
               value={localId}
               onChange={(e) => setLocalId(e.target.value)}
-              className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+              className="mt-1 w-full caixa-painel px-4 py-2.5 outline-none"
             >
               {locais.map((l) => (
                 <option key={l.id} value={l.id}>
@@ -163,8 +163,8 @@ export default function FormularioPromocao({
                 aria-pressed={marcado}
                 className={`h-11 w-12 rounded-xl text-sm font-semibold transition ${
                   marcado
-                    ? "bg-carvalho text-creme"
-                    : "border border-carvalho/25 bg-creme text-tinta/60 hover:bg-cal-sombra"
+                    ? "bg-[color:var(--color-madeira)] text-[color:var(--color-creme-claro)]"
+                    : "border pilula bg-[color:var(--color-superficie)] texto-suave "
                 }`}
               >
                 {nome}
@@ -196,7 +196,7 @@ export default function FormularioPromocao({
           dica="Deixe vazio se não tem prazo para acabar."
         />
 
-        <p className="border border-carvalho/20 bg-cal-sombra px-3 py-2 text-sm">
+        <p className="caixa-painel px-3 py-2 text-sm">
           Vai aparecer assim:{" "}
           <strong>
             {quandoVale({
@@ -211,7 +211,13 @@ export default function FormularioPromocao({
       <Bloco titulo="Imagem (opcional)">
         {imagem ? (
           <div className="relative h-40 w-full max-w-sm overflow-hidden rounded-xl">
-            <Image src={imagem} alt="" fill sizes="384px" className="object-cover" />
+            <Image
+              src={imagem}
+              alt=""
+              fill
+              sizes="384px"
+              className="object-cover"
+            />
             <button
               type="button"
               onClick={() => setImagem("")}
@@ -225,12 +231,12 @@ export default function FormularioPromocao({
             type="file"
             accept="image/*"
             onChange={(e) => enviarImagem(e.target.files)}
-            className="block w-full text-sm file:mr-3 file:border-2 file:border-carvalho file:bg-carvalho file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+            className="block w-full text-sm file:mr-3 file:mr-3 file:rounded-[9px] file:border-0 file:bg-[color:var(--color-madeira)] file:px-4 file:py-2 file:text-[13px] file:font-bold file:text-[#fff7ea]"
           />
         )}
       </Bloco>
 
-      <label className="flex items-center gap-3 border-2 border-carvalho bg-creme p-4">
+      <label className="flex items-center gap-3 caixa-painel p-4">
         <input
           type="checkbox"
           checked={ativa}
@@ -239,14 +245,16 @@ export default function FormularioPromocao({
         />
         <span className="text-sm">
           <strong>Promoção no ar</strong>
-          <span className="block text-tinta/55">
+          <span className="block texto-suave">
             Desmarque para guardar sem aparecer no site — sem precisar apagar.
           </span>
         </span>
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+          {erro}
+        </p>
       )}
 
       <BotaoSalvar salvando={salvando} salvo={false}>

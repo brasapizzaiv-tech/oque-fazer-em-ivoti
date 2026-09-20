@@ -90,7 +90,7 @@ export default function EditorItens({
     <form onSubmit={salvar}>
       <Bloco titulo={titulo} descricao={descricao}>
         {linhas.length === 0 && (
-          <p className="text-sm text-tinta/50">
+          <p className="text-sm texto-suave">
             Nada cadastrado ainda. Isso é opcional, mas ajuda bastante.
           </p>
         )}
@@ -99,26 +99,26 @@ export default function EditorItens({
           {linhas.map((linha, i) => (
             <div
               key={i}
-              className="grid gap-2 rounded-xl border border-carvalho/15 p-3 sm:grid-cols-[1fr_2fr_1fr_auto]"
+              className="grid gap-2 rounded-xl border border-[color:var(--color-madeira)]/20 p-3 sm:grid-cols-[1fr_2fr_1fr_auto]"
             >
               <input
                 value={linha.secao}
                 onChange={(e) => mudar(i, "secao", e.target.value)}
                 placeholder="Seção (Pizzas)"
-                className="border-2 border-carvalho px-3 py-2 text-sm"
+                className="campo-painel px-3 py-2 text-[14px]"
               />
               <div className="space-y-2">
                 <input
                   value={linha.nome}
                   onChange={(e) => mudar(i, "nome", e.target.value)}
                   placeholder="Nome do item"
-                  className="w-full border-2 border-carvalho px-3 py-2 text-sm"
+                  className="w-full campo-painel px-3 py-2 text-[14px]"
                 />
                 <input
                   value={linha.descricao}
                   onChange={(e) => mudar(i, "descricao", e.target.value)}
                   placeholder="Descrição (opcional)"
-                  className="w-full border-2 border-carvalho px-3 py-2 text-sm"
+                  className="w-full campo-painel px-3 py-2 text-[14px]"
                 />
               </div>
               <input
@@ -126,7 +126,7 @@ export default function EditorItens({
                 onChange={(e) => mudar(i, "preco", e.target.value)}
                 placeholder="Preço"
                 inputMode="decimal"
-                className="h-min border-2 border-carvalho px-3 py-2 text-sm"
+                className="h-min campo-painel px-3 py-2 text-[14px]"
               />
               <button
                 type="button"
@@ -135,7 +135,7 @@ export default function EditorItens({
                   setLinhas((a) => a.filter((_, j) => j !== i));
                   setSalvo(false);
                 }}
-                className="h-min rounded-lg px-2 py-2 text-tinta/40 hover:text-red-600"
+                className="h-min rounded-lg px-2 py-2 texto-suave hover:text-[color:var(--color-telha)]"
               >
                 ✕
               </button>
@@ -156,13 +156,13 @@ export default function EditorItens({
               },
             ])
           }
-          className="border-2 border-carvalho px-4 py-2 text-sm font-medium text-tinta hover:bg-cal-sombra"
+          className="botao-vazado px-4 py-2.5 text-[14px]"
         >
           + Adicionar item
         </button>
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
             {erro}
           </p>
         )}

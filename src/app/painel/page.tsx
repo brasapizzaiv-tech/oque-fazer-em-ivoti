@@ -1,41 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import type { StatusLocal } from "@/lib/tipos";
 import { planoAtivo, diasParaVencer } from "@/lib/planos";
+import { Botao } from "@/components/enxaimel/pecas";
+import {
+  Caixa,
+  Nenhum,
+  SeloSituacao,
+  SITUACOES,
+  TituloPainel,
+  type Situacao,
+} from "@/components/painel/pecas";
 
 export const dynamic = "force-dynamic";
-
-const SITUACAO: Record<
-  StatusLocal,
-  { texto: string; cor: string; dica: string }
-> = {
-  rascunho: {
-    texto: "Rascunho",
-    cor: "bg-tinta/10 text-tinta/70",
-    dica: "Só você enxerga. Termine de preencher e mande para análise.",
-  },
-  em_analise: {
-    texto: "Em análise",
-    cor: "bg-sol-100 text-sol-800",
-    dica: "Recebemos! Em breve publicamos no guia.",
-  },
-  publicado: {
-    texto: "No ar",
-    cor: "bg-mata-100 text-mata-800",
-    dica: "Está aparecendo no guia para todo mundo.",
-  },
-  rejeitado: {
-    texto: "Precisa de ajuste",
-    cor: "bg-red-100 text-red-800",
-    dica: "Veja o motivo, corrija e mande de novo.",
-  },
-  inativo: {
-    texto: "Fora do ar",
-    cor: "bg-tinta/10 text-tinta/70",
-    dica: "Nao aparece no guia. Nada foi perdido: da para voltar quando quiser.",
-  },
-};
 
 /**
  * O selo do plano ao lado do nome.
@@ -52,12 +29,16 @@ function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
 
   return (
     <span
-      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-        acabando ? "bg-red-100 text-red-800" : "bg-sol-100 text-sol-900"
-      }`}
+      className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
+      style={{
+        backgroundColor: acabando
+          ? "var(--color-telha)"
+          : "var(--color-petunia)",
+        color: "#fff7ea",
+      }}
       title={ate ? `Vale até ${ate}` : "Sem data de vencimento"}
     >
-      ⭐ Premium
+      Premium
       {acabando &&
         (dias === 0
           ? " · vence hoje"
@@ -99,98 +80,119 @@ export default async function Painel() {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-lg font-semibold">
-          {admin ? "Todos os locais" : "Meus locais"}
-        </h1>
-        <Link
-          href="/painel/novo"
-          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
-        >
-          + Cadastrar um local
-        </Link>
-      </div>
+      <TituloPainel
+        apoio={
+          admin
+            ? "Tudo o que está cadastrado no guia, inclusive o que não tem dono."
+            : "O que você cadastrou no guia."
+        }
+        acao={
+          <Botao href="/painel/novo">
+            <span aria-hidden>+</span> Cadastrar um local
+          </Botao>
+        }
+      >
+        {admin ? "Todos os locais" : "Meus locais"}
+      </TituloPainel>
 
       {lista.length === 0 ? (
-        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
-          <p className="text-3xl">🏪</p>
-          <p className="mt-2 font-semibold">Você ainda não cadastrou nada</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
-            Cadastre seu estabelecimento, atrativo ou ponto turístico. Leva
-            poucos minutos e é grátis.
-          </p>
-          <Link
-            href="/painel/novo"
-            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
+        <div className="mt-6">
+          <Nenhum
+            titulo="Você ainda não cadastrou nada"
+            acao={<Botao href="/painel/novo">Começar</Botao>}
           >
-            Começar
-          </Link>
+            Cadastre seu estabelecimento, atrativo ou ponto turístico. Leva
+            poucos minutos e é de graça.
+          </Nenhum>
         </div>
       ) : (
         <ul className="mt-6 space-y-3">
           {lista.map((l) => {
-            const s = SITUACAO[l.status as StatusLocal];
+            const situacao = l.status as Situacao;
+            const s = SITUACOES[situacao] ?? SITUACOES.rascunho;
             const categoria = l.categoria as unknown as {
               nome: string;
               emoji: string | null;
             } | null;
 
             return (
-              <li
-                key={l.id}
-                className="flex items-center gap-4 border-2 border-carvalho bg-creme p-4"
-              >
-                <div className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden border border-carvalho/20 bg-cal-sombra text-2xl">
-                  {l.capa_url ? (
-                    <Image
-                      src={l.capa_url}
-                      alt={l.nome}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                    />
-                  ) : (
-                    (categoria?.emoji ?? "📍")
-                  )}
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-semibold">{l.nome}</p>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-xs font-semibold ${s.cor}`}
-                    >
-                      {s.texto}
-                    </span>
-                    <SeloPlano
-                      plano={l.plano as string}
-                      ate={l.plano_ate as string | null}
-                    />
-                  </div>
-                  <p className="mt-0.5 text-sm text-tinta/55">{s.dica}</p>
-                  {l.status === "rejeitado" && l.motivo_rejeicao && (
-                    <p className="mt-1 text-sm text-red-700">
-                      Motivo: {l.motivo_rejeicao}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex shrink-0 flex-col gap-1.5 sm:flex-row">
-                  {l.status === "publicado" && (
-                    <Link
-                      href={`/local/${l.slug}`}
-                      className="border-2 border-carvalho px-3 py-2 text-center text-sm font-medium hover:bg-cal-sombra"
-                    >
-                      Ver no site
-                    </Link>
-                  )}
-                  <Link
-                    href={`/painel/${l.id}`}
-                    className="border-2 border-carvalho bg-carvalho px-4 py-2 text-center text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
+              <li key={l.id}>
+                <Caixa className="flex flex-wrap items-center gap-4">
+                  <div
+                    className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-[4px] text-2xl"
+                    style={{
+                      border: "2px solid var(--color-madeira)",
+                      backgroundColor: "var(--color-reboco)",
+                    }}
                   >
-                    Editar
-                  </Link>
-                </div>
+                    {l.capa_url ? (
+                      <Image
+                        src={l.capa_url}
+                        alt=""
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                      />
+                    ) : (
+                      (categoria?.emoji ?? "📍")
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p
+                        className="text-[16px] font-bold"
+                        style={{ color: "var(--color-texto)" }}
+                      >
+                        {l.nome}
+                      </p>
+                      <SeloSituacao situacao={situacao} />
+                      <SeloPlano
+                        plano={l.plano as string}
+                        ate={l.plano_ate as string | null}
+                      />
+                    </div>
+                    <p
+                      className="mt-0.5 text-[13px]"
+                      style={{ color: "var(--color-texto-suave)" }}
+                    >
+                      {s.dica}
+                    </p>
+                    {l.status === "rejeitado" && l.motivo_rejeicao && (
+                      <p
+                        className="mt-1 text-[13px] font-medium"
+                        style={{ color: "var(--color-telha-funda)" }}
+                      >
+                        Motivo: {l.motivo_rejeicao}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex shrink-0 gap-2">
+                    {l.status === "publicado" && (
+                      <Link
+                        href={`/local/${l.slug}`}
+                        className="inline-flex h-11 items-center rounded-[9px] px-4 text-[14px] font-semibold"
+                        style={{
+                          border: "2px solid var(--color-madeira)",
+                          color: "var(--color-madeira)",
+                        }}
+                      >
+                        Ver no site
+                      </Link>
+                    )}
+                    <Link
+                      href={`/painel/${l.id}`}
+                      className="inline-flex h-11 items-center rounded-[9px] px-5 text-[14px] font-bold"
+                      style={{
+                        backgroundColor: "var(--color-torii)",
+                        color: "#fff7ea",
+                      }}
+                    >
+                      Editar
+                    </Link>
+                  </div>
+                </Caixa>
               </li>
             );
           })}

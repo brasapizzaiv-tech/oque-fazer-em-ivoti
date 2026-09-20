@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TituloBloco } from "@/components/painel/pecas";
 import { createClient } from "@/lib/supabase/server";
 import { resumoDoLocal, resumoDeExemplo } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO } from "@/lib/metricas";
@@ -50,10 +51,10 @@ export default async function Metricas({
 
   if (locais.length === 0) {
     return (
-      <div className="border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
+      <div className="caixa-painel border-dashed p-10 text-center">
         <p className="text-3xl">📈</p>
         <p className="mt-2 font-semibold">Nada para medir ainda</p>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
+        <p className="mx-auto mt-1 max-w-sm text-sm texto-suave">
           Cadastre seu estabelecimento e o guia começa a contar quem visitou e
           quem clicou no seu contato.
         </p>
@@ -79,8 +80,16 @@ export default async function Metricas({
     <>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-lg font-semibold">Métricas</h1>
-          <p className="text-sm text-tinta/55">
+          <h1
+            className="text-[22px] font-bold sm:text-[26px]"
+            style={{
+              color: "var(--color-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            Métricas
+          </h1>
+          <p className="text-sm texto-suave">
             Quem procurou {local.nome} e o que fez na página.
           </p>
         </div>
@@ -91,9 +100,7 @@ export default async function Metricas({
               key={p.dias}
               href={`/painel/metricas?local=${local.id}&dias=${p.dias}`}
               className={`rounded-full px-3 py-1.5 text-sm transition ${
-                dias === p.dias
-                  ? "bg-carvalho font-semibold text-creme"
-                  : "border border-carvalho/25 bg-creme hover:bg-cal-sombra"
+                dias === p.dias ? "pilula-ativa" : "pilula"
               }`}
             >
               {p.rotulo}
@@ -105,7 +112,7 @@ export default async function Metricas({
       <EscolherLocal locais={locais} escolhido={local.id} dias={dias} />
 
       {vendoComoAdmin && (
-        <p className="mt-4 border-2 border-sol-600 bg-sol-50 px-3 py-2 text-sm text-sol-900">
+        <p className="mt-4 aviso-painel px-3 py-2 text-[14px]">
           Você está vendo como administração. {local.nome} está no plano
           gratuito — no painel do próprio estabelecimento, estes números
           aparecem bloqueados.
@@ -159,16 +166,16 @@ export default async function Metricas({
           {/* Quem paga costuma querer os numeros fora daqui: juntar com o
               faturamento, mandar para o contador, guardar o historico antes
               de o periodo sair da tela. */}
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-2 border-carvalho bg-creme px-5 py-4">
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 caixa-painel px-5 py-4">
             <div>
               <p className="font-semibold">Levar para uma planilha</p>
-              <p className="text-sm text-tinta/55">
+              <p className="text-sm texto-suave">
                 Dia a dia dos últimos {dias} dias, pronto para abrir no Excel.
               </p>
             </div>
             <a
               href={`/api/metricas/exportar?local=${local.id}&dias=${dias}`}
-              className="border-2 border-carvalho px-5 py-2.5 text-sm font-semibold text-tinta transition hover:bg-cal-sombra"
+              className="botao-vazado px-5 py-2.5 text-[14px] transition"
             >
               Baixar planilha
             </a>
@@ -194,9 +201,9 @@ function Detalhes({
 }) {
   return (
     <div className="mt-6 space-y-6">
-      <section className="border-2 border-carvalho bg-creme p-5">
-        <h2 className="font-semibold">Acessos por dia</h2>
-        <p className="text-sm text-tinta/55">
+      <section className="caixa-painel p-5">
+        <TituloBloco>Acessos por dia</TituloBloco>
+        <p className="text-sm texto-suave">
           Últimos {dias} dias. Passe o dedo ou o mouse numa barra para ver o
           dia.
         </p>
@@ -206,9 +213,9 @@ function Detalhes({
       </section>
 
       <div className="grid gap-6 sm:grid-cols-2">
-        <section className="border-2 border-carvalho bg-creme p-5">
-          <h2 className="font-semibold">Onde as pessoas clicaram</h2>
-          <p className="mb-4 text-sm text-tinta/55">
+        <section className="caixa-painel p-5">
+          <TituloBloco>Onde as pessoas clicaram</TituloBloco>
+          <p className="mb-4 text-sm texto-suave">
             Cada clique é alguém tentando falar com você.
           </p>
           <BarrasRanqueadas
@@ -220,9 +227,9 @@ function Detalhes({
           />
         </section>
 
-        <section className="border-2 border-carvalho bg-creme p-5">
-          <h2 className="font-semibold">Eventos e promoções</h2>
-          <p className="mb-4 text-sm text-tinta/55">
+        <section className="caixa-painel p-5">
+          <TituloBloco>Eventos e promoções</TituloBloco>
+          <p className="mb-4 text-sm texto-suave">
             Quantas vezes apareceram para alguém.
           </p>
           <BarrasRanqueadas

@@ -35,10 +35,10 @@ export default async function Assistente({
 
   if (locais.length === 0) {
     return (
-      <div className="border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
+      <div className="caixa-painel border-dashed p-10 text-center">
         <p className="text-3xl">💬</p>
         <p className="mt-2 font-semibold">Cadastre seu estabelecimento antes</p>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
+        <p className="mx-auto mt-1 max-w-sm text-sm texto-suave">
           O assistente conversa sobre o seu negócio — o cadastro, os textos e os
           números dele. Sem um cadastro, não há sobre o que conversar.
         </p>
@@ -57,8 +57,16 @@ export default async function Assistente({
   return (
     <>
       <div>
-        <h1 className="text-lg font-semibold">Assistente</h1>
-        <p className="text-sm text-tinta/55">
+        <h1
+          className="text-[22px] font-bold sm:text-[26px]"
+          style={{
+            color: "var(--color-texto)",
+            fontFamily: "var(--fonte-titulo-nova)",
+          }}
+        >
+          Assistente
+        </h1>
+        <p className="text-sm texto-suave">
           Ele conhece o cadastro e os números de {local.nome}, e não vê dado de
           mais ninguém.
         </p>
@@ -71,7 +79,7 @@ export default async function Assistente({
       />
 
       {vendoComoAdmin && (
-        <p className="mt-4 border-2 border-sol-600 bg-sol-50 px-3 py-2 text-sm text-sol-900">
+        <p className="mt-4 aviso-painel px-3 py-2 text-[14px]">
           Você está vendo como administração. {local.nome} está no plano
           gratuito — no painel do próprio estabelecimento, o assistente aparece
           bloqueado.

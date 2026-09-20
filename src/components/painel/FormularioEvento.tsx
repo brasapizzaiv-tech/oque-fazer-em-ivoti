@@ -27,9 +27,13 @@ export default function FormularioEvento({
   ehAdmin?: boolean;
 }) {
   const [titulo, setTitulo] = useState(evento?.titulo ?? "");
-  const [localId, setLocalId] = useState(evento?.local_id ?? locais[0]?.id ?? "");
+  const [localId, setLocalId] = useState(
+    evento?.local_id ?? locais[0]?.id ?? "",
+  );
   const [localTexto, setLocalTexto] = useState(evento?.local_texto ?? "");
-  const [inicio, setInicio] = useState(paraCampoDataHora(evento?.inicio ?? null));
+  const [inicio, setInicio] = useState(
+    paraCampoDataHora(evento?.inicio ?? null),
+  );
   const [fim, setFim] = useState(paraCampoDataHora(evento?.fim ?? null));
   const [descricao, setDescricao] = useState(evento?.descricao ?? "");
   const [url, setUrl] = useState(evento?.url ?? "");
@@ -156,7 +160,7 @@ export default function FormularioEvento({
           <select
             value={localId}
             onChange={(e) => setLocalId(e.target.value)}
-            className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-2.5 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+            className="mt-1 w-full caixa-painel px-4 py-2.5 outline-none"
           >
             {locais.map((l) => (
               <option key={l.id} value={l.id}>
@@ -229,7 +233,7 @@ export default function FormularioEvento({
 
         <div>
           <span className="text-sm font-medium">Imagem (opcional)</span>
-          <p className="text-xs text-tinta/50">
+          <p className="text-xs texto-suave">
             O cartaz do evento, se tiver. Até 8 MB.
           </p>
           {imagem && (
@@ -255,20 +259,20 @@ export default function FormularioEvento({
               type="file"
               accept="image/*"
               onChange={(e) => enviarImagem(e.target.files)}
-              className="mt-2 block w-full text-sm file:mr-3 file:border-2 file:border-carvalho file:bg-carvalho file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+              className="mt-2 block w-full text-sm file:mr-3 file:mr-3 file:rounded-[9px] file:border-0 file:bg-[color:var(--color-madeira)] file:px-4 file:py-2 file:text-[13px] file:font-bold file:text-[#fff7ea]"
             />
           )}
         </div>
       </Bloco>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
           {erro}
         </p>
       )}
 
       {!evento && !ehAdmin && (
-        <p className="rounded-lg bg-sol-50 px-3 py-2 text-sm text-sol-900">
+        <p className="aviso-painel px-3 py-2 text-[14px]">
           O evento passa por uma conferida rápida antes de aparecer na agenda.
         </p>
       )}

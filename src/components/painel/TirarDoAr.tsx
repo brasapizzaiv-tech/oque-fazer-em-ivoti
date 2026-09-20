@@ -54,7 +54,7 @@ export default function TirarDoAr({
       <button
         type="button"
         onClick={() => mudar(ativo ? "inativo" : "publicado")}
-        className="shrink-0 text-xs font-medium text-red-700 underline"
+        className="shrink-0 text-xs font-medium text-[color:var(--color-telha-funda)] underline"
       >
         não deu certo — tentar de novo
       </button>
@@ -67,7 +67,7 @@ export default function TirarDoAr({
         type="button"
         onClick={() => mudar("publicado")}
         disabled={indo}
-        className="shrink-0 border-2 border-carvalho px-3 py-1.5 text-xs font-semibold text-tinta transition hover:bg-cal-sombra disabled:opacity-50"
+        className="botao-vazado shrink-0 px-3.5 py-2 text-[12px] transition disabled:opacity-50"
       >
         {indo ? "..." : "Voltar ao ar"}
       </button>
@@ -88,7 +88,7 @@ export default function TirarDoAr({
         <button
           type="button"
           onClick={() => setConfirmando(false)}
-          className="border-2 border-carvalho px-2.5 py-1.5 text-xs"
+          className="botao-vazado px-2.5 py-1.5 text-[12px]"
         >
           Não
         </button>
@@ -101,7 +101,7 @@ export default function TirarDoAr({
       type="button"
       onClick={() => setConfirmando(true)}
       aria-label={`Tirar ${nome} do ar`}
-      className="shrink-0 text-xs text-tinta/45 underline transition hover:text-red-700"
+      className="shrink-0 text-xs texto-suave underline transition hover:text-[color:var(--color-telha-funda)]"
     >
       tirar do ar
     </button>

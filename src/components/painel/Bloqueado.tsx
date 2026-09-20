@@ -1,3 +1,4 @@
+import { NOME_DO_SITE } from "@/lib/marca";
 import { MODULOS, type Modulo } from "@/lib/planos";
 
 const WHATSAPP_DO_GUIA = "5551998323298";
@@ -27,11 +28,11 @@ export default function Bloqueado({
   const { nome: titulo, convite } = MODULOS[modulo];
 
   const mensagem = encodeURIComponent(
-    `Olá! Quero saber sobre o plano Premium do Guia de Ivoti${nome ? ` para o ${nome}` : ""}.`,
+    `Olá! Quero saber sobre o plano Premium do ${NOME_DO_SITE}${nome ? ` para o ${nome}` : ""}.`,
   );
 
   return (
-    <div className="relative isolate overflow-hidden border-2 border-carvalho bg-creme">
+    <div className="relative isolate overflow-hidden caixa-painel">
       {children && (
         <div
           aria-hidden
@@ -47,20 +48,20 @@ export default function Bloqueado({
           "grid place-items-center px-6 py-10 text-center",
           children
             ? "absolute inset-0 bg-white/70 backdrop-blur-[2px]"
-            : "bg-cal-sombra/60",
+            : "bg-[color:var(--color-reboco)]/60",
         ].join(" ")}
       >
         <div className="max-w-sm">
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-sol-100 text-xl mx-auto">
+          <span className="grid h-11 w-11 place-items-center rounded-full bg-[color:var(--color-reboco)] text-xl mx-auto">
             🔒
           </span>
           <p className="mt-3 font-semibold">{titulo} é do plano Premium</p>
-          <p className="mt-1.5 text-sm text-tinta/65">{convite}</p>
+          <p className="mt-1.5 text-sm texto-suave">{convite}</p>
           <a
             href={`https://wa.me/${WHATSAPP_DO_GUIA}?text=${mensagem}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-block rounded-full bg-sol-500 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-sol-600"
+            className="mt-5 inline-block rounded-[9px] bg-[color:var(--color-torii)] px-6 py-3 text-[14px] font-bold text-[#fff7ea] transition"
           >
             Quero saber mais
           </a>

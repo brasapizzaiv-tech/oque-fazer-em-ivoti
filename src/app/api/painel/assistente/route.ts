@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { NOME_DO_SITE } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import { podeConversar } from "@/lib/limite-chat";
 import { planoAtivo, podeUsar } from "@/lib/planos";
@@ -11,10 +12,14 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const MODELO = process.env.CHAT_MODELO || "claude-opus-5";
-const FAMILIAS_COM_ESFORCO = ["claude-opus-", "claude-sonnet-5", "claude-fable-"];
+const FAMILIAS_COM_ESFORCO = [
+  "claude-opus-",
+  "claude-sonnet-5",
+  "claude-fable-",
+];
 const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
 
-const INSTRUCOES = `Voce e o assistente do Guia de Ivoti no painel do comerciante. Quem conversa com voce e o dono do estabelecimento, nao um turista.
+const INSTRUCOES = `Voce e o assistente do ${NOME_DO_SITE} no painel do comerciante. Quem conversa com voce e o dono do estabelecimento, nao um turista.
 
 SEU PAPEL
 - Ajudar esta pessoa a tirar mais proveito do guia: melhorar o cadastro, escrever textos, entender os numeros dela e decidir o que fazer a seguir.
@@ -198,7 +203,10 @@ async function montarFicha(
         .select("dia_semana, abre, fecha")
         .eq("local_id", local.id),
       supabase.from("locais_fotos").select("id").eq("local_id", local.id),
-      supabase.from("locais_itens").select("nome, preco").eq("local_id", local.id),
+      supabase
+        .from("locais_itens")
+        .select("nome, preco")
+        .eq("local_id", local.id),
       resumoDoLocal(local.id, 30, supabase),
     ]);
 
@@ -244,14 +252,16 @@ async function montarFicha(
     `Horarios: ${(horarios ?? []).length > 0 ? resumoSemana((horarios ?? []) as Horario[]) : "nao informados"}`,
     `Fotos: ${quantasFotos}`,
     `Itens no cardapio: ${(itens ?? []).length}`,
-    `Contatos: ${[
-      local.telefone && "telefone",
-      local.whatsapp && "WhatsApp",
-      local.site && "site",
-      local.instagram && "Instagram",
-    ]
-      .filter(Boolean)
-      .join(", ") || "nenhum"}`,
+    `Contatos: ${
+      [
+        local.telefone && "telefone",
+        local.whatsapp && "WhatsApp",
+        local.site && "site",
+        local.instagram && "Instagram",
+      ]
+        .filter(Boolean)
+        .join(", ") || "nenhum"
+    }`,
     "",
     faltando.length > 0
       ? `Falta preencher: ${faltando.join(", ")}.`

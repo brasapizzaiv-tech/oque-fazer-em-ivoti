@@ -23,7 +23,10 @@ export default function ApagarEvento({
 
   async function apagar() {
     setIndo(true);
-    const { error } = await createClient().from("eventos").delete().eq("id", id);
+    const { error } = await createClient()
+      .from("eventos")
+      .delete()
+      .eq("id", id);
     if (error) {
       setIndo(false);
       return;
@@ -37,7 +40,7 @@ export default function ApagarEvento({
       <button
         type="button"
         onClick={() => setConfirmando(true)}
-        className="text-sm font-medium text-red-700 underline"
+        className="text-sm font-medium text-[color:var(--color-telha-funda)] underline"
       >
         Apagar este evento
       </button>
@@ -61,7 +64,7 @@ export default function ApagarEvento({
         <button
           type="button"
           onClick={() => setConfirmando(false)}
-          className="border-2 border-carvalho bg-creme px-4 py-2 text-sm font-medium"
+          className="caixa-painel px-4 py-2 text-sm font-medium"
         >
           Cancelar
         </button>

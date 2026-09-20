@@ -36,7 +36,7 @@ export default async function EditarLocal({
 
   return (
     <>
-      <Link href="/painel" className="text-sm text-tinta/55 hover:text-sol-700">
+      <Link href="/painel" className="text-sm texto-suave">
         ← Meus locais
       </Link>
       <Editor local={local} categorias={categorias} tags={tags} />

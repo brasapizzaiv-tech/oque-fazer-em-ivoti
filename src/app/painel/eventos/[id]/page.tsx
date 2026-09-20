@@ -28,16 +28,23 @@ export default async function EditarEvento({
 
   return (
     <>
-      <Link
-        href="/painel/eventos"
-        className="text-sm text-tinta/55 hover:text-sol-700"
-      >
+      <Link href="/painel/eventos" className="text-sm texto-suave">
         ← Meus eventos
       </Link>
-      <h1 className="mt-2 text-lg font-semibold">{evento.titulo}</h1>
+      <div className="mt-2">
+        <h1
+          className="text-[22px] font-bold sm:text-[26px]"
+          style={{
+            color: "var(--color-texto)",
+            fontFamily: "var(--fonte-titulo-nova)",
+          }}
+        >
+          {evento.titulo}
+        </h1>
+      </div>
 
       {evento.status === "rejeitado" && (
-        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
           Este evento precisa de ajuste antes de entrar na agenda.
         </p>
       )}
@@ -50,7 +57,7 @@ export default async function EditarEvento({
         />
       </div>
 
-      <div className="mt-10 border-t-2 border-carvalho/20 pt-6">
+      <div className="mt-10 border-t-2 border-[color:var(--color-madeira)]/20 pt-6">
         <ApagarEvento id={evento.id} titulo={evento.titulo} />
       </div>
     </>

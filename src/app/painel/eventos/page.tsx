@@ -1,13 +1,20 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { quandoPorExtenso } from "@/lib/horarios";
+import { Botao } from "@/components/enxaimel/pecas";
+import {
+  Caixa,
+  Editar,
+  Nenhum,
+  SubTitulo,
+  TituloPainel,
+} from "@/components/painel/pecas";
 
 export const dynamic = "force-dynamic";
 
-const SITUACAO: Record<string, { texto: string; cor: string }> = {
-  em_analise: { texto: "Em análise", cor: "bg-sol-100 text-sol-800" },
-  publicado: { texto: "Na agenda", cor: "bg-mata-100 text-mata-800" },
-  rejeitado: { texto: "Precisa de ajuste", cor: "bg-red-100 text-red-800" },
+const SITUACAO: Record<string, { texto: string; fundo: string }> = {
+  em_analise: { texto: "Em análise", fundo: "var(--color-petunia)" },
+  publicado: { texto: "Na agenda", fundo: "var(--color-veneziana)" },
+  rejeitado: { texto: "Precisa de ajuste", fundo: "var(--color-telha)" },
 };
 
 type Linha = {
@@ -62,37 +69,28 @@ export default async function MeusEventos() {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold">
-            {admin ? "Todos os eventos" : "Meus eventos"}
-          </h1>
-          <p className="text-sm text-tinta/55">
-            Feira, show, festa — tudo que tem hora marcada.
-          </p>
-        </div>
-        <Link
-          href="/painel/eventos/novo"
-          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
-        >
-          + Cadastrar evento
-        </Link>
-      </div>
+      <TituloPainel
+        apoio="Feira, show, festa — tudo o que tem hora marcada."
+        acao={
+          <Botao href="/painel/eventos/novo">
+            <span aria-hidden>+</span> Cadastrar evento
+          </Botao>
+        }
+      >
+        {admin ? "Todos os eventos" : "Meus eventos"}
+      </TituloPainel>
 
       {total === 0 ? (
-        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
-          <p className="text-3xl">📅</p>
-          <p className="mt-2 font-semibold">Nenhum evento cadastrado</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
+        <div className="mt-6">
+          <Nenhum
+            titulo="Nenhum evento cadastrado"
+            acao={
+              <Botao href="/painel/eventos/novo">Cadastrar o primeiro</Botao>
+            }
+          >
             Cadastre e ele entra na agenda do guia. O assistente também passa a
             indicar quando alguém perguntar o que fazer no fim de semana.
-          </p>
-          <Link
-            href="/painel/eventos/novo"
-            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
-          >
-            Cadastrar o primeiro
-          </Link>
+          </Nenhum>
         </div>
       ) : (
         <>
@@ -119,45 +117,54 @@ function Lista({
   titulo: string;
   eventos: Linha[];
   vazio?: string;
+  /** O que já passou entra esmaecido: continua acessível, sem disputar a vez. */
   apagado?: boolean;
 }) {
   return (
     <section className="mt-8">
-      <h2 className="text-sm font-semibold text-tinta/60">{titulo}</h2>
+      <SubTitulo>{titulo}</SubTitulo>
 
       {eventos.length === 0 ? (
-        <p className="mt-2 text-sm text-tinta/50">{vazio}</p>
+        <p
+          className="mt-2 text-[14px]"
+          style={{ color: "var(--color-texto-suave)" }}
+        >
+          {vazio}
+        </p>
       ) : (
         <ul className={`mt-3 space-y-2 ${apagado ? "opacity-60" : ""}`}>
           {eventos.map((e) => {
             const s = SITUACAO[e.status] ?? SITUACAO.em_analise;
             return (
-              <li
-                key={e.id}
-                className="flex flex-wrap items-center gap-3 border-2 border-carvalho bg-creme p-4"
-              >
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{e.titulo}</p>
-                  <p className="text-sm text-tinta/55">
-                    {quandoPorExtenso(e.inicio)}
-                    {e.local?.nome
-                      ? ` · ${e.local.nome}`
-                      : e.local_texto
-                        ? ` · ${e.local_texto}`
-                        : ""}
-                  </p>
-                </div>
-                <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${s.cor}`}
-                >
-                  {s.texto}
-                </span>
-                <Link
-                  href={`/painel/eventos/${e.id}`}
-                  className="border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
-                >
-                  Editar
-                </Link>
+              <li key={e.id}>
+                <Caixa className="flex flex-wrap items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className="text-[15px] font-bold"
+                      style={{ color: "var(--color-texto)" }}
+                    >
+                      {e.titulo}
+                    </p>
+                    <p
+                      className="text-[13px]"
+                      style={{ color: "var(--color-texto-suave)" }}
+                    >
+                      {quandoPorExtenso(e.inicio)}
+                      {e.local?.nome
+                        ? ` · ${e.local.nome}`
+                        : e.local_texto
+                          ? ` · ${e.local_texto}`
+                          : ""}
+                    </p>
+                  </div>
+                  <span
+                    className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
+                    style={{ backgroundColor: s.fundo, color: "#fff7ea" }}
+                  >
+                    {s.texto}
+                  </span>
+                  <Editar href={`/painel/eventos/${e.id}`} />
+                </Caixa>
               </li>
             );
           })}

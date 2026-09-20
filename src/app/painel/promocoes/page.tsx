@@ -1,6 +1,13 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { quandoVale, type Promocao } from "@/lib/promocoes";
+import { Botao } from "@/components/enxaimel/pecas";
+import {
+  Caixa,
+  Editar,
+  Nenhum,
+  SubTitulo,
+  TituloPainel,
+} from "@/components/painel/pecas";
 
 export const dynamic = "force-dynamic";
 
@@ -41,38 +48,28 @@ export default async function Promocoes() {
 
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-lg font-semibold">
-            {admin ? "Todas as promoções" : "Minhas promoções"}
-          </h1>
-          <p className="text-sm text-tinta/55">
-            As que se repetem: quinta de caipirinha, happy hour, promoção do
-            almoço.
-          </p>
-        </div>
-        <Link
-          href="/painel/promocoes/nova"
-          className="border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white hover:border-sol-700 hover:bg-sol-700"
-        >
-          + Cadastrar promoção
-        </Link>
-      </div>
+      <TituloPainel
+        apoio="As que se repetem: quinta de caipirinha, happy hour, promoção do almoço."
+        acao={
+          <Botao href="/painel/promocoes/nova">
+            <span aria-hidden>+</span> Cadastrar promoção
+          </Botao>
+        }
+      >
+        {admin ? "Todas as promoções" : "Minhas promoções"}
+      </TituloPainel>
 
       {total === 0 ? (
-        <div className="mt-6 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
-          <p className="text-3xl">🏷️</p>
-          <p className="mt-2 font-semibold">Nenhuma promoção cadastrada</p>
-          <p className="mx-auto mt-1 max-w-sm text-sm text-tinta/60">
+        <div className="mt-6">
+          <Nenhum
+            titulo="Nenhuma promoção cadastrada"
+            acao={
+              <Botao href="/painel/promocoes/nova">Cadastrar a primeira</Botao>
+            }
+          >
             Cadastre e ela aparece na sua página e no Explorar, no dia certo.
             Quem abrir o guia numa quinta vê as promoções de quinta.
-          </p>
-          <Link
-            href="/painel/promocoes/nova"
-            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-6 py-3 font-semibold text-white"
-          >
-            Cadastrar a primeira
-          </Link>
+          </Nenhum>
         </div>
       ) : (
         <>
@@ -99,35 +96,43 @@ function Lista({
   titulo: string;
   promocoes: Linha[];
   vazio?: string;
+  /** As guardadas entram esmaecidas: continuam acessíveis, sem disputar a vez. */
   apagado?: boolean;
 }) {
   return (
     <section className="mt-8">
-      <h2 className="text-sm font-semibold text-tinta/60">{titulo}</h2>
+      <SubTitulo>{titulo}</SubTitulo>
 
       {promocoes.length === 0 ? (
-        <p className="mt-2 text-sm text-tinta/50">{vazio}</p>
+        <p
+          className="mt-2 text-[14px]"
+          style={{ color: "var(--color-texto-suave)" }}
+        >
+          {vazio}
+        </p>
       ) : (
         <ul className={`mt-3 space-y-2 ${apagado ? "opacity-60" : ""}`}>
           {promocoes.map((p) => (
-            <li
-              key={p.id}
-              className="flex flex-wrap items-center gap-3 border-2 border-carvalho bg-creme p-4"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="font-semibold">{p.titulo}</p>
-                <p className="text-sm text-tinta/55">
-                  {quandoVale(p)}
-                  {p.local?.nome ? ` · ${p.local.nome}` : ""}
-                  {p.vale_ate ? ` · até ${porExtenso(p.vale_ate)}` : ""}
-                </p>
-              </div>
-              <Link
-                href={`/painel/promocoes/${p.id}`}
-                className="border-2 border-carvalho px-3 py-1.5 text-sm font-medium hover:bg-cal-sombra"
-              >
-                Editar
-              </Link>
+            <li key={p.id}>
+              <Caixa className="flex flex-wrap items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <p
+                    className="text-[15px] font-bold"
+                    style={{ color: "var(--color-texto)" }}
+                  >
+                    {p.titulo}
+                  </p>
+                  <p
+                    className="text-[13px]"
+                    style={{ color: "var(--color-texto-suave)" }}
+                  >
+                    {quandoVale(p)}
+                    {p.local?.nome ? ` · ${p.local.nome}` : ""}
+                    {p.vale_ate ? ` · até ${porExtenso(p.vale_ate)}` : ""}
+                  </p>
+                </div>
+                <Editar href={`/painel/promocoes/${p.id}`} />
+              </Caixa>
             </li>
           ))}
         </ul>

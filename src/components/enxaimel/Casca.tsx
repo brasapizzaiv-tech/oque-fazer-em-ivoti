@@ -35,8 +35,22 @@ const MIGRADAS = [
 ];
 const PREFIXOS_MIGRADOS = ["/local/", "/roteiros"];
 
+/**
+ * As areas que trazem a propria casca inteira.
+ *
+ * O painel e a administracao tem cabecalho, abas e largura proprios. Recebiam
+ * o cabecalho do site por cima disso, e a barra de baixo com "Explorar" e
+ * "Roteiros" por baixo — navegacao de quem passeia, empilhada na tela de quem
+ * esta editando o proprio cadastro.
+ */
+const CASCA_PROPRIA = ["/painel", "/admin"];
+
 export default function Casca({ children }: { children: React.ReactNode }) {
   const caminho = usePathname();
+
+  if (CASCA_PROPRIA.some((p) => caminho === p || caminho.startsWith(p + "/")))
+    return <main className="flex-1">{children}</main>;
+
   const nova =
     MIGRADAS.includes(caminho) ||
     PREFIXOS_MIGRADOS.some((p) => caminho.startsWith(p));

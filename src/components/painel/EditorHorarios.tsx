@@ -97,18 +97,18 @@ export default function EditorHorarios({
           {DIAS.map((nome, dia) => (
             <div
               key={dia}
-              className="flex flex-wrap items-center gap-2 rounded-xl border border-carvalho/15 p-2"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-[color:var(--color-madeira)]/20 p-2"
             >
               <span className="w-20 shrink-0 text-sm font-medium">{nome}</span>
 
               {semana[dia].length === 0 ? (
-                <span className="text-sm text-tinta/40">Fechado</span>
+                <span className="text-sm texto-suave">Fechado</span>
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {semana[dia].map((faixa, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-1 border border-carvalho/20 px-2 py-1"
+                      className="flex items-center gap-1 border border-[color:var(--color-madeira)]/20 px-2 py-1"
                     >
                       <input
                         type="time"
@@ -122,7 +122,7 @@ export default function EditorHorarios({
                         }
                         className="rounded border-0 bg-transparent text-sm"
                       />
-                      <span className="text-tinta/40">até</span>
+                      <span className="texto-suave">até</span>
                       <input
                         type="time"
                         value={faixa.fecha}
@@ -141,7 +141,7 @@ export default function EditorHorarios({
                         onClick={() =>
                           mexer(dia, (f) => f.filter((_, j) => j !== i))
                         }
-                        className="ml-1 text-tinta/40 hover:text-red-600"
+                        className="ml-1 texto-suave hover:text-[color:var(--color-telha)]"
                       >
                         ✕
                       </button>
@@ -160,7 +160,7 @@ export default function EditorHorarios({
                       : { abre: "18:00", fecha: "23:00" },
                   ])
                 }
-                className="ml-auto border-2 border-carvalho px-2.5 py-1 text-xs font-medium text-tinta hover:bg-cal-sombra"
+                className="ml-auto botao-vazado px-2.5 py-1.5 text-[12px]"
               >
                 + horário
               </button>
@@ -171,13 +171,13 @@ export default function EditorHorarios({
         <button
           type="button"
           onClick={repetirNaSemana}
-          className="text-sm font-medium text-sol-700 underline"
+          className="text-[14px] font-semibold text-[color:var(--color-torii)] underline"
         >
           Repetir a segunda de terça a sexta
         </button>
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
             {erro}
           </p>
         )}

@@ -27,7 +27,7 @@ export default function EscolherPosicao({
 }) {
   if (!CHAVE) {
     return (
-      <p className="rounded-xl bg-sol-50 p-4 text-sm text-sol-900">
+      <p className="aviso-painel p-4 text-[14px]">
         O mapa aparece aqui assim que a chave do Google Maps for configurada no
         site. Por enquanto, preencha o endereço em texto.
       </p>
@@ -38,7 +38,7 @@ export default function EscolherPosicao({
 
   return (
     <div>
-      <p className="mb-2 text-sm text-tinta/60">
+      <p className="mb-2 text-sm texto-suave">
         {posicao
           ? "Arraste o pino para ajustar a posição exata."
           : "Toque no mapa para marcar onde fica."}
@@ -69,7 +69,7 @@ export default function EscolherPosicao({
                     if (p) onMudar(p.lat(), p.lng());
                   }}
                 >
-                  <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-mata-600 text-base shadow-md">
+                  <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-[color:var(--color-veneziana)] text-base shadow-md">
                     📍
                   </span>
                 </AdvancedMarker>
@@ -88,7 +88,7 @@ export default function EscolherPosicao({
       </APIProvider>
 
       {posicao && (
-        <p className="mt-2 text-xs text-tinta/45">
+        <p className="mt-2 text-xs texto-suave">
           Posição marcada: {posicao.lat.toFixed(6)}, {posicao.lng.toFixed(6)}
         </p>
       )}

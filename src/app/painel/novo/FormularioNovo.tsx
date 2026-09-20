@@ -80,7 +80,7 @@ export default function FormularioNovo({
           value={nome}
           onChange={(e) => setNome(e.target.value)}
           placeholder="Pizzaria da Esquina"
-          className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-3 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+          className="mt-1 w-full caixa-painel px-4 py-3 outline-none"
         />
       </label>
 
@@ -90,7 +90,7 @@ export default function FormularioNovo({
           required
           value={categoriaId}
           onChange={(e) => setCategoriaId(e.target.value)}
-          className="mt-1 w-full border-2 border-carvalho bg-creme px-4 py-3 outline-none focus:border-sol-600 focus:ring-2 focus:ring-sol-200"
+          className="mt-1 w-full caixa-painel px-4 py-3 outline-none"
         >
           <option value="">Escolha...</option>
           {principais.map((pai) => (
@@ -109,7 +109,7 @@ export default function FormularioNovo({
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
           {erro}
         </p>
       )}
@@ -117,7 +117,7 @@ export default function FormularioNovo({
       <button
         type="submit"
         disabled={indo}
-        className="w-full border-2 border-carvalho bg-carvalho py-3 font-semibold text-white transition hover:border-sol-700 hover:bg-sol-700 disabled:opacity-50"
+        className="botao-cheio w-full py-3 text-[15px] transition disabled:opacity-50"
       >
         {indo ? "Criando..." : "Criar e continuar"}
       </button>

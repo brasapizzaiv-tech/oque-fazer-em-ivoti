@@ -41,8 +41,8 @@ export function GraficoDias({
               <div
                 className={`absolute right-0 bottom-0 left-0 rounded-t-[4px] transition-colors ${
                   d.contagem === 0
-                    ? "bg-carvalho/15"
-                    : "bg-carvalho group-hover:bg-sol-700"
+                    ? "bg-[color:var(--color-fechado)]"
+                    : "bg-[color:var(--color-torii)]"
                 }`}
                 style={{ height: `${altura}%` }}
               />
@@ -60,10 +60,11 @@ export function GraficoDias({
       {/* A escala escrita, e não só desenhada: sem isto a barra mais alta
           poderia ser 5 ou 500, e no celular não existe passar o mouse para
           descobrir. */}
-      <figcaption className="mt-2 flex flex-wrap justify-between gap-x-3 text-xs text-tinta/45">
+      <figcaption className="mt-2 flex flex-wrap justify-between gap-x-3 text-xs texto-suave">
         <span>{porExtenso(dados[0]?.dia)}</span>
-        <span className="text-tinta/60">
-          maior dia: <strong className="font-semibold tabular-nums">{maior}</strong>
+        <span className="texto-suave">
+          maior dia:{" "}
+          <strong className="font-semibold tabular-nums">{maior}</strong>
         </span>
         <span>{porExtenso(dados[dados.length - 1]?.dia)}</span>
       </figcaption>
@@ -86,7 +87,7 @@ export function BarrasRanqueadas({
   vazio?: string;
 }) {
   if (itens.length === 0) {
-    return <p className="text-sm text-tinta/50">{vazio}</p>;
+    return <p className="text-sm texto-suave">{vazio}</p>;
   }
 
   const maior = Math.max(...itens.map((i) => i.contagem));
@@ -94,17 +95,22 @@ export function BarrasRanqueadas({
   return (
     <ul className="space-y-2">
       {itens.map((i) => (
-        <li key={i.rotulo} className="grid grid-cols-[1fr_auto] items-center gap-3">
+        <li
+          key={i.rotulo}
+          className="grid grid-cols-[1fr_auto] items-center gap-3"
+        >
           <div className="min-w-0">
             <p className="truncate text-sm">{i.rotulo}</p>
-            <div className="mt-1 h-1.5 bg-carvalho/15">
+            <div className="mt-1 h-1.5 bg-[color:var(--color-fechado)]">
               <div
-                className="h-1.5 bg-carvalho"
+                className="h-1.5 bg-[color:var(--color-torii)]"
                 style={{ width: `${Math.max(3, (i.contagem / maior) * 100)}%` }}
               />
             </div>
           </div>
-          <span className="text-sm font-semibold tabular-nums">{i.contagem}</span>
+          <span className="text-sm font-semibold tabular-nums">
+            {i.contagem}
+          </span>
         </li>
       ))}
     </ul>
@@ -126,7 +132,9 @@ export function Numero({
   return (
     <div
       className={`rounded-2xl p-4 ${
-        destaque ? "bg-carvalho text-creme" : "border-2 border-carvalho/25 bg-creme"
+        destaque
+          ? "bg-[color:var(--color-madeira)] text-[color:var(--color-creme-claro)]"
+          : "caixa-painel"
       }`}
     >
       <p
@@ -136,11 +144,13 @@ export function Numero({
       >
         {valor}
       </p>
-      <p className={`text-sm ${destaque ? "text-creme/85" : "text-tinta/60"}`}>
+      <p className={`text-sm ${destaque ? "text-creme/85" : "texto-suave"}`}>
         {rotulo}
       </p>
       {dica && (
-        <p className={`mt-0.5 text-xs ${destaque ? "text-creme/65" : "text-tinta/45"}`}>
+        <p
+          className={`mt-0.5 text-xs ${destaque ? "text-creme/65" : "texto-suave"}`}
+        >
           {dica}
         </p>
       )}

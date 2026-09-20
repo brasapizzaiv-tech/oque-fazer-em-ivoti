@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { NOME_DO_ASSISTENTE, NOME_DO_SITE } from "@/lib/marca";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { normalizar } from "@/lib/texto";
@@ -31,8 +32,7 @@ const SUGESTOES = [
   "Monte um roteiro de um dia em Ivoti",
 ];
 
-const ABERTURA =
-  "Olá! 👋 Eu sou o Guia, o assistente do Guia de Ivoti. Me diga o que você está com vontade de fazer — comer, passear, tomar alguma coisa — que eu indico onde ir.";
+const ABERTURA = `Olá! 👋 Eu sou ${NOME_DO_ASSISTENTE}, o assistente do ${NOME_DO_SITE}. Me diga o que você está com vontade de fazer — comer, passear, tomar alguma coisa — que eu indico onde ir.`;
 
 export default function Chat({ compacto = false }: { compacto?: boolean }) {
   const [mensagens, setMensagens] = useState<Mensagem[]>([
@@ -396,11 +396,13 @@ function Resposta({
 
 /** Negrito simples (**assim**) — o resto vai como texto puro. */
 function formatar(texto: string) {
-  return texto.split(/(\*\*[^*]+\*\*)/g).map((parte, i) =>
-    parte.startsWith("**") && parte.endsWith("**") ? (
-      <strong key={i}>{parte.slice(2, -2)}</strong>
-    ) : (
-      <span key={i}>{parte}</span>
-    ),
-  );
+  return texto
+    .split(/(\*\*[^*]+\*\*)/g)
+    .map((parte, i) =>
+      parte.startsWith("**") && parte.endsWith("**") ? (
+        <strong key={i}>{parte.slice(2, -2)}</strong>
+      ) : (
+        <span key={i}>{parte}</span>
+      ),
+    );
 }

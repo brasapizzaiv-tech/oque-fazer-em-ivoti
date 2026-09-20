@@ -3,7 +3,18 @@
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
-export default function BotaoSair() {
+/**
+ * Sai da conta e volta para a capa.
+ *
+ * Vazado, nunca cheio: sair é o botão que ninguém quer apertar por engano, e
+ * um retângulo colorido ao lado do nome atrai o dedo sozinho.
+ */
+export default function BotaoSair({
+  /** Sobre a barra escura do painel, a borda e o texto viram creme. */
+  claro = false,
+}: {
+  claro?: boolean;
+}) {
   const router = useRouter();
 
   return (
@@ -14,7 +25,18 @@ export default function BotaoSair() {
         router.push("/");
         router.refresh();
       }}
-      className="rounded-full border border-mata-200 px-4 py-2 text-sm font-medium text-tinta/70 hover:bg-mata-50"
+      className="rounded-[9px] px-3.5 py-2 text-[13px] font-semibold transition"
+      style={
+        claro
+          ? {
+              border: "2px solid var(--color-creme-fundo)",
+              color: "var(--color-creme-claro)",
+            }
+          : {
+              border: "2px solid var(--color-madeira)",
+              color: "var(--color-madeira)",
+            }
+      }
     >
       Sair
     </button>

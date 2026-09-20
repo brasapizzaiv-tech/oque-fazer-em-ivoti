@@ -28,19 +28,26 @@ export default async function EditarPromocao({
 
   return (
     <>
-      <Link
-        href="/painel/promocoes"
-        className="text-sm text-tinta/55 hover:text-sol-700"
-      >
+      <Link href="/painel/promocoes" className="text-sm texto-suave">
         ← Minhas promoções
       </Link>
-      <h1 className="mt-2 text-lg font-semibold">{promocao.titulo}</h1>
+      <div className="mt-2">
+        <h1
+          className="text-[22px] font-bold sm:text-[26px]"
+          style={{
+            color: "var(--color-texto)",
+            fontFamily: "var(--fonte-titulo-nova)",
+          }}
+        >
+          {promocao.titulo}
+        </h1>
+      </div>
 
       <div className="mt-6">
         <FormularioPromocao promocao={promocao as Promocao} locais={locais} />
       </div>
 
-      <div className="mt-10 border-t-2 border-carvalho/20 pt-6">
+      <div className="mt-10 border-t-2 border-[color:var(--color-madeira)]/20 pt-6">
         <ApagarPromocao id={promocao.id} titulo={promocao.titulo} />
       </div>
     </>

@@ -1,3 +1,5 @@
+import { NOME_DO_SITE } from "@/lib/marca";
+
 // ============================================================
 // Roteiros: paradas, rota e compartilhamento
 // ============================================================
@@ -59,7 +61,9 @@ export function linkGoogleMaps(paradas: Parada[]): string | null {
  * Em vez de esconder isso, devolve um link por parada, na ordem — a tela
  * mostra os botões numerados e a pessoa vai abrindo conforme avança.
  */
-export function linksWaze(paradas: Parada[]): { parada: Parada; url: string }[] {
+export function linksWaze(
+  paradas: Parada[],
+): { parada: Parada; url: string }[] {
   return paradas.map((p) => {
     const url = new URL("https://www.waze.com/ul");
     if (p.lat != null && p.lng != null) {
@@ -73,8 +77,11 @@ export function linksWaze(paradas: Parada[]): { parada: Parada; url: string }[] 
 }
 
 /** A mensagem pronta para mandar o roteiro no WhatsApp. */
-export function linkWhatsappDoRoteiro(titulo: string, endereco: string): string {
-  const texto = `${titulo} — roteiro no Guia de Ivoti:\n${endereco}`;
+export function linkWhatsappDoRoteiro(
+  titulo: string,
+  endereco: string,
+): string {
+  const texto = `${titulo} — roteiro no ${NOME_DO_SITE}:\n${endereco}`;
   return `https://wa.me/?text=${encodeURIComponent(texto)}`;
 }
 
