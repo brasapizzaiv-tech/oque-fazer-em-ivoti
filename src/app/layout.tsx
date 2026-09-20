@@ -1,3 +1,4 @@
+import { NOME_DO_SITE } from "@/lib/marca";
 import { SITE } from "@/lib/site";
 import type { Metadata, Viewport } from "next";
 import {
@@ -51,15 +52,15 @@ const corpoNovo = DM_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: {
-    default: "O Guia de Ivoti",
-    template: "%s · O Guia de Ivoti",
+    default: NOME_DO_SITE,
+    template: `%s · ${NOME_DO_SITE}`,
   },
   description:
     "O guia de Ivoti: onde comer, beber, passear, se hospedar e o que está acontecendo hoje na cidade.",
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    siteName: "O Guia de Ivoti",
+    siteName: NOME_DO_SITE,
   },
 };
 

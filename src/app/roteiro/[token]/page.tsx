@@ -30,7 +30,9 @@ async function buscar(token: string) {
   const ids = (roteiro.locais ?? []) as string[];
   const { data: locais } = await supabase
     .from("locais")
-    .select("id, slug, nome, lat, lng, endereco, bairro, categoria:categorias(nome)")
+    .select(
+      "id, slug, nome, lat, lng, endereco, bairro, categoria:categorias(nome)",
+    )
     .in("id", ids)
     .eq("status", "publicado");
 

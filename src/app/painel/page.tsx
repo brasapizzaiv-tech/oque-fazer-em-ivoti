@@ -59,7 +59,11 @@ function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
     >
       ⭐ Premium
       {acabando &&
-        (dias === 0 ? " · vence hoje" : dias === 1 ? " · vence amanhã" : ` · ${dias} dias`)}
+        (dias === 0
+          ? " · vence hoje"
+          : dias === 1
+            ? " · vence amanhã"
+            : ` · ${dias} dias`)}
     </span>
   );
 }

@@ -96,7 +96,11 @@ export default async function MeusEventos() {
         </div>
       ) : (
         <>
-          <Lista titulo="Próximos" eventos={futuros} vazio="Nenhum evento marcado daqui para frente." />
+          <Lista
+            titulo="Próximos"
+            eventos={futuros}
+            vazio="Nenhum evento marcado daqui para frente."
+          />
           {passados.length > 0 && (
             <Lista titulo="Já aconteceram" eventos={passados} apagado />
           )}

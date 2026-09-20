@@ -39,32 +39,34 @@ export default async function Admin() {
     { data: perguntas },
     { data: eventos },
   ] = await Promise.all([
-      supabase
-        .from("locais")
-        .select("id, slug, nome, status, resumo, bairro, criado_em")
-        .eq("status", "em_analise")
-        .order("criado_em", { ascending: true }),
-      supabase
-        .from("locais")
-        .select("id, slug, nome, status, resumo, bairro, criado_em")
-        .eq("status", "publicado")
-        .order("nome"),
-      supabase
-        .from("locais")
-        .select("id, slug, nome, status, resumo, bairro, criado_em, desativado_em")
-        .eq("status", "inativo")
-        .order("desativado_em", { ascending: false }),
-      supabase
-        .from("chat_conversas")
-        .select("id, pergunta, criado_em")
-        .order("criado_em", { ascending: false })
-        .limit(30),
-      supabase
-        .from("eventos")
-        .select("id, titulo, inicio, descricao, local_texto, local:locais(nome)")
-        .eq("status", "em_analise")
-        .order("inicio", { ascending: true }),
-    ]);
+    supabase
+      .from("locais")
+      .select("id, slug, nome, status, resumo, bairro, criado_em")
+      .eq("status", "em_analise")
+      .order("criado_em", { ascending: true }),
+    supabase
+      .from("locais")
+      .select("id, slug, nome, status, resumo, bairro, criado_em")
+      .eq("status", "publicado")
+      .order("nome"),
+    supabase
+      .from("locais")
+      .select(
+        "id, slug, nome, status, resumo, bairro, criado_em, desativado_em",
+      )
+      .eq("status", "inativo")
+      .order("desativado_em", { ascending: false }),
+    supabase
+      .from("chat_conversas")
+      .select("id, pergunta, criado_em")
+      .order("criado_em", { ascending: false })
+      .limit(30),
+    supabase
+      .from("eventos")
+      .select("id, titulo, inicio, descricao, local_texto, local:locais(nome)")
+      .eq("status", "em_analise")
+      .order("inicio", { ascending: true }),
+  ]);
 
   const naFila = (analise ?? []) as unknown as LinhaAdmin[];
   const noAr = (publicados ?? []) as unknown as LinhaAdmin[];
@@ -127,10 +129,7 @@ export default async function Admin() {
         ) : (
           <ul className="mt-3 space-y-3">
             {naFila.map((l) => (
-              <li
-                key={l.id}
-                className="border-2 border-sol-600 bg-creme p-4"
-              >
+              <li key={l.id} className="border-2 border-sol-600 bg-creme p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-semibold">{l.nome}</p>
@@ -171,10 +170,7 @@ export default async function Admin() {
         ) : (
           <ul className="mt-3 space-y-3">
             {eventosNaFila.map((e) => (
-              <li
-                key={e.id}
-                className="border-2 border-sol-600 bg-creme p-4"
-              >
+              <li key={e.id} className="border-2 border-sol-600 bg-creme p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-semibold">{e.titulo}</p>
@@ -220,7 +216,10 @@ export default async function Admin() {
                 key={l.id}
                 className="flex items-center justify-between gap-2 border-2 border-carvalho/30 bg-creme px-3 py-2 text-sm"
               >
-                <Link href={`/local/${l.slug}`} className="truncate font-medium">
+                <Link
+                  href={`/local/${l.slug}`}
+                  className="truncate font-medium"
+                >
                   {l.nome}
                 </Link>
                 <span className="flex shrink-0 items-center gap-2">
@@ -258,7 +257,8 @@ export default async function Admin() {
                   </span>
                   {l.desativado_em && (
                     <span className="text-xs text-tinta/45">
-                      desde {new Date(l.desativado_em).toLocaleDateString("pt-BR")}
+                      desde{" "}
+                      {new Date(l.desativado_em).toLocaleDateString("pt-BR")}
                     </span>
                   )}
                 </span>

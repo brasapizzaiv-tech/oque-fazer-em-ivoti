@@ -25,9 +25,12 @@ export default function FormularioEntrar() {
       ? "Esse link de confirmação não vale mais — pode ter vencido, já ter sido usado, ou ter sido aberto em outro navegador. Entre com seu e-mail e senha aqui embaixo."
       : null;
 
-  useEffect(() => () => {
-    if (relogio.current) clearTimeout(relogio.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (relogio.current) clearTimeout(relogio.current);
+    },
+    [],
+  );
 
   async function entrar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -81,7 +84,7 @@ export default function FormularioEntrar() {
   return (
     <form onSubmit={entrar} className="mt-6 space-y-4">
       {avisoConfirmacao && (
-        <p className="rounded-lg bg-sol-50 px-3 py-2 text-sm text-sol-900">
+        <p className="rounded-[9px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-3 py-2 text-[13px] text-[color:var(--color-telha-funda)]">
           {avisoConfirmacao}
         </p>
       )}
@@ -102,7 +105,7 @@ export default function FormularioEntrar() {
       />
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-[9px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-3 py-2 text-[13px] text-[color:var(--color-telha-funda)]">
           {erro}
         </p>
       )}
@@ -110,7 +113,7 @@ export default function FormularioEntrar() {
       <button
         type="submit"
         disabled={indo}
-        className="w-full rounded-full bg-mata-600 py-3 font-semibold text-white transition hover:bg-mata-700 disabled:opacity-50"
+        className="h-12 w-full rounded-[11px] bg-[color:var(--color-torii)] text-[14px] font-bold text-[#fff7ea] transition disabled:opacity-50"
       >
         {indo ? "Entrando..." : "Entrar"}
       </button>
@@ -118,7 +121,7 @@ export default function FormularioEntrar() {
       <p className="text-center text-sm">
         <Link
           href="/recuperar-senha"
-          className="font-medium text-tinta/60 underline hover:text-mata-700"
+          className="font-medium text-tinta/60 underline hover:text-[color:var(--color-torii)]"
         >
           Esqueci minha senha
         </Link>
@@ -126,7 +129,10 @@ export default function FormularioEntrar() {
 
       <p className="text-center text-sm text-tinta/60">
         Ainda não tem conta?{" "}
-        <Link href="/cadastrar" className="font-semibold text-mata-700 underline">
+        <Link
+          href="/cadastrar"
+          className="font-semibold text-[color:var(--color-torii)] underline"
+        >
           Cadastre seu estabelecimento
         </Link>
       </p>
@@ -156,7 +162,7 @@ function Campo({
         value={valor}
         autoComplete={autoComplete}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-3 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+        className="mt-1 h-12 w-full rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] px-4 text-[14px] text-[color:var(--color-texto)] outline-none focus:border-[color:var(--color-torii)]"
       />
     </label>
   );

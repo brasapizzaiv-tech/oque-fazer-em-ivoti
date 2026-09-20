@@ -54,33 +54,57 @@ export const metadata: Metadata = {
 };
 
 const CATEGORIAS = [
-  "Todos", "Comer", "Beber", "Bares", "Cafés", "Dormir",
-  "Passear", "Compras", "Flores", "Serviços", "Com evento", "Com promoção",
+  "Todos",
+  "Comer",
+  "Beber",
+  "Bares",
+  "Cafés",
+  "Dormir",
+  "Passear",
+  "Compras",
+  "Flores",
+  "Serviços",
+  "Com evento",
+  "Com promoção",
 ];
 
 export default function Componentes() {
   return (
     <div
       className={`${titulo.variable} ${corpo.variable} font-[family-name:var(--fonte-corpo-nova)]`}
-      style={{ backgroundColor: "var(--color-reboco)", color: "var(--color-texto)" }}
+      style={{
+        backgroundColor: "var(--color-reboco)",
+        color: "var(--color-texto)",
+      }}
     >
       <div className="mx-auto max-w-[430px] px-4 py-8 sm:max-w-3xl">
         <Bloco n="1" nome="Paleta">
           <div className="grid grid-cols-4 gap-2">
             {[
-              ["Reboco", "#f4ede0"], ["Superfície", "#fffdf7"],
-              ["Madeira", "#3b2418"], ["Madeira funda", "#1e1008"],
-              ["Texto", "#2b1b12"], ["Texto suave", "#6b5647"],
-              ["Torii", "#c8362b"], ["Telha", "#b5533a"],
-              ["Telha funda", "#8e3e2b"], ["Veneziana", "#2f6b4f"],
-              ["Petúnia", "#b94a8c"], ["Garganta", "#7e2a6b"],
-              ["Miolo", "#f7e7a6"], ["Petúnia clara", "#e7b3d0"],
-              ["Creme fundo", "#c9bba2"], ["Treliça", "#e9e0cf"],
+              ["Reboco", "#f4ede0"],
+              ["Superfície", "#fffdf7"],
+              ["Madeira", "#3b2418"],
+              ["Madeira funda", "#1e1008"],
+              ["Texto", "#2b1b12"],
+              ["Texto suave", "#6b5647"],
+              ["Torii", "#c8362b"],
+              ["Telha", "#b5533a"],
+              ["Telha funda", "#8e3e2b"],
+              ["Veneziana", "#2f6b4f"],
+              ["Petúnia", "#b94a8c"],
+              ["Garganta", "#7e2a6b"],
+              ["Miolo", "#f7e7a6"],
+              ["Petúnia clara", "#e7b3d0"],
+              ["Creme fundo", "#c9bba2"],
+              ["Treliça", "#e9e0cf"],
             ].map(([nome, hex]) => (
               <div key={hex}>
                 <div
                   className="h-12 w-full rounded-[4px]"
-                  style={{ backgroundColor: hex, border: "1px solid rgba(43,27,18,.2)" }}
+                  style={{
+                    backgroundColor: hex,
+                    border: "1px solid rgba(43,27,18,.2)",
+                  }}
                 />
                 <p className="mt-1 text-[10px] leading-tight">{nome}</p>
                 <p className="font-mono text-[9px] opacity-55">{hex}</p>
@@ -95,7 +119,10 @@ export default function Componentes() {
               <Torii tamanho={34} style={{ color: "var(--color-torii)" }} />
             </Marcado>
             <Marcado rotulo="Casa 34×30">
-              <CasaEnxaimel tamanho={34} style={{ color: "var(--color-madeira)" }} />
+              <CasaEnxaimel
+                tamanho={34}
+                style={{ color: "var(--color-madeira)" }}
+              />
             </Marcado>
             <Marcado rotulo="Petúnia">
               <Petunia tamanho={30} />
@@ -109,7 +136,10 @@ export default function Componentes() {
             <div className="p-4" style={{ backgroundColor: "#2e1a10" }}>
               <Logo claro />
             </div>
-            <p className="text-[12px]" style={{ color: "var(--color-texto-suave)" }}>
+            <p
+              className="text-[12px]"
+              style={{ color: "var(--color-texto-suave)" }}
+            >
               O nome entra por parâmetro. Acima está o do documento; o site no
               ar hoje se chama <strong>O Guia de Ivoti</strong>.
             </p>
@@ -120,7 +150,10 @@ export default function Componentes() {
         </Bloco>
 
         <Bloco n="4" nome="Cabeçalho">
-          <div className="overflow-hidden" style={{ border: "1px solid rgba(43,27,18,.2)" }}>
+          <div
+            className="overflow-hidden"
+            style={{ border: "1px solid rgba(43,27,18,.2)" }}
+          >
             <Cabecalho>
               <BuscaCabecalho />
             </Cabecalho>
@@ -134,7 +167,10 @@ export default function Componentes() {
                 <p className="font-[family-name:var(--fonte-titulo-nova)] text-[16px] font-bold">
                   Variante 1, com mãos-francesas
                 </p>
-                <p className="mt-1 text-[13px]" style={{ color: "var(--color-texto-suave)" }}>
+                <p
+                  className="mt-1 text-[13px]"
+                  style={{ color: "var(--color-texto-suave)" }}
+                >
                   Veio deitado em cima e embaixo, em pé nos lados. Sombra dura
                   de 4px. As diagonais travam os cantos opostos e param na
                   margem interna.
@@ -155,7 +191,10 @@ export default function Componentes() {
                   <p className="mt-1.5 font-[family-name:var(--fonte-titulo-nova)] text-[16px] font-bold">
                     Variante 2, com treliça
                   </p>
-                  <p className="text-[13px]" style={{ color: "var(--color-texto-suave)" }}>
+                  <p
+                    className="text-[13px]"
+                    style={{ color: "var(--color-texto-suave)" }}
+                  >
                     Café · Centro · 800 m
                   </p>
                 </div>
@@ -198,7 +237,9 @@ export default function Componentes() {
             ))}
           </div>
           <div className="mt-3 flex gap-2">
-            <Chip ativo destaque>Ativa em vermelho</Chip>
+            <Chip ativo destaque>
+              Ativa em vermelho
+            </Chip>
             <Chip ativo>Ativa em madeira</Chip>
           </div>
         </Bloco>
@@ -299,7 +340,10 @@ function Marcado({
   return (
     <span className="flex flex-col items-center gap-1.5">
       {children}
-      <span className="text-[10px]" style={{ color: "var(--color-texto-suave)" }}>
+      <span
+        className="text-[10px]"
+        style={{ color: "var(--color-texto-suave)" }}
+      >
         {rotulo}
       </span>
     </span>

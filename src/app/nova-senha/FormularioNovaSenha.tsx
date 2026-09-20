@@ -77,7 +77,7 @@ export default function FormularioNovaSenha() {
 
   if (situacao === "semSessao") {
     return (
-      <div className="mt-6 rounded-xl bg-sol-50 px-4 py-3 text-sm text-sol-900">
+      <div className="mt-6 rounded-[11px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-4 py-3 text-[14px] text-[color:var(--color-telha-funda)]">
         <p className="font-semibold">Este link não vale mais</p>
         <p className="mt-1">
           Ele pode ter vencido, já ter sido usado, ou ter sido aberto em outro
@@ -95,14 +95,14 @@ export default function FormularioNovaSenha() {
 
   if (pronto) {
     return (
-      <div className="mt-6 rounded-xl bg-mata-50 p-4 text-sm">
+      <div className="mt-6 rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] p-4 text-[14px]">
         <p className="font-semibold">Senha trocada 🎉</p>
         <p className="mt-1 text-tinta/70">
           Você já está com a conta aberta. Pode ir direto para o painel.
         </p>
         <Link
           href="/painel"
-          className="mt-4 inline-block rounded-full bg-mata-600 px-6 py-2.5 font-semibold text-white"
+          className="mt-4 inline-flex h-12 items-center rounded-[11px] bg-[color:var(--color-torii)] px-6 text-[14px] font-bold text-[#fff7ea]"
         >
           Ir para o painel
         </Link>
@@ -121,7 +121,7 @@ export default function FormularioNovaSenha() {
           autoComplete="new-password"
           value={senha}
           onChange={(e) => setSenha(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-3 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+          className="mt-1 h-12 w-full rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] px-4 text-[14px] text-[color:var(--color-texto)] outline-none focus:border-[color:var(--color-torii)]"
         />
         <span className="mt-1 block text-xs text-tinta/50">
           Pelo menos 8 caracteres.
@@ -136,12 +136,12 @@ export default function FormularioNovaSenha() {
           autoComplete="new-password"
           value={repetida}
           onChange={(e) => setRepetida(e.target.value)}
-          className="mt-1 w-full rounded-xl border border-mata-200 bg-white px-4 py-3 outline-none focus:border-mata-500 focus:ring-2 focus:ring-mata-100"
+          className="mt-1 h-12 w-full rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] px-4 text-[14px] text-[color:var(--color-texto)] outline-none focus:border-[color:var(--color-torii)]"
         />
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-[9px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-3 py-2 text-[13px] text-[color:var(--color-telha-funda)]">
           {erro}
         </p>
       )}
@@ -149,7 +149,7 @@ export default function FormularioNovaSenha() {
       <button
         type="submit"
         disabled={indo}
-        className="w-full rounded-full bg-mata-600 py-3 font-semibold text-white transition hover:bg-mata-700 disabled:opacity-50"
+        className="h-12 w-full rounded-[11px] bg-[color:var(--color-torii)] text-[14px] font-bold text-[#fff7ea] transition disabled:opacity-50"
       >
         {indo ? "Salvando..." : "Salvar a nova senha"}
       </button>

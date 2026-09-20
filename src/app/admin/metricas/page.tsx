@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { resumoDoSite } from "@/lib/metricas-resumo";
-import { BarrasRanqueadas, GraficoDias, Numero } from "@/components/painel/Graficos";
+import {
+  BarrasRanqueadas,
+  GraficoDias,
+  Numero,
+} from "@/components/painel/Graficos";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +19,8 @@ export default async function MetricasDoSite({
   searchParams,
 }: PageProps<"/admin/metricas">) {
   const params = await searchParams;
-  const dias = Number(params.dias) === 7 ? 7 : Number(params.dias) === 90 ? 90 : 30;
+  const dias =
+    Number(params.dias) === 7 ? 7 : Number(params.dias) === 90 ? 90 : 30;
 
   const supabase = await createClient();
   const resumo = await resumoDoSite(dias, supabase);
@@ -24,7 +29,10 @@ export default async function MetricasDoSite({
   const { data: locais } = await supabase
     .from("locais")
     .select("id, slug, nome")
-    .in("id", resumo.locais.slice(0, 10).map((l) => l.local_id));
+    .in(
+      "id",
+      resumo.locais.slice(0, 10).map((l) => l.local_id),
+    );
 
   const nomePorId = new Map((locais ?? []).map((l) => [l.id, l]));
 

@@ -58,9 +58,7 @@ export default async function Planos() {
         </span>
       </div>
 
-      {premium.length > 0 && (
-        <Grupo titulo="Premium" locais={premium} />
-      )}
+      {premium.length > 0 && <Grupo titulo="Premium" locais={premium} />}
       <Grupo
         titulo="Gratuitos"
         locais={gratuitos}
@@ -88,10 +86,7 @@ function Grupo({
       ) : (
         <ul className="mt-3 space-y-3">
           {locais.map((l) => (
-            <li
-              key={l.id}
-              className="border-2 border-carvalho bg-creme p-4"
-            >
+            <li key={l.id} className="border-2 border-carvalho bg-creme p-4">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <Link href={`/local/${l.slug}`} className="font-semibold">
                   {l.nome}

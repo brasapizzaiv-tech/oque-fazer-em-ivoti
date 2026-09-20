@@ -3,7 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { resumoDoLocal, resumoDeExemplo } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO } from "@/lib/metricas";
 import { planoAtivo, podeUsar } from "@/lib/planos";
-import { BarrasRanqueadas, GraficoDias, Numero } from "@/components/painel/Graficos";
+import {
+  BarrasRanqueadas,
+  GraficoDias,
+  Numero,
+} from "@/components/painel/Graficos";
 import Bloqueado from "@/components/painel/Bloqueado";
 import EscolherLocal from "@/components/painel/EscolherLocal";
 
@@ -19,7 +23,8 @@ export default async function Metricas({
   searchParams,
 }: PageProps<"/painel/metricas">) {
   const params = await searchParams;
-  const dias = Number(params.dias) === 7 ? 7 : Number(params.dias) === 90 ? 90 : 30;
+  const dias =
+    Number(params.dias) === 7 ? 7 : Number(params.dias) === 90 ? 90 : 30;
   const escolhido = String(params.local ?? "");
 
   const supabase = await createClient();
@@ -133,7 +138,10 @@ export default async function Metricas({
           <div className="sm:col-span-2">
             <Bloqueado modulo="metricas" nome={local.nome}>
               <div className="grid gap-3 p-1 sm:grid-cols-2">
-                <Numero valor={exemplo.indicacoes} rotulo="Indicações do Guia" />
+                <Numero
+                  valor={exemplo.indicacoes}
+                  rotulo="Indicações do Guia"
+                />
                 <Numero
                   valor={exemplo.cliques.reduce((s, c) => s + c.contagem, 0)}
                   rotulo="Cliques nos seus contatos"
@@ -189,7 +197,8 @@ function Detalhes({
       <section className="border-2 border-carvalho bg-creme p-5">
         <h2 className="font-semibold">Acessos por dia</h2>
         <p className="text-sm text-tinta/55">
-          Últimos {dias} dias. Passe o dedo ou o mouse numa barra para ver o dia.
+          Últimos {dias} dias. Passe o dedo ou o mouse numa barra para ver o
+          dia.
         </p>
         <div className="mt-4">
           <GraficoDias dados={resumo.porDia} />

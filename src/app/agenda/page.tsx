@@ -1,140 +1,136 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import Cabecalho from "@/components/enxaimel/Cabecalho";
+import { LinhaEvento } from "@/components/enxaimel/blocos";
+import { CasaEnxaimel } from "@/components/enxaimel/icones";
+import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
 import { eventosVisiveis } from "@/lib/eventos";
 import { FUSO } from "@/lib/horarios";
 
-export const revalidate = 300;
+export const revalidate = 120;
 
 export const metadata: Metadata = {
   title: "Agenda",
-  description: "O que vai rolar em Ivoti: shows, feiras, festas e encontros.",
+  description:
+    "O que vai acontecer em Ivoti: shows, feiras, festas e encontros.",
 };
 
-type EventoNaLista = {
-  id: string;
-  titulo: string;
-  descricao: string | null;
-  inicio: string;
-  fim: string | null;
-  local_texto: string | null;
-  imagem_url: string | null;
-  url: string | null;
-  local: { slug: string; nome: string } | null;
-};
+/**
+ * Os eventos agrupados por dia.
+ *
+ * Agenda sem agrupamento vira uma lista longa em que a pessoa precisa
+ * comparar datas de cabeça para saber o que é de hoje e o que é de daqui a
+ * duas semanas. O título de cada dia faz esse trabalho por ela.
+ */
+function porDia(eventos: Awaited<ReturnType<typeof eventosVisiveis>>) {
+  const grupos = new Map<string, typeof eventos>();
+  for (const e of eventos) {
+    const dia = new Date(e.inicio).toLocaleDateString("pt-BR", {
+      weekday: "long",
+      day: "2-digit",
+      month: "long",
+      timeZone: FUSO,
+    });
+    const atual = grupos.get(dia) ?? [];
+    atual.push(e);
+    grupos.set(dia, atual);
+  }
+  return [...grupos.entries()];
+}
 
 export default async function Agenda() {
-  const eventos = await proximosEventos();
+  const eventos = await eventosVisiveis({ limite: 40 });
+  const dias = porDia(eventos);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Agenda de Ivoti</h1>
-      <p className="mt-1 text-sm text-tinta/60">
-        Shows, feiras, festas e tudo que tem hora marcada.
-      </p>
-
-      {eventos.length === 0 ? (
-        <div className="mt-8 border-2 border-dashed border-carvalho/40 bg-creme p-10 text-center">
-          <p className="text-3xl">📅</p>
-          <p className="mt-2 font-semibold">Nada marcado por enquanto</p>
-          <p className="mt-1 text-sm text-tinta/60">
-            Vai rolar alguma coisa? Quem tem perfil no guia pode cadastrar o
-            evento pelo painel.
-          </p>
-          <Link
-            href="/painel"
-            className="mt-5 inline-block border-2 border-carvalho bg-carvalho px-5 py-2.5 text-sm font-semibold text-white"
+    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+      <Cabecalho foto="/fotos/portico-ivoti.jpg" alt="">
+        <div className="flex items-center gap-2">
+          <h1
+            className="text-[22px] leading-none font-bold"
+            style={{
+              color: "var(--color-creme-claro)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
           >
-            Cadastrar um evento
-          </Link>
+            Agenda
+          </h1>
+          <CasaEnxaimel
+            tamanho={26}
+            style={{ color: "var(--color-creme-claro)" }}
+          />
         </div>
-      ) : (
-        <ul className="mt-6 space-y-3">
-          {eventos.map((e) => (
-            <li
-              key={e.id}
-              className="flex gap-4 border-2 border-carvalho bg-creme p-4"
+      </Cabecalho>
+
+      <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-12">
+        <div className="hidden px-4 pt-8 lg:block lg:px-0">
+          <div className="flex items-center gap-2">
+            <h1
+              className="text-[30px] leading-none font-bold"
+              style={{
+                color: "var(--color-texto)",
+                fontFamily: "var(--fonte-titulo-nova)",
+              }}
             >
-              <DataCarimbo quando={e.inicio} />
+              Agenda
+            </h1>
+            <CasaEnxaimel
+              tamanho={30}
+              style={{ color: "var(--color-madeira)" }}
+            />
+          </div>
+        </div>
 
-              <div className="min-w-0 flex-1">
-                <h2 className="leading-tight font-semibold">{e.titulo}</h2>
-                <p className="mt-0.5 text-sm text-tinta/55">
-                  {hora(e.inicio)}
-                  {e.local ? (
-                    <>
-                      {" · "}
-                      <Link
-                        href={`/local/${e.local.slug}`}
-                        className="hover:text-mata-700"
-                      >
-                        {e.local.nome}
-                      </Link>
-                    </>
-                  ) : e.local_texto ? (
-                    ` · ${e.local_texto}`
-                  ) : null}
-                </p>
-                {e.descricao && (
-                  <p className="mt-1.5 line-clamp-2 text-sm text-tinta/70">
-                    {e.descricao}
-                  </p>
-                )}
-              </div>
+        <div className="px-4 pt-5 lg:px-0">
+          <p
+            className="text-[14px]"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            {eventos.length === 0
+              ? "Nenhum evento marcado por enquanto."
+              : `${eventos.length} ${eventos.length === 1 ? "evento" : "eventos"} pela frente.`}
+          </p>
+        </div>
 
-              {e.imagem_url && (
-                <div className="relative hidden h-20 w-28 shrink-0 overflow-hidden rounded-xl sm:block">
-                  <Image
-                    src={e.imagem_url}
-                    alt={e.titulo}
-                    fill
-                    sizes="112px"
-                    className="object-cover"
-                  />
+        <div className="pt-4">
+          <FaixaEnxaimel />
+        </div>
+
+        {eventos.length === 0 ? (
+          <div className="px-4 py-10 text-center lg:px-0">
+            <p
+              className="text-[14px]"
+              style={{ color: "var(--color-texto-suave)" }}
+            >
+              Ainda não há nada marcado. Se você tem um estabelecimento, pode
+              cadastrar seu evento — é grátis.
+            </p>
+            <Link
+              href="/painel"
+              className="mt-5 inline-flex h-12 items-center rounded-[11px] px-6 text-[14px] font-bold"
+              style={{
+                backgroundColor: "var(--color-torii)",
+                color: "#fff7ea",
+              }}
+            >
+              Cadastrar um evento
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-7 px-4 pt-6 pb-10 lg:px-0">
+            {dias.map(([dia, doDia]) => (
+              <section key={dia}>
+                <Legenda>{dia}</Legenda>
+                <div className="mt-2.5 space-y-3">
+                  {doDia.map((e) => (
+                    <LinhaEvento key={e.id} evento={e} />
+                  ))}
                 </div>
-              )}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-async function proximosEventos(): Promise<EventoNaLista[]> {
-  // A regra de visibilidade (publicado, ja liberado, ainda nao passou) mora
-  // em eventosVisiveis, que a pagina do local, o Explorar e o Guia usam tambem.
-  return (await eventosVisiveis({ limite: 60 })) as unknown as EventoNaLista[];
-}
-
-function DataCarimbo({ quando }: { quando: string }) {
-  const data = new Date(quando);
-  const dia = new Intl.DateTimeFormat("pt-BR", {
-    timeZone: FUSO,
-    day: "2-digit",
-  }).format(data);
-  const mes = new Intl.DateTimeFormat("pt-BR", {
-    timeZone: FUSO,
-    month: "short",
-  }).format(data);
-
-  return (
-    <div className="grid h-14 w-14 shrink-0 place-items-center border border-carvalho/20 bg-cal-sombra leading-none">
-      <div className="text-center">
-        <p className="text-lg font-bold text-mata-800">{dia}</p>
-        <p className="text-xs text-mata-600 uppercase">
-          {mes.replace(".", "")}
-        </p>
+              </section>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
-}
-
-function hora(quando: string) {
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: FUSO,
-    weekday: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(quando));
 }

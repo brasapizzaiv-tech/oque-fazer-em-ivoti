@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { NOME_DO_SITE } from "@/lib/marca";
 
 export default function Rodape() {
   return (
@@ -6,7 +7,7 @@ export default function Rodape() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
           <p className="font-[family-name:var(--font-titulo)] text-lg font-semibold">
-            O Guia de Ivoti
+            {NOME_DO_SITE}
           </p>
           <p className="mt-2 text-sm text-tinta/60">
             O guia da cidade: onde comer, beber, passear e se hospedar. Feito

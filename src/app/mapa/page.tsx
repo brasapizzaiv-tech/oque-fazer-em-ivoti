@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
-import TiraRolante from "@/components/TiraRolante";
 import Link from "next/link";
+import Cabecalho from "@/components/enxaimel/Cabecalho";
+import CardMadeira from "@/components/enxaimel/CardMadeira";
+import { Fileira } from "@/components/enxaimel/blocos";
+import { CasaEnxaimel } from "@/components/enxaimel/icones";
+import { Chip, FaixaEnxaimel } from "@/components/enxaimel/pecas";
 import Mapa from "@/components/Mapa";
 import { buscarLocais, listarCategorias } from "@/lib/locais";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
-  title: "Mapa de Ivoti",
-  description: "Todos os lugares do guia no mapa, com rota e o que está perto.",
+  title: "Mapa",
+  description: "Todos os lugares de Ivoti no mapa, com rota e detalhes.",
 };
 
 export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
@@ -19,72 +23,107 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
 
   const [categorias, locais] = await Promise.all([
     listarCategorias(),
-    buscarLocais({ categoria, limite: 500 }),
+    buscarLocais({ categoria, limite: 300 }),
   ]);
 
   const principais = categorias.filter((c) => c.pai_id === null);
   const noMapa = locais.filter((l) => l.lat != null && l.lng != null);
+  const semPosicao = locais.length - noMapa.length;
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-bold">Mapa de Ivoti</h1>
-      <p className="mt-1 text-sm text-tinta/60">
-        {noMapa.length} {noMapa.length === 1 ? "lugar" : "lugares"} no mapa.
-        Toque num pino para ver os detalhes e traçar a rota.
-      </p>
-
-      <TiraRolante className="mt-4" nome="categorias">
-        <Filtro href="/mapa" ativo={!categoria}>
-          Tudo
-        </Filtro>
-        {principais.map((c) => (
-          <Filtro
-            key={c.id}
-            href={`/mapa?categoria=${c.slug}`}
-            ativo={categoria === c.slug}
+    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+      <Cabecalho foto="/fotos/portico-ivoti.jpg" alt="">
+        <div className="flex items-center gap-2">
+          <h1
+            className="text-[22px] leading-none font-bold"
+            style={{
+              color: "var(--color-creme-claro)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
           >
-            {c.emoji} {c.nome}
-          </Filtro>
-        ))}
-      </TiraRolante>
+            Mapa de Ivoti
+          </h1>
+          <CasaEnxaimel
+            tamanho={26}
+            style={{ color: "var(--color-creme-claro)" }}
+          />
+        </div>
+      </Cabecalho>
 
-      <div className="mt-4">
-        <Mapa locais={noMapa} altura="h-[65vh]" />
-      </div>
+      <div className="mx-auto lg:max-w-[1440px] lg:px-16 lg:pb-12">
+        <div className="hidden pt-8 lg:block">
+          <div className="flex items-center gap-2">
+            <h1
+              className="text-[30px] leading-none font-bold"
+              style={{
+                color: "var(--color-texto)",
+                fontFamily: "var(--fonte-titulo-nova)",
+              }}
+            >
+              Mapa de Ivoti
+            </h1>
+            <CasaEnxaimel
+              tamanho={30}
+              style={{ color: "var(--color-madeira)" }}
+            />
+          </div>
+        </div>
 
-      {locais.length > noMapa.length && (
-        <p className="mt-3 text-xs text-tinta/50">
-          {locais.length - noMapa.length}{" "}
-          {locais.length - noMapa.length === 1
-            ? "lugar ainda não marcou"
-            : "lugares ainda não marcaram"}{" "}
-          a posição no mapa.
+        <p
+          className="px-4 pt-4 text-[14px] lg:px-0"
+          style={{ color: "var(--color-texto-suave)" }}
+        >
+          <strong style={{ color: "var(--color-texto)" }}>
+            {noMapa.length}
+          </strong>{" "}
+          {noMapa.length === 1 ? "lugar" : "lugares"} no mapa. Toque num pino
+          para ver os detalhes e traçar a rota.
         </p>
-      )}
-    </div>
-  );
-}
 
-function Filtro({
-  href,
-  ativo,
-  children,
-}: {
-  href: string;
-  ativo?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className={[
-        "shrink-0 rounded-full border px-4 py-2 text-sm font-medium whitespace-nowrap transition",
-        ativo
-          ? "border-carvalho bg-carvalho text-creme"
-          : "border-carvalho/25 bg-creme text-tinta/70 hover:border-carvalho hover:text-tinta",
-      ].join(" ")}
-    >
-      {children}
-    </Link>
+        <div className="pt-3 lg:px-0">
+          <Fileira semRolagemNoComputador>
+            <Chip href="/mapa" ativo={!categoria}>
+              Todos
+            </Chip>
+            {principais.map((c) => (
+              <Chip
+                key={c.id}
+                href={`/mapa?categoria=${c.slug}`}
+                ativo={categoria === c.slug}
+                flor={c.slug === "natureza"}
+              >
+                {c.nome}
+              </Chip>
+            ))}
+          </Fileira>
+        </div>
+
+        <div className="pt-4 lg:hidden">
+          <FaixaEnxaimel />
+        </div>
+
+        <div className="px-4 pt-4 lg:px-0">
+          <CardMadeira variante={1} maosFrancesas={false}>
+            <Mapa locais={noMapa} altura="h-[62vh] lg:h-[620px]" />
+          </CardMadeira>
+        </div>
+
+        {semPosicao > 0 && (
+          <p
+            className="px-4 pt-3 pb-8 text-[13px] lg:px-0"
+            style={{ color: "var(--color-texto-suave)" }}
+          >
+            {semPosicao}{" "}
+            {semPosicao === 1
+              ? "lugar ainda não marcou a posição"
+              : "lugares ainda não marcaram a posição"}{" "}
+            no mapa.{" "}
+            <Link href="/explorar" className="font-bold underline">
+              Ver na lista
+            </Link>
+          </p>
+        )}
+      </div>
+    </div>
   );
 }
