@@ -60,7 +60,7 @@ export default function FormularioRecuperar() {
 
   if (enviado) {
     return (
-      <div className="mt-6 rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] p-4 text-[14px]">
+      <div className="mt-6 vidro p-4 text-[14px]">
         <p className="font-semibold">Confira seu e-mail 📬</p>
         <p className="mt-1 text-tinta/70">
           Se houver uma conta com <strong>{email.trim()}</strong>, o link para
@@ -71,7 +71,7 @@ export default function FormularioRecuperar() {
         </p>
         <Link
           href="/entrar"
-          className="mt-4 inline-block font-semibold text-[color:var(--color-torii)] underline"
+          className="mt-4 inline-block font-semibold text-[color:var(--color-v-torii)] underline"
         >
           Voltar para a entrada
         </Link>
@@ -90,12 +90,13 @@ export default function FormularioRecuperar() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="mt-1 h-12 w-full rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] px-4 text-[14px] text-[color:var(--color-texto)] outline-none focus:border-[color:var(--color-torii)]"
+          className="vidro mt-1 h-12 w-full px-4 text-[14px] outline-none focus:border-[color:var(--color-v-torii)]"
+          style={{ borderRadius: 12, color: "var(--color-v-texto)" }}
         />
       </label>
 
       {erro && (
-        <p className="rounded-[9px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-3 py-2 text-[13px] text-[color:var(--color-telha-funda)]">
+        <p className="vidro px-3 py-2 text-[13px] text-[color:var(--color-v-fechado-claro)]">
           {erro}
         </p>
       )}
@@ -103,7 +104,7 @@ export default function FormularioRecuperar() {
       <button
         type="submit"
         disabled={indo}
-        className="h-12 w-full rounded-[11px] bg-[color:var(--color-torii)] text-[14px] font-bold text-[#fff7ea] transition disabled:opacity-50"
+        className="h-12 w-full rounded-[11px] bg-[color:var(--color-v-torii)] text-[14px] font-bold text-[#FFFFFF] transition disabled:opacity-50"
       >
         {indo ? "Enviando..." : "Enviar o link"}
       </button>
@@ -112,7 +113,7 @@ export default function FormularioRecuperar() {
         Lembrou a senha?{" "}
         <Link
           href="/entrar"
-          className="font-semibold text-[color:var(--color-torii)] underline"
+          className="font-semibold text-[color:var(--color-v-torii)] underline"
         >
           Entrar
         </Link>

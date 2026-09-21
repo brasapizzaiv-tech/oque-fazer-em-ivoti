@@ -58,7 +58,7 @@ export default function Mapa({
     <APIProvider apiKey={CHAVE} language="pt-BR" region="BR">
       <div
         className={`relative ${altura} overflow-hidden rounded-2xl`}
-        style={{ backgroundColor: "var(--color-reboco)" }}
+        style={{ backgroundColor: "var(--color-v-fundo)" }}
       >
         {/* Enquanto os ladrilhos do Google nao chegam, a area fica cinza e
             vazia — em conexao lenta isso passa de dez segundos e parece
@@ -67,7 +67,7 @@ export default function Mapa({
         {!pronto && (
           <div
             className="absolute inset-0 z-10 grid place-items-center text-center"
-            style={{ backgroundColor: "var(--color-reboco)" }}
+            style={{ backgroundColor: "var(--color-v-fundo)" }}
           >
             <div>
               <p className="text-2xl">🗺️</p>
@@ -260,7 +260,7 @@ function Conteudo({
                 href={`/local/${aberto.slug}`}
                 className="flex-1 rounded-[9px] px-2 py-1.5 text-center text-xs font-bold"
                 style={{
-                  backgroundColor: "var(--color-torii)",
+                  backgroundColor: "var(--color-v-torii)",
                   color: "#fff7ea",
                 }}
               >
@@ -272,8 +272,8 @@ function Conteudo({
                 rel="noopener noreferrer"
                 className="flex-1 rounded-[9px] px-2 py-1.5 text-center text-xs font-bold"
                 style={{
-                  border: "2px solid var(--color-madeira)",
-                  color: "var(--color-madeira)",
+                  border: "1.5px solid var(--color-v-azul)",
+                  color: "var(--color-v-azul)",
                 }}
               >
                 Rota
@@ -289,8 +289,8 @@ function Conteudo({
         className="absolute bottom-4 left-4 rounded-full px-3.5 py-2 text-xs font-bold shadow-lg"
         style={{
           backgroundColor: "var(--color-superficie)",
-          border: "2px solid var(--color-madeira)",
-          color: "var(--color-madeira)",
+          border: "1.5px solid var(--color-v-azul)",
+          color: "var(--color-v-azul)",
         }}
       >
         📍 Onde eu estou

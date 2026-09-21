@@ -1,11 +1,12 @@
+import Image from "next/image";
 import Link from "next/link";
+import { FileiraDePetunias } from "@/components/vidro/blocos";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ContarAcesso from "@/components/ContarAcesso";
 import Mapa from "@/components/Mapa";
-import CardMadeira from "@/components/enxaimel/CardMadeira";
-import { CasaEnxaimel, Petunia } from "@/components/enxaimel/icones";
-import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
+import { CasaEnxaimel, Petunia } from "@/components/vidro/icones";
+import { Legenda } from "@/components/vidro/pecas";
 import {
   CAMINHOS,
   caminhoPorSlug,
@@ -48,43 +49,49 @@ export default async function PaginaCaminho({
   const outros = CAMINHOS.filter((c) => c.slug !== caminho.slug);
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+    <>
       <ContarAcesso />
 
       <div className="mx-auto lg:max-w-[900px] lg:px-8 lg:pb-12">
-        <header
-          className="px-4 pt-5 pb-6"
-          style={{ backgroundColor: "var(--color-madeira)" }}
-        >
-          <Legenda cor="var(--color-petunia-clara)">
-            Caminho do interior
-          </Legenda>
+        <header className="relative isolate px-4 pt-4 pb-4">
+          <Image
+            src="/fotos/portico-ivoti.jpg"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="-z-10 object-cover object-center"
+          />
+          <div aria-hidden className="veu-do-topo absolute inset-0 -z-10" />
+          <div className="vidro-azul px-4 py-4">
+            <Legenda cor="#FFFFFF">Caminho do interior</Legenda>
 
-          <div className="mt-1.5 flex items-start gap-2">
-            <h1
-              className="text-[26px] leading-tight font-bold lg:text-[34px]"
-              style={{
-                color: "var(--color-creme-claro)",
-                fontFamily: "var(--fonte-titulo-nova)",
-              }}
+            <div className="mt-1.5 flex items-start gap-2">
+              <h1
+                className="text-[26px] leading-tight font-bold lg:text-[34px]"
+                style={{
+                  color: "#FFFFFF",
+                  fontFamily: "var(--fonte-titulo-nova)",
+                }}
+              >
+                {caminho.nome}
+              </h1>
+              <CasaEnxaimel
+                tamanho={28}
+                className="mt-1 shrink-0"
+                style={{ color: "#FFFFFF" }}
+              />
+            </div>
+
+            <p
+              className="mt-2 text-[13px]"
+              style={{ color: "rgba(255,255,255,0.85)" }}
             >
-              {caminho.nome}
-            </h1>
-            <CasaEnxaimel
-              tamanho={28}
-              className="mt-1 shrink-0"
-              style={{ color: "var(--color-creme-claro)" }}
-            />
+              {extensaoPorExtenso(caminho.metros)}
+              {caminho.circuito ? " · sai e volta no mesmo ponto" : ""}
+              {" · estrada de chão"}
+            </p>
           </div>
-
-          <p
-            className="mt-2 text-[13px]"
-            style={{ color: "var(--color-creme-fundo)" }}
-          >
-            {extensaoPorExtenso(caminho.metros)}
-            {caminho.circuito ? " · sai e volta no mesmo ponto" : ""}
-            {" · estrada de chão"}
-          </p>
         </header>
 
         {/* ---------------- os números ---------------- */}
@@ -98,13 +105,13 @@ export default async function PaginaCaminho({
 
         {/* ---------------- o traçado ---------------- */}
         <div className="px-4 pt-5">
-          <CardMadeira variante={1}>
+          <div className="vidro overflow-hidden p-2">
             <Mapa locais={locais} caminho={caminho} altura="h-[380px]" />
-          </CardMadeira>
+          </div>
 
           <p
             className="mt-2 text-[12px]"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             A linha vermelha é o caminho. Os pinos verdes são os lugares que
             estão no guia.
@@ -118,29 +125,29 @@ export default async function PaginaCaminho({
             target="_blank"
             rel="noopener noreferrer"
             className="flex h-12 items-center justify-center rounded-[11px] px-4 text-center text-[14px] font-bold"
-            style={{ backgroundColor: "var(--color-torii)", color: "#fff7ea" }}
+            style={{
+              backgroundColor: "var(--color-v-torii)",
+              color: "#FFFFFF",
+            }}
           >
             Abrir o caminho no Google Maps
           </a>
           <p
             className="mt-2 text-[12px]"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             O Google Maps aceita poucos pontos por rota, então ele recebe o
             caminho resumido em nove — passa pelas mesmas estradas.
           </p>
         </div>
-
-        <div className="pt-7">
-          <FaixaEnxaimel />
-        </div>
+        <FileiraDePetunias />
 
         {/* ---------------- o que tem pelo caminho ---------------- */}
         <section className="px-4 pt-6">
           <h2
             className="text-[20px] font-bold"
             style={{
-              color: "var(--color-texto)",
+              color: "var(--color-v-texto)",
               fontFamily: "var(--fonte-titulo-nova)",
             }}
           >
@@ -150,7 +157,7 @@ export default async function PaginaCaminho({
           {naBeira.length === 0 ? (
             <p
               className="mt-2 text-[14px]"
-              style={{ color: "var(--color-texto-suave)" }}
+              style={{ color: "var(--color-v-texto-suave)" }}
             >
               Nenhum lugar do guia fica na beira desta estrada ainda. As casas
               enxaimel e as propriedades do interior vão entrando no guia aos
@@ -163,17 +170,13 @@ export default async function PaginaCaminho({
                 <li key={lugar.id}>
                   <Link
                     href={`/local/${lugar.slug}`}
-                    className="flex items-center gap-3 rounded-[4px] px-3 py-3"
-                    style={{
-                      backgroundColor: "var(--color-superficie)",
-                      border: "2px solid var(--color-madeira)",
-                    }}
+                    className="vidro flex items-center gap-3 px-3 py-3"
                   >
                     <span
                       className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-[12px] font-bold"
                       style={{
-                        backgroundColor: "var(--color-torii)",
-                        color: "#fff7ea",
+                        backgroundColor: "var(--color-v-torii)",
+                        color: "#FFFFFF",
                         fontFamily: "var(--fonte-titulo-nova)",
                       }}
                     >
@@ -182,13 +185,13 @@ export default async function PaginaCaminho({
                     <span className="min-w-0 flex-1">
                       <span
                         className="block text-[15px] font-bold"
-                        style={{ color: "var(--color-texto)" }}
+                        style={{ color: "var(--color-v-texto)" }}
                       >
                         {lugar.nome}
                       </span>
                       <span
                         className="block text-[13px]"
-                        style={{ color: "var(--color-texto-suave)" }}
+                        style={{ color: "var(--color-v-texto-suave)" }}
                       >
                         {lugar.categoria?.nome ?? "Ponto de interesse"}
                         {metros > 30 ? ` · a ${metros} m da estrada` : ""}
@@ -203,25 +206,19 @@ export default async function PaginaCaminho({
 
         {/* ---------------- antes de sair ---------------- */}
         <section className="px-4 pt-7">
-          <div
-            className="rounded-[4px] p-4"
-            style={{
-              backgroundColor: "var(--color-superficie)",
-              border: "2px solid var(--color-madeira)",
-            }}
-          >
+          <div className="vidro p-4">
             <p className="flex items-center gap-2">
               <Petunia tamanho={15} />
               <span
                 className="text-[11px] font-bold tracking-[0.12em] uppercase"
-                style={{ color: "var(--color-petunia)" }}
+                style={{ color: "var(--color-v-petunia)" }}
               >
                 Antes de sair
               </span>
             </p>
             <ul
               className="mt-2 space-y-1.5 text-[14px]"
-              style={{ color: "var(--color-texto-suave)" }}
+              style={{ color: "var(--color-v-texto-suave)" }}
             >
               <li>
                 É estrada de chão: em dia de chuva forte, alguns trechos ficam
@@ -246,7 +243,7 @@ export default async function PaginaCaminho({
             <h2
               className="text-[20px] font-bold"
               style={{
-                color: "var(--color-texto)",
+                color: "var(--color-v-texto)",
                 fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
@@ -257,21 +254,17 @@ export default async function PaginaCaminho({
                 <Link
                   key={c.slug}
                   href={`/caminhos/${c.slug}`}
-                  className="block rounded-[4px] px-4 py-3"
-                  style={{
-                    backgroundColor: "var(--color-superficie)",
-                    border: "2px solid var(--color-madeira)",
-                  }}
+                  className="vidro block px-4 py-3"
                 >
                   <span
                     className="block text-[15px] font-bold"
-                    style={{ color: "var(--color-texto)" }}
+                    style={{ color: "var(--color-v-texto)" }}
                   >
                     {c.nome}
                   </span>
                   <span
                     className="block text-[13px]"
-                    style={{ color: "var(--color-texto-suave)" }}
+                    style={{ color: "var(--color-v-texto-suave)" }}
                   >
                     {extensaoPorExtenso(c.metros)} · {tempoAPe(c.metros)} a pé
                   </span>
@@ -281,7 +274,7 @@ export default async function PaginaCaminho({
           </section>
         )}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -294,17 +287,11 @@ function Numero({
   rotulo: string;
 }) {
   return (
-    <div
-      className="rounded-[4px] px-2 py-3 text-center"
-      style={{
-        backgroundColor: "var(--color-superficie)",
-        border: "2px solid var(--color-madeira)",
-      }}
-    >
+    <div className="vidro px-2 py-3 text-center">
       <p
         className="text-[19px] leading-none font-bold"
         style={{
-          color: "var(--color-texto)",
+          color: "var(--color-v-texto)",
           fontFamily: "var(--fonte-titulo-nova)",
         }}
       >
@@ -312,7 +299,7 @@ function Numero({
       </p>
       <p
         className="mt-1 text-[11px] font-medium tracking-[0.06em] uppercase"
-        style={{ color: "var(--color-texto-suave)" }}
+        style={{ color: "var(--color-v-texto-suave)" }}
       >
         {rotulo}
       </p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CabecalhoSimples from "@/components/enxaimel/CabecalhoSimples";
+import CabecalhoSimples from "@/components/vidro/CabecalhoSimples";
 import FormularioNovaSenha from "./FormularioNovaSenha";
 
 export const metadata: Metadata = {
@@ -9,13 +9,13 @@ export const metadata: Metadata = {
 
 export default function NovaSenha() {
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+    <>
       <CabecalhoSimples />
       <div className="mx-auto max-w-md px-4 py-10">
         <h1
           className="text-[28px] font-bold"
           style={{
-            color: "var(--color-texto)",
+            color: "var(--color-v-texto)",
             fontFamily: "var(--fonte-titulo-nova)",
           }}
         >
@@ -23,12 +23,12 @@ export default function NovaSenha() {
         </h1>
         <p
           className="mt-1 text-[14px]"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
           Escolha a senha que você vai usar para entrar no painel.
         </p>
         <FormularioNovaSenha />
       </div>
-    </div>
+    </>
   );
 }

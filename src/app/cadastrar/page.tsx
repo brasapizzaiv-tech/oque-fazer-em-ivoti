@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import CabecalhoSimples from "@/components/enxaimel/CabecalhoSimples";
+import CabecalhoSimples from "@/components/vidro/CabecalhoSimples";
 import {
   CasaEnxaimel,
   IconeExplorar,
@@ -42,7 +42,7 @@ const VANTAGENS = [
 
 export default function Cadastrar() {
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+    <>
       <CabecalhoSimples />
 
       <div className="mx-auto max-w-[1100px] gap-12 px-4 py-10 lg:grid lg:grid-cols-12 lg:px-8 lg:py-14">
@@ -52,7 +52,7 @@ export default function Cadastrar() {
             <Petunia tamanho={16} />
             <span
               className="text-[11px] font-bold tracking-[0.12em] uppercase"
-              style={{ color: "var(--color-petunia)" }}
+              style={{ color: "var(--color-v-petunia)" }}
             >
               Para quem tem um negócio em Ivoti
             </span>
@@ -61,7 +61,7 @@ export default function Cadastrar() {
           <h1
             className="mt-3 text-[30px] leading-[1.1] font-bold lg:text-[38px]"
             style={{
-              color: "var(--color-texto)",
+              color: "var(--color-v-texto)",
               fontFamily: "var(--fonte-titulo-nova)",
             }}
           >
@@ -70,7 +70,7 @@ export default function Cadastrar() {
 
           <p
             className="mt-3 max-w-[46ch] text-[15px]"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             É de graça. Você cria a conta, preenche o perfil do jeito que
             quiser, e a gente publica.
@@ -83,8 +83,8 @@ export default function Cadastrar() {
                   className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px]"
                   style={{
                     backgroundColor: "var(--color-superficie)",
-                    border: "2px solid var(--color-madeira)",
-                    color: "var(--color-madeira)",
+                    border: "2px solid var(--color-v-texto)",
+                    color: "var(--color-v-texto)",
                   }}
                 >
                   <Icone tamanho={18} />
@@ -92,13 +92,13 @@ export default function Cadastrar() {
                 <div>
                   <p
                     className="text-[15px] font-bold"
-                    style={{ color: "var(--color-texto)" }}
+                    style={{ color: "var(--color-v-texto)" }}
                   >
                     {titulo}
                   </p>
                   <p
                     className="text-[14px]"
-                    style={{ color: "var(--color-texto-suave)" }}
+                    style={{ color: "var(--color-v-texto-suave)" }}
                   >
                     {texto}
                   </p>
@@ -118,14 +118,14 @@ export default function Cadastrar() {
             className="rounded-[4px] p-5 lg:p-7"
             style={{
               backgroundColor: "var(--color-superficie)",
-              border: "3px solid var(--color-madeira)",
-              boxShadow: "4px 4px 0 var(--color-madeira)",
+              border: "3px solid var(--color-v-texto)",
+              boxShadow: "4px 4px 0 var(--color-v-texto)",
             }}
           >
             <h2
               className="text-[20px] font-bold"
               style={{
-                color: "var(--color-texto)",
+                color: "var(--color-v-texto)",
                 fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
@@ -135,6 +135,6 @@ export default function Cadastrar() {
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

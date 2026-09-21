@@ -75,14 +75,25 @@ export default function Confirmacao() {
   return (
     <div className="mx-auto max-w-md px-4 py-20 text-center">
       <p className="text-3xl">🌿</p>
-      <h1 className="mt-3 text-xl font-semibold">Confirmando seu e-mail...</h1>
-      <p className="mt-2 text-sm text-tinta/60">
+      <h1
+        className="mt-3 text-[22px] font-bold"
+        style={{
+          color: "var(--color-v-texto)",
+          fontFamily: "var(--fonte-titulo-nova)",
+        }}
+      >
+        Confirmando seu e-mail...
+      </h1>
+      <p className="mt-2 text-[14px] text-[color:var(--color-v-texto-suave)]">
         Só um instante, já te levamos pro painel.
       </p>
       {demorou && (
-        <p className="mt-6 text-sm text-tinta/60">
+        <p className="mt-6 text-[14px] text-[color:var(--color-v-texto-suave)]">
           Está demorando mais que o normal.{" "}
-          <a href="/entrar" className="font-semibold text-mata-700 underline">
+          <a
+            href="/entrar"
+            className="font-bold text-[color:var(--color-v-azul)] underline"
+          >
             Entrar com e-mail e senha
           </a>
         </p>

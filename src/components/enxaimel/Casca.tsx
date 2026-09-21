@@ -28,8 +28,27 @@ import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
  * A lista do vidro cresce a cada tela migrada, a de madeira encolhe, e
  * este arquivo some quando a última virar.
  */
-const VIDRO = ["/", "/explorar", "/chat"];
-const VIDRO_PREFIXOS = ["/local/", "/roteiros/"];
+const VIDRO = [
+  "/",
+  "/explorar",
+  "/chat",
+  "/agenda",
+  "/mapa",
+  "/roteiros",
+  "/entrar",
+  "/cadastrar",
+  "/recuperar-senha",
+  "/nova-senha",
+];
+// A confirmacao de e-mail nao tem cabecalho proprio, mas entra no vidro
+// como as outras: quem chega nela vem de um link e precisa reconhecer o site.
+const VIDRO_PREFIXOS = [
+  "/local/",
+  "/roteiros/",
+  "/roteiro/",
+  "/caminhos/",
+  "/auth/",
+];
 
 // Trazem cabeçalho, largura e navegação próprios.
 const CASCA_PROPRIA = ["/painel", "/admin", "/componentes"];

@@ -1,12 +1,10 @@
 import Link from "next/link";
+import { CabecalhoDeTela, FileiraDePetunias } from "@/components/vidro/blocos";
 import Image from "next/image";
 import type { Metadata } from "next";
-import Cabecalho from "@/components/enxaimel/Cabecalho";
-import CardMadeira from "@/components/enxaimel/CardMadeira";
 import ContarAcesso from "@/components/ContarAcesso";
-import { Trelica } from "@/components/enxaimel/icones";
-import { CasaEnxaimel } from "@/components/enxaimel/icones";
-import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
+import { CasaEnxaimel } from "@/components/vidro/icones";
+import { Legenda } from "@/components/vidro/pecas";
 import { listarRoteirosCurados } from "@/lib/roteiros-curados";
 import {
   CAMINHOS,
@@ -27,26 +25,13 @@ export default async function Roteiros() {
   const roteiros = await listarRoteirosCurados();
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
+    <>
       <ContarAcesso />
 
-      <Cabecalho foto="/fotos/eu-amo-ivoti.jpg" alt="">
-        <div className="flex items-center gap-2">
-          <h1
-            className="text-[22px] leading-none font-bold"
-            style={{
-              color: "var(--color-creme-claro)",
-              fontFamily: "var(--fonte-titulo-nova)",
-            }}
-          >
-            Roteiros prontos
-          </h1>
-          <CasaEnxaimel
-            tamanho={26}
-            style={{ color: "var(--color-creme-claro)" }}
-          />
-        </div>
-      </Cabecalho>
+      <CabecalhoDeTela
+        titulo="Roteiros prontos"
+        foto="/fotos/eu-amo-ivoti.jpg"
+      />
 
       <div className="mx-auto lg:max-w-[1000px] lg:px-8 lg:pb-12">
         <div className="hidden pt-8 lg:block">
@@ -54,7 +39,7 @@ export default async function Roteiros() {
             <h1
               className="text-[30px] leading-none font-bold"
               style={{
-                color: "var(--color-texto)",
+                color: "var(--color-v-texto)",
                 fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
@@ -62,30 +47,27 @@ export default async function Roteiros() {
             </h1>
             <CasaEnxaimel
               tamanho={30}
-              style={{ color: "var(--color-madeira)" }}
+              style={{ color: "var(--color-v-texto)" }}
             />
           </div>
         </div>
 
         <p
           className="px-4 pt-4 text-[14px] lg:px-0"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
           Passeios já montados, com as paradas na ordem e a rota pronta para
           abrir no mapa. Dá para tirar uma parada que não combina antes de sair.
           Mais abaixo estão os caminhos do interior, que são estrada e não lista
           de endereços.
         </p>
-
-        <div className="pt-5">
-          <FaixaEnxaimel />
-        </div>
+        <FileiraDePetunias />
 
         {roteiros.length === 0 ? (
           <div className="px-4 py-10 text-center lg:px-0">
             <p
               className="text-[14px]"
-              style={{ color: "var(--color-texto-suave)" }}
+              style={{ color: "var(--color-v-texto-suave)" }}
             >
               Ainda não montamos nenhum passeio por paradas. Logo abaixo estão
               os caminhos do interior, e o Guia monta um do seu jeito — é só
@@ -95,8 +77,8 @@ export default async function Roteiros() {
               href="/chat"
               className="mt-5 inline-flex h-12 items-center rounded-[11px] px-6 text-[14px] font-bold"
               style={{
-                backgroundColor: "var(--color-torii)",
-                color: "#fff7ea",
+                backgroundColor: "var(--color-v-torii)",
+                color: "#FFFFFF",
               }}
             >
               Falar com o Guia
@@ -104,8 +86,8 @@ export default async function Roteiros() {
           </div>
         ) : (
           <div className="space-y-4 px-4 pt-6 pb-10 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0 lg:px-0">
-            {roteiros.map((r, i) => (
-              <CardMadeira key={r.id} variante={i % 2 === 0 ? 1 : 2}>
+            {roteiros.map((r) => (
+              <div key={r.id} className="vidro overflow-hidden">
                 <Link href={`/roteiros/${r.slug}`} className="block">
                   <span className="relative block h-[150px]">
                     {r.capa_url ? (
@@ -117,17 +99,24 @@ export default async function Roteiros() {
                         className="object-cover"
                       />
                     ) : (
-                      <Trelica />
+                      <span
+                        aria-hidden
+                        className="absolute inset-0"
+                        style={{
+                          background:
+                            "linear-gradient(135deg, #d8cfc2 0%, #bfb3a2 50%, #a99c8a 100%)",
+                        }}
+                      />
                     )}
                   </span>
                   <span className="block p-4">
-                    <Legenda cor="var(--color-torii)">
+                    <Legenda cor="var(--color-v-torii)">
                       {r.quantas} {r.quantas === 1 ? "parada" : "paradas"}
                     </Legenda>
                     <span
                       className="mt-1 block text-[18px] leading-tight font-bold"
                       style={{
-                        color: "var(--color-texto)",
+                        color: "var(--color-v-texto)",
                         fontFamily: "var(--fonte-titulo-nova)",
                       }}
                     >
@@ -136,28 +125,26 @@ export default async function Roteiros() {
                     {r.descricao && (
                       <span
                         className="mt-1 line-clamp-2 block text-[14px]"
-                        style={{ color: "var(--color-texto-suave)" }}
+                        style={{ color: "var(--color-v-texto-suave)" }}
                       >
                         {r.descricao}
                       </span>
                     )}
                   </span>
                 </Link>
-              </CardMadeira>
+              </div>
             ))}
           </div>
         )}
 
         {CAMINHOS.length > 0 && (
           <section className="px-4 pb-10 lg:px-0">
-            <div className="pb-6">
-              <FaixaEnxaimel />
-            </div>
+            <FileiraDePetunias />
 
             <h2
               className="text-[22px] font-bold"
               style={{
-                color: "var(--color-texto)",
+                color: "var(--color-v-texto)",
                 fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
@@ -165,23 +152,23 @@ export default async function Roteiros() {
             </h2>
             <p
               className="mt-1 text-[14px]"
-              style={{ color: "var(--color-texto-suave)" }}
+              style={{ color: "var(--color-v-texto-suave)" }}
             >
               As estradas de chão entre as casas enxaimel. Todas saem e voltam
               no mesmo ponto, e dá para fazer a pé, de bicicleta ou de carro.
             </p>
 
             <div className="mt-4 space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
-              {CAMINHOS.map((c, i) => (
-                <CardMadeira key={c.slug} variante={i % 2 === 0 ? 2 : 1}>
+              {CAMINHOS.map((c) => (
+                <div key={c.slug} className="vidro">
                   <Link href={`/caminhos/${c.slug}`} className="block p-4">
-                    <Legenda cor="var(--color-veneziana)">
+                    <Legenda cor="var(--color-v-verde)">
                       {c.circuito ? "Circuito" : "Percurso"}
                     </Legenda>
                     <span
                       className="mt-1 block text-[18px] leading-tight font-bold"
                       style={{
-                        color: "var(--color-texto)",
+                        color: "var(--color-v-texto)",
                         fontFamily: "var(--fonte-titulo-nova)",
                       }}
                     >
@@ -189,18 +176,18 @@ export default async function Roteiros() {
                     </span>
                     <span
                       className="mt-1 block text-[14px]"
-                      style={{ color: "var(--color-texto-suave)" }}
+                      style={{ color: "var(--color-v-texto-suave)" }}
                     >
                       {extensaoPorExtenso(c.metros)} · {tempoAPe(c.metros)} a pé
                       · {tempoDeCarro(c.metros)} de carro
                     </span>
                   </Link>
-                </CardMadeira>
+                </div>
               ))}
             </div>
           </section>
         )}
       </div>
-    </div>
+    </>
   );
 }

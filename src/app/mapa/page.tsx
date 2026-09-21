@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import Cabecalho from "@/components/enxaimel/Cabecalho";
-import CardMadeira from "@/components/enxaimel/CardMadeira";
-import { Fileira } from "@/components/enxaimel/blocos";
-import { CasaEnxaimel } from "@/components/enxaimel/icones";
-import { Chip, FaixaEnxaimel } from "@/components/enxaimel/pecas";
+import {
+  CabecalhoDeTela,
+  Fileira,
+  FileiraDePetunias,
+} from "@/components/vidro/blocos";
+import { CasaEnxaimel } from "@/components/vidro/icones";
+import { Chip } from "@/components/vidro/pecas";
 import Mapa from "@/components/Mapa";
 import { buscarLocais, listarCategorias } from "@/lib/locais";
 import { CAMINHOS, extensaoPorExtenso } from "@/lib/caminhos";
@@ -32,24 +34,8 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
   const semPosicao = locais.length - noMapa.length;
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <Cabecalho foto="/fotos/portico-ivoti.jpg" alt="">
-        <div className="flex items-center gap-2">
-          <h1
-            className="text-[22px] leading-none font-bold"
-            style={{
-              color: "var(--color-creme-claro)",
-              fontFamily: "var(--fonte-titulo-nova)",
-            }}
-          >
-            Mapa de Ivoti
-          </h1>
-          <CasaEnxaimel
-            tamanho={26}
-            style={{ color: "var(--color-creme-claro)" }}
-          />
-        </div>
-      </Cabecalho>
+    <>
+      <CabecalhoDeTela titulo="Mapa de Ivoti" foto="/fotos/portico-ivoti.jpg" />
 
       <div className="mx-auto lg:max-w-[1440px] lg:px-16 lg:pb-12">
         <div className="hidden pt-8 lg:block">
@@ -57,7 +43,7 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
             <h1
               className="text-[30px] leading-none font-bold"
               style={{
-                color: "var(--color-texto)",
+                color: "var(--color-v-texto)",
                 fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
@@ -65,16 +51,16 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
             </h1>
             <CasaEnxaimel
               tamanho={30}
-              style={{ color: "var(--color-madeira)" }}
+              style={{ color: "var(--color-v-texto)" }}
             />
           </div>
         </div>
 
         <p
           className="px-4 pt-4 text-[14px] lg:px-0"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
-          <strong style={{ color: "var(--color-texto)" }}>
+          <strong style={{ color: "var(--color-v-texto)" }}>
             {noMapa.length}
           </strong>{" "}
           {noMapa.length === 1 ? "lugar" : "lugares"} no mapa. Toque num pino
@@ -99,25 +85,22 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
             ))}
           </Fileira>
         </div>
-
-        <div className="pt-4 lg:hidden">
-          <FaixaEnxaimel />
-        </div>
+        <FileiraDePetunias />
 
         <div className="px-4 pt-4 lg:px-0">
-          <CardMadeira variante={1} maosFrancesas={false}>
+          <div className="vidro overflow-hidden p-2">
             <Mapa
               locais={noMapa}
               caminhos={CAMINHOS}
               altura="h-[62vh] lg:h-[620px]"
             />
-          </CardMadeira>
+          </div>
         </div>
 
         <section className="px-4 pt-5 lg:px-0">
           <h2
             className="text-[11px] font-bold tracking-[0.12em] uppercase"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             Os caminhos desenhados no mapa
           </h2>
@@ -128,8 +111,8 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
                 href={`/caminhos/${c.slug}`}
                 className="rounded-full px-3.5 py-2 text-[13px] font-semibold"
                 style={{
-                  border: "2px solid var(--color-torii)",
-                  color: "var(--color-torii)",
+                  border: "2px solid var(--color-v-torii)",
+                  color: "var(--color-v-torii)",
                 }}
               >
                 {c.nome.replace(/^Caminho /, "")} ·{" "}
@@ -142,7 +125,7 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
         {semPosicao > 0 && (
           <p
             className="px-4 pt-3 pb-8 text-[13px] lg:px-0"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             {semPosicao}{" "}
             {semPosicao === 1
@@ -155,6 +138,6 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
           </p>
         )}
       </div>
-    </div>
+    </>
   );
 }

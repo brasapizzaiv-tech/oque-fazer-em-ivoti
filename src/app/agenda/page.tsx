@@ -1,9 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import Cabecalho from "@/components/enxaimel/Cabecalho";
-import { LinhaEvento } from "@/components/enxaimel/blocos";
-import { CasaEnxaimel } from "@/components/enxaimel/icones";
-import { FaixaEnxaimel, Legenda } from "@/components/enxaimel/pecas";
+import {
+  CabecalhoDeTela,
+  FileiraDePetunias,
+  LinhaEvento,
+} from "@/components/vidro/blocos";
+import { CasaEnxaimel } from "@/components/vidro/icones";
+import { Legenda } from "@/components/vidro/pecas";
 import { eventosVisiveis } from "@/lib/eventos";
 import { FUSO } from "@/lib/horarios";
 
@@ -43,24 +46,8 @@ export default async function Agenda() {
   const dias = porDia(eventos);
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <Cabecalho foto="/fotos/portico-ivoti.jpg" alt="">
-        <div className="flex items-center gap-2">
-          <h1
-            className="text-[22px] leading-none font-bold"
-            style={{
-              color: "var(--color-creme-claro)",
-              fontFamily: "var(--fonte-titulo-nova)",
-            }}
-          >
-            Agenda
-          </h1>
-          <CasaEnxaimel
-            tamanho={26}
-            style={{ color: "var(--color-creme-claro)" }}
-          />
-        </div>
-      </Cabecalho>
+    <>
+      <CabecalhoDeTela titulo="Agenda" foto="/fotos/portico-ivoti.jpg" />
 
       <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-12">
         <div className="hidden px-4 pt-8 lg:block lg:px-0">
@@ -68,7 +55,7 @@ export default async function Agenda() {
             <h1
               className="text-[30px] leading-none font-bold"
               style={{
-                color: "var(--color-texto)",
+                color: "var(--color-v-texto)",
                 fontFamily: "var(--fonte-titulo-nova)",
               }}
             >
@@ -76,7 +63,7 @@ export default async function Agenda() {
             </h1>
             <CasaEnxaimel
               tamanho={30}
-              style={{ color: "var(--color-madeira)" }}
+              style={{ color: "var(--color-v-texto)" }}
             />
           </div>
         </div>
@@ -84,23 +71,20 @@ export default async function Agenda() {
         <div className="px-4 pt-5 lg:px-0">
           <p
             className="text-[14px]"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             {eventos.length === 0
               ? "Nenhum evento marcado por enquanto."
               : `${eventos.length} ${eventos.length === 1 ? "evento" : "eventos"} pela frente.`}
           </p>
         </div>
-
-        <div className="pt-4">
-          <FaixaEnxaimel />
-        </div>
+        <FileiraDePetunias />
 
         {eventos.length === 0 ? (
           <div className="px-4 py-10 text-center lg:px-0">
             <p
               className="text-[14px]"
-              style={{ color: "var(--color-texto-suave)" }}
+              style={{ color: "var(--color-v-texto-suave)" }}
             >
               Ainda não há nada marcado. Se você tem um estabelecimento, pode
               cadastrar seu evento — é grátis.
@@ -109,8 +93,8 @@ export default async function Agenda() {
               href="/painel"
               className="mt-5 inline-flex h-12 items-center rounded-[11px] px-6 text-[14px] font-bold"
               style={{
-                backgroundColor: "var(--color-torii)",
-                color: "#fff7ea",
+                backgroundColor: "var(--color-v-torii)",
+                color: "#FFFFFF",
               }}
             >
               Cadastrar um evento
@@ -122,15 +106,30 @@ export default async function Agenda() {
               <section key={dia}>
                 <Legenda>{dia}</Legenda>
                 <div className="mt-2.5 space-y-3">
-                  {doDia.map((e) => (
-                    <LinhaEvento key={e.id} evento={e} />
-                  ))}
+                  {doDia.map((e) => {
+                    const d = new Date(e.inicio);
+                    const parte = (o: Intl.DateTimeFormatOptions) =>
+                      new Intl.DateTimeFormat("pt-BR", {
+                        timeZone: FUSO,
+                        ...o,
+                      }).format(d);
+                    return (
+                      <LinhaEvento
+                        key={e.id}
+                        titulo={e.titulo}
+                        dia={parte({ day: "2-digit" })}
+                        mes={parte({ month: "short" }).replace(".", "")}
+                        hora={parte({ hour: "2-digit", minute: "2-digit" })}
+                        onde={e.local?.nome ?? e.local_texto ?? undefined}
+                      />
+                    );
+                  })}
                 </div>
               </section>
             ))}
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

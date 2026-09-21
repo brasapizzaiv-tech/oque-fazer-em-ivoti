@@ -84,7 +84,7 @@ export default function FormularioEntrar() {
   return (
     <form onSubmit={entrar} className="mt-6 space-y-4">
       {avisoConfirmacao && (
-        <p className="rounded-[9px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-3 py-2 text-[13px] text-[color:var(--color-telha-funda)]">
+        <p className="vidro px-3 py-2 text-[13px] text-[color:var(--color-v-fechado-claro)]">
           {avisoConfirmacao}
         </p>
       )}
@@ -105,7 +105,7 @@ export default function FormularioEntrar() {
       />
 
       {erro && (
-        <p className="rounded-[9px] border-2 border-[color:var(--color-telha)] bg-[color:var(--color-superficie)] px-3 py-2 text-[13px] text-[color:var(--color-telha-funda)]">
+        <p className="vidro px-3 py-2 text-[13px] text-[color:var(--color-v-fechado-claro)]">
           {erro}
         </p>
       )}
@@ -113,7 +113,7 @@ export default function FormularioEntrar() {
       <button
         type="submit"
         disabled={indo}
-        className="h-12 w-full rounded-[11px] bg-[color:var(--color-torii)] text-[14px] font-bold text-[#fff7ea] transition disabled:opacity-50"
+        className="h-12 w-full rounded-[11px] bg-[color:var(--color-v-torii)] text-[14px] font-bold text-[#FFFFFF] transition disabled:opacity-50"
       >
         {indo ? "Entrando..." : "Entrar"}
       </button>
@@ -121,7 +121,7 @@ export default function FormularioEntrar() {
       <p className="text-center text-sm">
         <Link
           href="/recuperar-senha"
-          className="font-medium text-tinta/60 underline hover:text-[color:var(--color-torii)]"
+          className="font-medium text-tinta/60 underline hover:text-[color:var(--color-v-torii)]"
         >
           Esqueci minha senha
         </Link>
@@ -131,7 +131,7 @@ export default function FormularioEntrar() {
         Ainda não tem conta?{" "}
         <Link
           href="/cadastrar"
-          className="font-semibold text-[color:var(--color-torii)] underline"
+          className="font-semibold text-[color:var(--color-v-torii)] underline"
         >
           Cadastre seu estabelecimento
         </Link>
@@ -162,7 +162,8 @@ function Campo({
         value={valor}
         autoComplete={autoComplete}
         onChange={(e) => onChange(e.target.value)}
-        className="mt-1 h-12 w-full rounded-[11px] border-2 border-[color:var(--color-madeira)] bg-[color:var(--color-superficie)] px-4 text-[14px] text-[color:var(--color-texto)] outline-none focus:border-[color:var(--color-torii)]"
+        className="vidro mt-1 h-12 w-full px-4 text-[14px] outline-none focus:border-[color:var(--color-v-torii)]"
+        style={{ borderRadius: 12, color: "var(--color-v-texto)" }}
       />
     </label>
   );

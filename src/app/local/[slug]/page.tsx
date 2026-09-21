@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Mapa from "@/components/Mapa";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -96,219 +97,251 @@ export default async function PaginaLocal({
   ].filter(Boolean) as { rotulo: string; href: string; icone: string }[];
 
   return (
-    <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-10">
-      <ContarAcesso local={local.id} />
+    <div className="mx-auto lg:max-w-[1440px] lg:px-16 lg:pt-6 lg:pb-12">
+      <div className="lg:grid lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-8">
+          <ContarAcesso local={local.id} />
 
-      <div className="relative h-[250px] overflow-hidden lg:mt-4 lg:rounded-[18px]">
-        {local.capa_url ? (
-          <Image
-            src={local.capa_url}
-            alt={local.nome}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        ) : (
-          <span
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(135deg, #d8cfc2 0%, #bfb3a2 50%, #a99c8a 100%)",
-            }}
-          />
-        )}
-
-        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-          <Link
-            href="/explorar"
-            aria-label="Voltar"
-            className="grid h-11 w-11 place-items-center rounded-full"
-            style={{
-              backgroundColor: "rgba(20, 14, 10, 0.55)",
-              backdropFilter: "blur(10px)",
-              color: "#FFFFFF",
-            }}
-          >
-            <IconeVoltar tamanho={22} />
-          </Link>
-          <Favoritar slug={local.slug} />
-        </div>
-      </div>
-
-      <div className="px-4 pt-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
-          <span
-            className="text-[13px]"
-            style={{ color: "var(--color-v-texto-suave)" }}
-          >
-            {textoDoHorario}
-          </span>
-        </div>
-
-        <h1
-          className="mt-2 text-[26px] leading-tight font-bold"
-          style={{
-            color: "var(--color-v-texto)",
-            fontFamily: "var(--fonte-titulo-nova)",
-          }}
-        >
-          {local.nome}
-        </h1>
-
-        <p
-          className="mt-1 text-[14px]"
-          style={{ color: "var(--color-v-texto-suave)" }}
-        >
-          {local.categoria?.nome}
-          {endereco ? ` · ${endereco}` : ""}
-        </p>
-
-        {local.resumo && (
-          <p
-            className="mt-3 text-[14px]"
-            style={{ color: "var(--color-v-texto)" }}
-          >
-            {local.resumo}
-          </p>
-        )}
-
-        <div className="mt-4">
-          <AcoesDoLocal acoes={acoes} />
-        </div>
-      </div>
-
-      {promocoes.length > 0 && (
-        <section className="px-4 pt-6">
-          <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
-          <div className="mt-3 space-y-3">
-            {promocoes.map((p) => (
-              <CardPromocao
-                key={p.id}
-                href="#"
-                titulo={p.titulo}
-                quando={quandoVale(p)}
+          <div className="relative h-[250px] overflow-hidden lg:mt-4 lg:rounded-[18px]">
+            {local.capa_url ? (
+              <Image
+                src={local.capa_url}
+                alt={local.nome}
+                fill
+                priority
+                sizes="100vw"
+                className="object-cover"
               />
-            ))}
+            ) : (
+              <span
+                aria-hidden
+                className="absolute inset-0"
+                style={{
+                  background:
+                    "linear-gradient(135deg, #d8cfc2 0%, #bfb3a2 50%, #a99c8a 100%)",
+                }}
+              />
+            )}
+
+            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+              <Link
+                href="/explorar"
+                aria-label="Voltar"
+                className="grid h-11 w-11 place-items-center rounded-full"
+                style={{
+                  backgroundColor: "rgba(20, 14, 10, 0.55)",
+                  backdropFilter: "blur(10px)",
+                  color: "#FFFFFF",
+                }}
+              >
+                <IconeVoltar tamanho={22} />
+              </Link>
+              <Favoritar slug={local.slug} />
+            </div>
           </div>
-        </section>
-      )}
 
-      <FileiraDePetunias />
+          <div className="px-4 pt-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+              <span
+                className="text-[13px]"
+                style={{ color: "var(--color-v-texto-suave)" }}
+              >
+                {textoDoHorario}
+              </span>
+            </div>
 
-      {local.descricao && (
-        <section className="px-4 pt-5">
-          <TituloSecao>Sobre</TituloSecao>
-          <p
-            className="mt-2 text-[14px] whitespace-pre-line"
-            style={{ color: "var(--color-v-texto)" }}
-          >
-            {local.descricao}
-          </p>
-        </section>
-      )}
+            <h1
+              className="mt-2 text-[26px] leading-tight font-bold"
+              style={{
+                color: "var(--color-v-texto)",
+                fontFamily: "var(--fonte-titulo-nova)",
+              }}
+            >
+              {local.nome}
+            </h1>
 
-      {semana.some((d) => !d.fechado) && (
-        <section className="px-4 pt-6">
-          <TituloSecao>Horários</TituloSecao>
-          <CardVidro className="mt-2 px-4 py-2">
-            <dl>
-              {semana.map((d) => (
-                <div
-                  key={d.dia}
-                  className="flex justify-between border-b py-1.5 text-[14px] last:border-b-0"
-                  style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
-                >
-                  <dt style={{ color: "var(--color-v-texto)" }}>{d.nome}</dt>
-                  <dd style={{ color: "var(--color-v-texto-suave)" }}>
-                    {d.fechado ? "Fechado" : d.faixas.join(", ")}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </CardVidro>
-        </section>
-      )}
+            <p
+              className="mt-1 text-[14px]"
+              style={{ color: "var(--color-v-texto-suave)" }}
+            >
+              {local.categoria?.nome}
+              {endereco ? ` · ${endereco}` : ""}
+            </p>
 
-      {eventos.length > 0 && (
-        <section className="px-4 pt-6">
-          <TituloSecao selo="evento">Próximos eventos</TituloSecao>
-          <div className="mt-3 space-y-3">
-            {eventos.map((e) => {
-              const d = new Date(e.inicio);
-              return (
-                <LinhaEvento
-                  key={e.id}
-                  titulo={e.titulo}
-                  dia={new Intl.DateTimeFormat("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                    day: "2-digit",
-                  }).format(d)}
-                  mes={new Intl.DateTimeFormat("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                    month: "short",
-                  })
-                    .format(d)
-                    .replace(".", "")}
-                  hora={new Intl.DateTimeFormat("pt-BR", {
-                    timeZone: "America/Sao_Paulo",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  }).format(d)}
-                  onde={e.local_texto ?? undefined}
-                />
-              );
-            })}
+            {local.resumo && (
+              <p
+                className="mt-3 text-[14px]"
+                style={{ color: "var(--color-v-texto)" }}
+              >
+                {local.resumo}
+              </p>
+            )}
+
+            <div className="mt-4">
+              <AcoesDoLocal acoes={acoes} />
+            </div>
           </div>
-        </section>
-      )}
 
-      {(local.itens ?? []).length > 0 && (
-        <section id="cardapio" className="px-4 pt-6">
-          <TituloSecao>Cardápio</TituloSecao>
-          <CardVidro className="mt-2 px-4 py-2">
-            <ul>
-              {local.itens.map((item) => (
-                <li
-                  key={item.id}
-                  className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
-                  style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
-                >
-                  <span>
-                    <span
-                      className="block font-medium"
-                      style={{ color: "var(--color-v-texto)" }}
+          {promocoes.length > 0 && (
+            <section className="px-4 pt-6">
+              <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
+              <div className="mt-3 space-y-3">
+                {promocoes.map((p) => (
+                  <CardPromocao
+                    key={p.id}
+                    href="#"
+                    titulo={p.titulo}
+                    quando={quandoVale(p)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          <FileiraDePetunias />
+
+          {local.descricao && (
+            <section className="px-4 pt-5">
+              <TituloSecao>Sobre</TituloSecao>
+              <p
+                className="mt-2 text-[14px] whitespace-pre-line"
+                style={{ color: "var(--color-v-texto)" }}
+              >
+                {local.descricao}
+              </p>
+            </section>
+          )}
+
+          {semana.some((d) => !d.fechado) && (
+            <section className="px-4 pt-6">
+              <TituloSecao>Horários</TituloSecao>
+              <CardVidro className="mt-2 px-4 py-2">
+                <dl>
+                  {semana.map((d) => (
+                    <div
+                      key={d.dia}
+                      className="flex justify-between border-b py-1.5 text-[14px] last:border-b-0"
+                      style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
                     >
-                      {item.nome}
-                    </span>
-                    {item.descricao && (
-                      <span
-                        className="block text-[13px]"
-                        style={{ color: "var(--color-v-texto-suave)" }}
-                      >
-                        {item.descricao}
+                      <dt style={{ color: "var(--color-v-texto)" }}>
+                        {d.nome}
+                      </dt>
+                      <dd style={{ color: "var(--color-v-texto-suave)" }}>
+                        {d.fechado ? "Fechado" : d.faixas.join(", ")}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </CardVidro>
+            </section>
+          )}
+
+          {eventos.length > 0 && (
+            <section className="px-4 pt-6">
+              <TituloSecao selo="evento">Próximos eventos</TituloSecao>
+              <div className="mt-3 space-y-3">
+                {eventos.map((e) => {
+                  const d = new Date(e.inicio);
+                  return (
+                    <LinhaEvento
+                      key={e.id}
+                      titulo={e.titulo}
+                      dia={new Intl.DateTimeFormat("pt-BR", {
+                        timeZone: "America/Sao_Paulo",
+                        day: "2-digit",
+                      }).format(d)}
+                      mes={new Intl.DateTimeFormat("pt-BR", {
+                        timeZone: "America/Sao_Paulo",
+                        month: "short",
+                      })
+                        .format(d)
+                        .replace(".", "")}
+                      hora={new Intl.DateTimeFormat("pt-BR", {
+                        timeZone: "America/Sao_Paulo",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }).format(d)}
+                      onde={e.local_texto ?? undefined}
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          )}
+
+          {(local.itens ?? []).length > 0 && (
+            <section id="cardapio" className="px-4 pt-6">
+              <TituloSecao>Cardápio</TituloSecao>
+              <CardVidro className="mt-2 px-4 py-2">
+                <ul>
+                  {local.itens.map((item) => (
+                    <li
+                      key={item.id}
+                      className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
+                      style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
+                    >
+                      <span>
+                        <span
+                          className="block font-medium"
+                          style={{ color: "var(--color-v-texto)" }}
+                        >
+                          {item.nome}
+                        </span>
+                        {item.descricao && (
+                          <span
+                            className="block text-[13px]"
+                            style={{ color: "var(--color-v-texto-suave)" }}
+                          >
+                            {item.descricao}
+                          </span>
+                        )}
                       </span>
-                    )}
-                  </span>
-                  {item.preco != null && (
-                    <span
-                      className="shrink-0 font-bold"
-                      style={{ color: "var(--color-v-texto)" }}
-                    >
-                      R$ {Number(item.preco).toFixed(2).replace(".", ",")}
-                    </span>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </CardVidro>
-        </section>
-      )}
+                      {item.preco != null && (
+                        <span
+                          className="shrink-0 font-bold"
+                          style={{ color: "var(--color-v-texto)" }}
+                        >
+                          R$ {Number(item.preco).toFixed(2).replace(".", ",")}
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </CardVidro>
+            </section>
+          )}
 
-      <div className="px-4 pt-7 pb-8">
-        <ConviteAoGuia nome={local.nome} />
+          <div className="px-4 pt-7 pb-8 lg:px-0">
+            <ConviteAoGuia nome={local.nome} />
+          </div>
+        </div>
+
+        {/* No computador o mapa fica do lado, acompanhando a rolagem: quem
+            le a pagina de um lugar esta decidindo se vai ate la, e a
+            pergunta seguinte e sempre onde fica. */}
+        {local.lat != null && local.lng != null && (
+          <aside className="hidden lg:col-span-4 lg:block">
+            <div className="sticky top-[104px] space-y-3">
+              <div className="vidro overflow-hidden p-2">
+                <Mapa
+                  locais={[local]}
+                  focoSlug={local.slug}
+                  altura="h-[340px]"
+                />
+              </div>
+              <a
+                href={linkRota(local)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="vidro-leve flex h-12 items-center justify-center rounded-[11px] text-[14px] font-bold"
+                style={{ color: "var(--color-v-azul)" }}
+              >
+                Como chegar
+              </a>
+            </div>
+          </aside>
+        )}
       </div>
     </div>
   );
