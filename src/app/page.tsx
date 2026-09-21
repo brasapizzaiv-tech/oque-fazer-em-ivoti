@@ -57,7 +57,11 @@ export default async function Inicio() {
   return (
     <>
       {/* ================= a capa ================= */}
-      <section className="relative isolate h-[420px] lg:h-[760px]">
+      {/* 420px de capa, mas nunca mais que a tela: com o iPhone deitado a
+          altura vira 375px, e a capa fixa empurrava o titulo e a busca para
+          fora do campo de visao — quem virava o telefone via foto e mais
+          nada. */}
+      <section className="relative isolate h-[min(420px,86dvh)] lg:h-[760px]">
         <Image
           src={feira?.capa_url ?? "/fotos/portico-ivoti.jpg"}
           alt=""

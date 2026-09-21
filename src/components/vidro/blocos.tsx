@@ -114,6 +114,10 @@ export function TituloSecao({
  *
  * No computador o degradê some quando tudo cabe — `semRolagemNoComputador`
  * troca a fileira por uma grade a partir de `lg`.
+ *
+ * "overscroll-x-contain" existe por causa do iPhone: arrastar a fileira
+ * ate o comeco e continuar arrastando disparava o gesto de voltar do
+ * Safari, e a pessoa saia da pagina sem querer.
  */
 export function Fileira({
   children,
@@ -125,7 +129,7 @@ export function Fileira({
   return (
     <div className="relative">
       <div
-        className={`flex gap-2.5 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+        className={`flex gap-2.5 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
           semRolagemNoComputador
             ? "lg:flex-wrap lg:overflow-visible lg:px-0"
             : ""
@@ -335,8 +339,12 @@ export function AcoesDoLocal({
             <span aria-hidden className="text-[19px] leading-none">
               {a.icone}
             </span>
+            {/* Quebra em duas linhas em vez de cortar: em 320px o
+                "Como chegar" virava "Como cheg...", e o rotulo de um botao
+                nao pode ser adivinhacao. As quatro caixas crescem juntas
+                porque a fileira estica os filhos. */}
             <span
-              className="w-full truncate text-center text-[11px] font-semibold"
+              className="w-full text-center text-[11px] leading-tight font-semibold"
               style={{ color: "var(--color-v-texto)" }}
             >
               {a.rotulo}

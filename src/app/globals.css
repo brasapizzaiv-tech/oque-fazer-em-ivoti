@@ -85,8 +85,13 @@
   --color-creme-fundo: #c9bba2;
   --color-trelica: #e9e0cf;
 
-  --font-titulo: var(--fonte-titulo), ui-sans-serif, system-ui, sans-serif;
-  --font-sans: var(--fonte-corpo), ui-sans-serif, system-ui, sans-serif;
+  /* As duas fontes do site apontavam para as antigas — Bricolage nos
+     titulos e IBM Plex no texto — dois redesenhos depois de o documento
+     pedir Fraunces e DM Sans. Os titulos escapavam porque cada um traz a
+     fonte escrita na propria tag; o texto, nao: todo paragrafo, botao,
+     rotulo e item de menu do site saia em IBM Plex. */
+  --font-titulo: var(--fonte-titulo-nova), Georgia, serif;
+  --font-sans: var(--fonte-corpo-nova), ui-sans-serif, system-ui, sans-serif;
 }
 
 html {
@@ -94,7 +99,10 @@ html {
 }
 
 body {
-  background: var(--color-creme);
+  /* O creme da paleta nova. Ficou no da antiga, que puxava para o verde:
+     aparecia quando o iPhone estica a pagina no fim da rolagem, ali onde a
+     foto de fundo ja acabou. */
+  background: var(--color-v-fundo);
   color: var(--color-tinta);
   -webkit-font-smoothing: antialiased;
 }
@@ -322,6 +330,14 @@ h4 {
 
   /* O azul do vidro de destaque, em componentes separados para o CSS
      poder aplicar transparencia. Durante uma feira, o tema troca. */
+  /* A altura da barra de baixo, com a faixa de gestos do iPhone incluida.
+     Fica numa variavel porque tres lugares dependem dela: o respiro que a
+     pagina deixa embaixo, o campo de escrever do Guia, que se apoia em
+     cima dela, e a altura da conversa. Com numeros soltos, o campo do Guia
+     estava a 72px enquanto a barra media 64px mais a faixa — num iPhone
+     com faixa, o campo ficava ATRAS da barra. */
+  --barra-de-baixo: calc(64px + env(safe-area-inset-bottom));
+
   --vidro-azul-rgb: 31 78 156;
   /* Quanto do vidro e cor. Fora de feira, o valor calculado para o azul;
      durante uma feira, o que a cor dela exigir para o branco continuar

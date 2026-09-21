@@ -44,7 +44,7 @@ export default function Casca({ children }: { children: React.ReactNode }) {
           "Sou comerciante" quase sumiam. A capa tem de passar por baixo da
           barra, que e o que faz o texto branco ter foto atras. */}
       <main
-        className={`flex-1 pb-[76px] lg:pb-0 ${temCapa ? "" : "lg:pt-[84px]"}`}
+        className={`flex-1 pb-[var(--barra-de-baixo)] lg:pb-0 ${temCapa ? "" : "lg:pt-[84px]"}`}
       >
         {children}
       </main>

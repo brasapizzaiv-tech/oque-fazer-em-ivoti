@@ -133,7 +133,7 @@ export default function Galeria({
       </div>
 
       {total > 1 && (
-        <div className="mt-2 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] lg:px-0 [&::-webkit-scrollbar]:hidden">
+        <div className="mt-2 flex gap-2 overflow-x-auto overscroll-x-contain px-4 pb-1 [scrollbar-width:none] lg:px-0 [&::-webkit-scrollbar]:hidden">
           {imagens.map((url, i) => (
             <button
               key={url}

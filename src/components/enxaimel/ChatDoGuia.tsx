@@ -131,13 +131,13 @@ export default function ChatDoGuia() {
       // Desconta a barra de baixo, que so existe no celular: sem isso a
       // conversa fica mais alta do que o espaco disponivel e o campo de
       // escrever some por tras dela.
-      className="mx-auto flex min-h-[calc(100dvh-76px)] flex-col lg:min-h-[calc(100dvh-84px)] lg:max-w-[760px]"
+      className="mx-auto flex min-h-[calc(100dvh-var(--barra-de-baixo))] flex-col lg:min-h-[calc(100dvh-84px)] lg:max-w-[760px]"
     >
       <Cabecalho />
 
       {/* Sem textura de fundo: a foto fixa do site aparece por tras dos
           baloes, e e ela que faz o vidro deles funcionar. */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4">
         <div className="space-y-3">
           {mensagens.map((m, i) => (
             <Balao key={i} mensagem={m} locais={locais} />
@@ -172,7 +172,7 @@ export default function ChatDoGuia() {
           e.preventDefault();
           enviar(texto);
         }}
-        className="sticky bottom-[72px] flex gap-2 px-4 py-3 lg:bottom-0"
+        className="sticky bottom-[var(--barra-de-baixo)] flex gap-2 px-4 py-3 lg:bottom-0"
         style={{
           backgroundColor: "rgba(250, 247, 241, 0.86)",
           backdropFilter: "blur(14px)",
