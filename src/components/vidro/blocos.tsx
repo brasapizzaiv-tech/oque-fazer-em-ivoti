@@ -2,6 +2,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { CasaEnxaimel, Petunia } from "./icones";
+import LinkDeContato from "@/components/LinkDeContato";
+import type { TipoMetrica } from "@/lib/metricas";
+import { telefoneBonito } from "@/lib/texto";
 import { Botao, CardAzul, CardVidro, Legenda, SeloHanko } from "./pecas";
 
 /* ==================================================================== */
@@ -308,32 +311,133 @@ export function CardPromocao({
  */
 export function AcoesDoLocal({
   acoes,
+  local,
 }: {
-  acoes: { rotulo: string; href: string; icone: string }[];
+  acoes: {
+    rotulo: string;
+    href: string;
+    icone: string;
+    tipo?: TipoMetrica;
+  }[];
+  /** O identificador do estabelecimento, para contar o clique. */
+  local: string;
 }) {
   if (acoes.length === 0) return null;
 
+  const classe =
+    "vidro flex min-w-0 flex-1 flex-col items-center gap-1 px-1 py-3";
+
   return (
     <div className="flex gap-2">
-      {acoes.map((a) => (
-        <a
-          key={a.rotulo}
-          href={a.href}
-          target={a.href.startsWith("http") ? "_blank" : undefined}
-          rel={a.href.startsWith("http") ? "noopener noreferrer" : undefined}
-          className="vidro flex min-w-0 flex-1 flex-col items-center gap-1 px-1 py-3"
+      {acoes.map((a) => {
+        const dentro = (
+          <>
+            <span aria-hidden className="text-[19px] leading-none">
+              {a.icone}
+            </span>
+            <span
+              className="w-full truncate text-center text-[11px] font-semibold"
+              style={{ color: "var(--color-v-texto)" }}
+            >
+              {a.rotulo}
+            </span>
+          </>
+        );
+
+        // Com tipo, o clique conta como indicacao no painel do comerciante.
+        // Sem tipo — o cardapio, que e um pulo dentro da propria pagina —
+        // e um link comum.
+        return a.tipo ? (
+          <LinkDeContato
+            key={a.rotulo}
+            href={a.href}
+            tipo={a.tipo}
+            local={local}
+            externo={a.href.startsWith("http")}
+            className={classe}
+          >
+            {dentro}
+          </LinkDeContato>
+        ) : (
+          <a key={a.rotulo} href={a.href} className={classe}>
+            {dentro}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+/** "https://beeis.com.br/" vira "beeis.com.br". */
+function semProtocolo(endereco: string): string {
+  const sem = endereco.replace("https://", "").replace("http://", "");
+  return sem.endsWith("/") ? sem.slice(0, -1) : sem;
+}
+
+/**
+ * Telefone e site, embaixo das quatro acoes.
+ *
+ * Nao entram na fileira de cima porque la cabem quatro, e o documento
+ * escolheu quais sao. Mas sumir com eles tirava do ar o telefone de quem
+ * so tem telefone — e o clique deles conta como indicacao igual.
+ */
+export function ContatosDoLocal({
+  telefone,
+  site,
+  local,
+}: {
+  telefone?: string | null;
+  site?: string | null;
+  local: string;
+}) {
+  if (!telefone && !site) return null;
+
+  const enderecoDoSite = site
+    ? site.startsWith("http")
+      ? site
+      : `https://${site}`
+    : null;
+
+  return (
+    <div className="mt-2 space-y-2">
+      {telefone && (
+        <LinkDeContato
+          href={`tel:${telefone.replace(/\D/g, "")}`}
+          tipo="clique_telefone"
+          local={local}
+          externo={false}
+          className="vidro flex items-center gap-3 px-4 py-3"
         >
-          <span aria-hidden className="text-[19px] leading-none">
-            {a.icone}
+          <span aria-hidden className="text-[17px] leading-none">
+            📞
           </span>
           <span
-            className="w-full truncate text-center text-[11px] font-semibold"
+            className="text-[14px] font-semibold"
             style={{ color: "var(--color-v-texto)" }}
           >
-            {a.rotulo}
+            {telefoneBonito(telefone)}
           </span>
-        </a>
-      ))}
+        </LinkDeContato>
+      )}
+
+      {enderecoDoSite && (
+        <LinkDeContato
+          href={enderecoDoSite}
+          tipo="clique_site"
+          local={local}
+          className="vidro flex items-center gap-3 px-4 py-3"
+        >
+          <span aria-hidden className="text-[17px] leading-none">
+            🌐
+          </span>
+          <span
+            className="truncate text-[14px] font-semibold"
+            style={{ color: "var(--color-v-azul)" }}
+          >
+            {semProtocolo(site!)}
+          </span>
+        </LinkDeContato>
+      )}
     </div>
   );
 }
@@ -345,6 +449,8 @@ export function LinhaEvento({
   mes,
   hora,
   onde,
+  descricao,
+  foto,
 }: {
   titulo: string;
   /** "14" */
@@ -353,9 +459,12 @@ export function LinhaEvento({
   mes: string;
   hora?: string;
   onde?: string;
+  /** As duas primeiras linhas do que o evento é. */
+  descricao?: string | null;
+  foto?: string | null;
 }) {
   return (
-    <CardVidro className="flex items-center gap-3 p-3.5">
+    <CardVidro className="flex items-start gap-3 p-3.5">
       <span
         className="grid h-12 w-12 shrink-0 place-items-center rounded-[12px] leading-none"
         style={{ backgroundColor: "var(--color-v-petunia)", color: "#FFFFFF" }}
@@ -386,7 +495,29 @@ export function LinhaEvento({
         >
           {[hora, onde].filter(Boolean).join(" · ")}
         </span>
+        {descricao && (
+          <span
+            className="mt-1 line-clamp-2 block text-[13px]"
+            style={{ color: "var(--color-v-texto-suave)" }}
+          >
+            {descricao}
+          </span>
+        )}
       </span>
+
+      {/* A foto do evento só no espaço que tem: numa tela de 320px ela
+          espremeria o texto, e o que a pessoa precisa ler é a data. */}
+      {foto && (
+        <span className="relative hidden h-20 w-28 shrink-0 overflow-hidden rounded-[12px] sm:block">
+          <Image
+            src={foto}
+            alt=""
+            fill
+            sizes="112px"
+            className="object-cover"
+          />
+        </span>
+      )}
     </CardVidro>
   );
 }

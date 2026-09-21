@@ -121,6 +121,8 @@ export default async function Agenda() {
                         mes={parte({ month: "short" }).replace(".", "")}
                         hora={parte({ hour: "2-digit", minute: "2-digit" })}
                         onde={e.local?.nome ?? e.local_texto ?? undefined}
+                        descricao={e.descricao}
+                        foto={e.imagem_url}
                       />
                     );
                   })}

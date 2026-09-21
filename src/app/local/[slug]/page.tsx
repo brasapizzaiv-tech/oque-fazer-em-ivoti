@@ -9,6 +9,7 @@ import Galeria from "@/components/vidro/Galeria";
 import {
   AcoesDoLocal,
   CardPromocao,
+  ContatosDoLocal,
   ConviteAoGuia,
   FileiraDePetunias,
   LinhaEvento,
@@ -16,6 +17,8 @@ import {
 } from "@/components/vidro/blocos";
 import { IconeVoltar } from "@/components/vidro/icones";
 import { CardVidro, SeloStatus } from "@/components/vidro/pecas";
+import type { TipoMetrica } from "@/lib/metricas";
+import { faixaPreco } from "@/lib/texto";
 import { quandoVale } from "@/lib/promocoes";
 import { localPorSlug } from "@/lib/locais";
 import { porDia, situacao } from "@/lib/horarios";
@@ -73,28 +76,49 @@ export default async function PaginaLocal({
     .filter(Boolean)
     .join(", ");
 
+  // O cardápio vem numa lista só; as seções voltam a existir aqui. Sem
+  // isto, "Entradas" e "Sobremesas" viravam uma lista corrida de trinta
+  // linhas, que é justamente o que a seção evita.
+  const secoes = new Map<string, typeof local.itens>();
+  for (const item of local.itens ?? []) {
+    const chave = item.secao ?? "";
+    secoes.set(chave, [...(secoes.get(chave) ?? []), item]);
+  }
+
   // Só entra o que o estabelecimento preencheu: botão que não leva a lugar
   // nenhum ensina a pessoa a desconfiar dos outros.
   const whats = linkWhatsapp(local.whatsapp, "Oi! Vi vocês no guia da cidade.");
   const insta = usuarioInstagram(local.instagram);
   const acoes = [
-    whats && { rotulo: "WhatsApp", href: whats, icone: "💬" },
+    whats && {
+      rotulo: "WhatsApp",
+      href: whats,
+      icone: "💬",
+      tipo: "clique_whatsapp" as const,
+    },
     (local.lat != null || local.endereco) && {
       rotulo: "Como chegar",
       href: linkRota(local),
       icone: "🧭",
+      tipo: "clique_rota" as const,
     },
     insta && {
       rotulo: "Instagram",
       href: `https://instagram.com/${insta}`,
       icone: "📷",
+      tipo: "clique_instagram" as const,
     },
     (local.itens ?? []).length > 0 && {
       rotulo: "Cardápio",
       href: "#cardapio",
       icone: "📋",
     },
-  ].filter(Boolean) as { rotulo: string; href: string; icone: string }[];
+  ].filter(Boolean) as {
+    rotulo: string;
+    href: string;
+    icone: string;
+    tipo?: TipoMetrica;
+  }[];
 
   return (
     <div className="mx-auto lg:max-w-[1440px] lg:px-16 lg:pt-6 lg:pb-12">
@@ -151,6 +175,7 @@ export default async function PaginaLocal({
               style={{ color: "var(--color-v-texto-suave)" }}
             >
               {local.categoria?.nome}
+              {local.faixa_preco ? ` · ${faixaPreco(local.faixa_preco)}` : ""}
               {endereco ? ` · ${endereco}` : ""}
             </p>
 
@@ -164,7 +189,12 @@ export default async function PaginaLocal({
             )}
 
             <div className="mt-4">
-              <AcoesDoLocal acoes={acoes} />
+              <AcoesDoLocal acoes={acoes} local={local.id} />
+              <ContatosDoLocal
+                telefone={local.telefone}
+                site={local.site}
+                local={local.id}
+              />
             </div>
           </div>
 
@@ -195,6 +225,27 @@ export default async function PaginaLocal({
               >
                 {local.descricao}
               </p>
+            </section>
+          )}
+
+          {/* As etiquetas dizem o que nao cabe na categoria: leva cartao,
+              bom para crianca, tem opcao sem gluten. Sao elas que o filtro
+              do Explorar usa, e sumir com elas aqui deixava o visitante sem
+              saber por que o lugar apareceu na busca dele. */}
+          {(local.tags ?? []).length > 0 && (
+            <section className="px-4 pt-6">
+              <TituloSecao>O que tem por lá</TituloSecao>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {local.tags.map((t) => (
+                  <span
+                    key={t.id}
+                    className="vidro-leve inline-flex items-center gap-1.5 rounded-full px-3.5 py-2 text-[13px] font-medium"
+                    style={{ color: "var(--color-v-texto)" }}
+                  >
+                    {t.emoji} {t.nome}
+                  </span>
+                ))}
+              </div>
             </section>
           )}
 
@@ -248,6 +299,8 @@ export default async function PaginaLocal({
                         minute: "2-digit",
                       }).format(d)}
                       onde={e.local_texto ?? undefined}
+                      descricao={e.descricao}
+                      foto={e.imagem_url}
                     />
                   );
                 })}
@@ -258,42 +311,55 @@ export default async function PaginaLocal({
           {(local.itens ?? []).length > 0 && (
             <section id="cardapio" className="px-4 pt-6">
               <TituloSecao>Cardápio</TituloSecao>
-              <CardVidro className="mt-2 px-4 py-2">
-                <ul>
-                  {local.itens.map((item) => (
-                    <li
-                      key={item.id}
-                      className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
-                      style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
+              {[...secoes.entries()].map(([secao, itens]) => (
+                <div key={secao} className="mt-3">
+                  {secao && (
+                    <p
+                      className="mb-1.5 text-[11px] font-bold tracking-[0.1em] uppercase"
+                      style={{ color: "var(--color-v-texto-suave)" }}
                     >
-                      <span>
-                        <span
-                          className="block font-medium"
-                          style={{ color: "var(--color-v-texto)" }}
+                      {secao}
+                    </p>
+                  )}
+                  <CardVidro className="px-4 py-2">
+                    <ul>
+                      {itens.map((item) => (
+                        <li
+                          key={item.id}
+                          className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
+                          style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
                         >
-                          {item.nome}
-                        </span>
-                        {item.descricao && (
-                          <span
-                            className="block text-[13px]"
-                            style={{ color: "var(--color-v-texto-suave)" }}
-                          >
-                            {item.descricao}
+                          <span>
+                            <span
+                              className="block font-medium"
+                              style={{ color: "var(--color-v-texto)" }}
+                            >
+                              {item.nome}
+                            </span>
+                            {item.descricao && (
+                              <span
+                                className="block text-[13px]"
+                                style={{ color: "var(--color-v-texto-suave)" }}
+                              >
+                                {item.descricao}
+                              </span>
+                            )}
                           </span>
-                        )}
-                      </span>
-                      {item.preco != null && (
-                        <span
-                          className="shrink-0 font-bold"
-                          style={{ color: "var(--color-v-texto)" }}
-                        >
-                          R$ {Number(item.preco).toFixed(2).replace(".", ",")}
-                        </span>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </CardVidro>
+                          {item.preco != null && (
+                            <span
+                              className="shrink-0 font-bold"
+                              style={{ color: "var(--color-v-texto)" }}
+                            >
+                              R${" "}
+                              {Number(item.preco).toFixed(2).replace(".", ",")}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardVidro>
+                </div>
+              ))}
             </section>
           )}
 

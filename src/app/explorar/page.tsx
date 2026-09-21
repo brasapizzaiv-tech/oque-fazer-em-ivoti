@@ -52,24 +52,38 @@ export default async function Explorar({
   const tags = lista(params.tag);
   const posicao = lerPosicao(texto(params.perto));
   const soDaFeira = texto(params.feira) === "1";
+  const soComPromocao = texto(params.promocao) === "1";
+  const soComEvento = texto(params.evento) === "1";
 
   const [categorias, todasTags, todos, eventosDeHoje, promocoes, feira] =
     await Promise.all([
       listarCategorias(),
       listarTags(),
       buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
-      eventosVisiveis({ ate: hojeEmIvoti(), limite: 4 }),
-      promocoesDeHoje(3),
+      eventosVisiveis({ ate: hojeEmIvoti(), limite: 200 }),
+      promocoesDeHoje(200),
       temaAtivo(),
     ]);
 
   // "Na feira" e um filtro que so existe durante a feira: a lista de quem
   // esta expondo vem do tema, e fora do periodo ela nao quer dizer nada.
   const naFeira = new Set(feira?.locais ?? []);
-  const locais =
-    soDaFeira && naFeira.size > 0
-      ? todos.filter((l) => naFeira.has(l.id))
-      : todos;
+
+  // Quem tem promoção valendo hoje e quem tem evento hoje. O menu do
+  // computador já apontava para "/explorar?promocao=1", e o Explorar não
+  // sabia desse filtro: a aba Promoções abria a lista inteira, igual ao
+  // Explorar. Agora os dois filtros existem de verdade, e viram pílula.
+  const comPromocao = new Set(promocoes.map((pr) => pr.local_id));
+  const comEvento = new Set(
+    eventosDeHoje.map((ev) => ev.local_id).filter(Boolean) as string[],
+  );
+
+  const locais = todos.filter((l) => {
+    if (soDaFeira && naFeira.size > 0 && !naFeira.has(l.id)) return false;
+    if (soComPromocao && !comPromocao.has(l.id)) return false;
+    if (soComEvento && !comEvento.has(l.id)) return false;
+    return true;
+  });
 
   const principais = categorias.filter((c) => c.pai_id === null);
 
@@ -80,6 +94,8 @@ export default async function Explorar({
       categoria,
       aberto: aberto ? "1" : undefined,
       feira: soDaFeira ? "1" : undefined,
+      promocao: soComPromocao ? "1" : undefined,
+      evento: soComEvento ? "1" : undefined,
       tag: tags,
       perto: texto(params.perto),
       ...mudanca,
@@ -157,6 +173,18 @@ export default async function Explorar({
           <Chip href={url({ aberto: aberto ? undefined : "1" })} ativo={aberto}>
             Aberto agora
           </Chip>
+          <Chip
+            href={url({ promocao: soComPromocao ? undefined : "1" })}
+            ativo={soComPromocao}
+          >
+            Com promoção
+          </Chip>
+          <Chip
+            href={url({ evento: soComEvento ? undefined : "1" })}
+            ativo={soComEvento}
+          >
+            Com evento
+          </Chip>
           {feira && feira.locais.length > 0 && (
             <Chip
               href={url({ feira: soDaFeira ? undefined : "1" })}
@@ -211,7 +239,13 @@ export default async function Explorar({
             <div className="space-y-3 px-4 pt-3 pb-8 lg:px-0">
               {comDistancia.length === 0 ? (
                 <Vazio>
-                  Nada encontrado com esses filtros. Tente afrouxar a busca.
+                  {soComPromocao
+                    ? "Nenhum lugar com promoção valendo hoje. As promoções mudam por dia da semana — amanhã a lista pode ser outra."
+                    : soComEvento
+                      ? "Nenhum lugar com evento hoje. Veja a agenda da cidade para o que vem pela frente."
+                      : soDaFeira
+                        ? "Nenhum expositor da feira cadastrado no guia ainda."
+                        : "Nada encontrado com esses filtros. Tente afrouxar a busca."}
                 </Vazio>
               ) : (
                 comDistancia.map(({ local, metros }) => (
@@ -255,7 +289,7 @@ export default async function Explorar({
                   </p>
                 ) : (
                   <ul className="mt-3 space-y-3">
-                    {eventosDeHoje.map((ev) => (
+                    {eventosDeHoje.slice(0, 4).map((ev) => (
                       <li key={ev.id}>
                         <p
                           className="text-[14px] leading-tight font-bold"
@@ -268,7 +302,7 @@ export default async function Explorar({
                         </p>
                       </li>
                     ))}
-                    {promocoes.map((pr) => (
+                    {promocoes.slice(0, 3).map((pr) => (
                       <li key={pr.id}>
                         <p
                           className="text-[14px] leading-tight font-bold"
