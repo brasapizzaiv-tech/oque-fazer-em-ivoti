@@ -67,7 +67,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#147a59",
+  // A cor que o navegador do celular pinta na propria barra. Ficou no verde
+  // da paleta antiga depois dos dois redesenhos: a barra do iPhone saia
+  // verde por cima de um site que nao tem mais verde nenhum.
+  themeColor: "#FAF7F1",
 };
 
 export default async function RootLayout({ children }: LayoutProps<"/">) {

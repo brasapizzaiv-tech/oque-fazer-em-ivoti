@@ -403,3 +403,32 @@ h4 {
     text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
   }
 }
+
+/* ==================================================================== */
+/* O zoom do iPhone ao escrever                                         */
+/* ==================================================================== */
+/* O Safari do iPhone amplia a pagina inteira quando a pessoa toca num
+   campo cuja letra e menor que 16px. Ele acha que esta ajudando; na
+   pratica o cabecalho sai da tela, o texto fica gigante e a pessoa
+   precisa dar dois dedos para voltar — foi o que aconteceu no campo do
+   Guia, que estava em 15px.
+
+   A saida certa e a letra, nao o zoom: poe 16px em campo de toque e o
+   Safari nao mexe em nada. A saida errada, que muita gente usa, e travar
+   o zoom no <meta viewport> — isso tira tambem o zoom de quem precisa
+   ampliar para enxergar, e nao vamos fazer isso.
+
+   Fica fora de camada de proposito: precisa vencer o tamanho que a classe
+   do campo pede, e a diferenca de um pixel nao muda o desenho.
+
+   "pointer: coarse" pega o dedo e deixa o mouse em paz: no computador os
+   campos seguem no tamanho do documento. */
+@media (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not(
+      [type="range"]
+    ),
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
