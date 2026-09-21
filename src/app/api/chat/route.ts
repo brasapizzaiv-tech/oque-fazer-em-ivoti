@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NOME_DO_ASSISTENTE, NOME_DO_SITE } from "@/lib/marca";
 import { catalogo } from "@/lib/catalogo";
+import { emLinhas, periodoPorExtenso, temaAtivo } from "@/lib/temas";
 import { respostaDemo } from "@/lib/demo";
 import { podeConversar } from "@/lib/limite-chat";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -17,7 +18,11 @@ const MODELO = process.env.CHAT_MODELO || "claude-opus-5";
 // O parametro de esforco (o quanto o modelo "pensa" antes de responder) so
 // existe nos modelos maiores. Mandar ele pro Haiku 4.5 devolve erro 400, entao
 // so mandamos pra quem aceita — e, na duvida, nao mandamos.
-const FAMILIAS_COM_ESFORCO = ["claude-opus-", "claude-sonnet-5", "claude-fable-"];
+const FAMILIAS_COM_ESFORCO = [
+  "claude-opus-",
+  "claude-sonnet-5",
+  "claude-fable-",
+];
 const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
 
 const INSTRUCOES = `Voce e ${NOME_DO_ASSISTENTE}, o assistente do site "${NOME_DO_SITE}" — alguem que conhece a cidade inteira e gosta de ajudar quem chega.
@@ -73,7 +78,10 @@ Regras do roteiro:
 - Use o marcador de roteiro OU os marcadores de lugar, nunca os dois na mesma resposta.`;
 
 export async function POST(request: Request) {
-  let corpo: { mensagens?: { papel: string; texto: string }[]; sessao?: string };
+  let corpo: {
+    mensagens?: { papel: string; texto: string }[];
+    sessao?: string;
+  };
   try {
     corpo = await request.json();
   } catch {
@@ -103,8 +111,39 @@ export async function POST(request: Request) {
     return respostaEmLetras(respostaDemo(ultima));
   }
 
-  const { texto: lista } = await catalogo();
+  const [{ texto: lista }, feira] = await Promise.all([
+    catalogo(),
+    temaAtivo(),
+  ]);
   const cliente = new Anthropic();
+
+  // A feira da semana entra como um bloco proprio, fora do cache: ela muda
+  // e o catalogo nao, e misturar os dois jogaria fora o cache do catalogo
+  // toda vez que uma feira comecasse ou terminasse.
+  const sobreAFeira = feira
+    ? [
+        "A FEIRA QUE ESTA ACONTECENDO AGORA",
+        "",
+        `Nome: ${feira.subtitulo ? feira.subtitulo + " " : ""}${feira.nome}`,
+        periodoPorExtenso(feira) ? `Quando: ${periodoPorExtenso(feira)}` : "",
+        feira.onde ? `Onde: ${feira.onde}` : "",
+        emLinhas(feira.programacao).length
+          ? "Programacao:\n" +
+            emLinhas(feira.programacao)
+              .map((l) => "- " + l)
+              .join("\n")
+          : "",
+        emLinhas(feira.expositores).length
+          ? "Expositores: " + emLinhas(feira.expositores).join(", ")
+          : "",
+        "",
+        "Quando a pergunta tiver a ver com a feira, responda com estes dados.",
+        "Se alguem perguntar o que fazer nesses dias, cite a feira primeiro.",
+        "Nao invente atracao, horario nem expositor que nao esteja escrito aqui.",
+      ]
+        .filter(Boolean)
+        .join("\n")
+    : null;
 
   const stream = cliente.messages.stream({
     model: MODELO,
@@ -119,6 +158,7 @@ export async function POST(request: Request) {
         text: `LOCAIS DO GUIA\n\n${lista}`,
         cache_control: { type: "ephemeral" },
       },
+      ...(sobreAFeira ? [{ type: "text" as const, text: sobreAFeira }] : []),
     ],
     messages: mensagens.map((m) => ({
       role: m.papel === "guia" ? ("assistant" as const) : ("user" as const),

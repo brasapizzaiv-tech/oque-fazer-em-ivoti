@@ -13,6 +13,8 @@ import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { hojeEmIvoti } from "@/lib/planos";
 import { quandoPorExtenso, situacao } from "@/lib/horarios";
+import { AvisoDaFeira } from "@/components/vidro/Feira";
+import { temaAtivo } from "@/lib/temas";
 
 export const revalidate = 60;
 
@@ -49,15 +51,25 @@ export default async function Explorar({
   const aberto = texto(params.aberto) === "1";
   const tags = lista(params.tag);
   const posicao = lerPosicao(texto(params.perto));
+  const soDaFeira = texto(params.feira) === "1";
 
-  const [categorias, todasTags, locais, eventosDeHoje, promocoes] =
+  const [categorias, todasTags, todos, eventosDeHoje, promocoes, feira] =
     await Promise.all([
       listarCategorias(),
       listarTags(),
       buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
       eventosVisiveis({ ate: hojeEmIvoti(), limite: 4 }),
       promocoesDeHoje(3),
+      temaAtivo(),
     ]);
+
+  // "Na feira" e um filtro que so existe durante a feira: a lista de quem
+  // esta expondo vem do tema, e fora do periodo ela nao quer dizer nada.
+  const naFeira = new Set(feira?.locais ?? []);
+  const locais =
+    soDaFeira && naFeira.size > 0
+      ? todos.filter((l) => naFeira.has(l.id))
+      : todos;
 
   const principais = categorias.filter((c) => c.pai_id === null);
 
@@ -67,6 +79,7 @@ export default async function Explorar({
       q,
       categoria,
       aberto: aberto ? "1" : undefined,
+      feira: soDaFeira ? "1" : undefined,
       tag: tags,
       perto: texto(params.perto),
       ...mudanca,
@@ -144,6 +157,14 @@ export default async function Explorar({
           <Chip href={url({ aberto: aberto ? undefined : "1" })} ativo={aberto}>
             Aberto agora
           </Chip>
+          {feira && feira.locais.length > 0 && (
+            <Chip
+              href={url({ feira: soDaFeira ? undefined : "1" })}
+              ativo={soDaFeira}
+            >
+              Na feira
+            </Chip>
+          )}
           {todasTags.map((t) => {
             const marcada = tags.includes(t.slug);
             return (
@@ -162,6 +183,12 @@ export default async function Explorar({
           })}
         </Fileira>
       </div>
+
+      {feira && (
+        <div className="px-4 pt-4 lg:mx-auto lg:max-w-[1440px] lg:px-16">
+          <AvisoDaFeira tema={feira} />
+        </div>
+      )}
 
       <div className="lg:mx-auto lg:max-w-[1440px] lg:px-16">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">

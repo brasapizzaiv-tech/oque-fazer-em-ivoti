@@ -319,6 +319,16 @@ h4 {
   --color-v-fechado-claro: #b5533a; /* "fechado" sobre fundo claro */
   --color-v-fechado-escuro: #f28c28; /* "fechado" sobre foto */
   --color-v-rosa-clara: #ffd3e8; /* a assinatura do logo sobre foto */
+
+  /* O azul do vidro de destaque, em componentes separados para o CSS
+     poder aplicar transparencia. Durante uma feira, o tema troca. */
+  --vidro-azul-rgb: 31 78 156;
+  /* Quanto do vidro e cor. Fora de feira, o valor calculado para o azul;
+     durante uma feira, o que a cor dela exigir para o branco continuar
+     legivel. */
+  --vidro-azul-alfa: 0.78;
+  /* O detalhe claro do tema; fora de feira, so o branco. */
+  --color-v-tema-destaque: #ffffff;
 }
 
 @layer components {
@@ -346,8 +356,13 @@ h4 {
     /* 0,78 e nao os 0,60 do documento, pela mesma razao e com folga maior:
        branco sobre azul a 60% dava 3,15 sobre a parte clara da foto, longe
        dos 4,5. O minimo seria 0,76; 0,78 deixa margem para a foto de fundo
-       mudar sem o texto sair do limite. */
-    background-color: rgba(31, 78, 156, 0.78);
+       mudar sem o texto sair do limite.
+
+       A cor vem de uma variavel, e nao escrita aqui, porque durante as
+       feiras ela vira a cor do tema — o verde da Feira das Flores, o
+       vermelho do Kerb. Sem a variavel, cada bloco azul do site precisaria
+       saber sozinho que ha uma feira acontecendo. */
+    background-color: rgb(var(--vidro-azul-rgb) / var(--vidro-azul-alfa));
     backdrop-filter: blur(14px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 18px;

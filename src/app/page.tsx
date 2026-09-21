@@ -22,6 +22,8 @@ import {
   Legenda,
   Logo,
 } from "@/components/vidro/pecas";
+import { BlocoDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
+import { temaAtivo } from "@/lib/temas";
 import { listarCategorias } from "@/lib/locais";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
@@ -39,10 +41,11 @@ function daquiA(dias: number) {
 }
 
 export default async function Inicio() {
-  const [categorias, daSemana, promocoes] = await Promise.all([
+  const [categorias, daSemana, promocoes, feira] = await Promise.all([
     listarCategorias(),
     eventosVisiveis({ ate: daquiA(7), limite: 8 }),
     promocoesDeHoje(4),
+    temaAtivo(),
   ]);
 
   const principais = categorias.filter((c) => c.pai_id === null);
@@ -56,14 +59,30 @@ export default async function Inicio() {
       {/* ================= a capa ================= */}
       <section className="relative isolate h-[420px] lg:h-[760px]">
         <Image
-          src="/fotos/portico-ivoti.jpg"
+          src={feira?.capa_url ?? "/fotos/portico-ivoti.jpg"}
           alt=""
           fill
           priority
           sizes="100vw"
           className="object-cover object-center"
         />
-        <div aria-hidden className="veu-do-topo absolute inset-0" />
+        {/* Em feira o veu vai na cor do tema, escuro. O titulo e o nome do
+            site continuam brancos: a cor da festa entra nos detalhes, nao
+            por cima do que a pessoa precisa ler. */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={
+            feira
+              ? {
+                  backgroundImage:
+                    "linear-gradient(to bottom, rgb(var(--vidro-azul-rgb) / 0.82) 0%, rgb(var(--vidro-azul-rgb) / 0.35) 45%, rgb(var(--vidro-azul-rgb) / 0.1) 70%)",
+                }
+              : undefined
+          }
+        >
+          {!feira && <span className="veu-do-topo absolute inset-0" />}
+        </div>
 
         {/* ---- celular ---- */}
         <div className="relative flex h-full flex-col px-4 pt-4 lg:hidden">
@@ -81,6 +100,12 @@ export default async function Inicio() {
               <IconeGuia tamanho={22} />
             </Link>
           </div>
+
+          {feira && (
+            <div className="mt-3">
+              <SeloDaFeira tema={feira} />
+            </div>
+          )}
 
           <div className="mt-auto pb-5">
             <h1
@@ -104,12 +129,16 @@ export default async function Inicio() {
 
         {/* ---- computador ---- */}
         <div className="relative mx-auto hidden h-full max-w-[1440px] flex-col justify-center px-16 lg:flex">
-          <p className="flex items-center gap-2">
-            <Petunia tamanho={18} />
-            <span className="sobre-foto text-[12px] font-bold tracking-[0.12em] text-white uppercase">
-              Ivoti · A Cidade das Flores
-            </span>
-          </p>
+          {feira ? (
+            <SeloDaFeira tema={feira} />
+          ) : (
+            <p className="flex items-center gap-2">
+              <Petunia tamanho={18} />
+              <span className="sobre-foto text-[12px] font-bold tracking-[0.12em] text-white uppercase">
+                Ivoti · A Cidade das Flores
+              </span>
+            </p>
+          )}
 
           <h1
             className="sobre-foto mt-4 max-w-[19ch] text-[72px] leading-[1.02] font-bold text-white"
@@ -143,6 +172,13 @@ export default async function Inicio() {
           </div>
         </div>
       </section>
+
+      {/* ================= a feira ================= */}
+      {feira && (
+        <section className="px-4 pt-5 lg:mx-auto lg:max-w-[1440px] lg:px-16">
+          <BlocoDaFeira tema={feira} />
+        </section>
+      )}
 
       {/* ================= categorias, só no celular ================= */}
       <div className="pt-4 lg:hidden">

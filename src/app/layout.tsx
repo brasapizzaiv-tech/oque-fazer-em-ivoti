@@ -11,6 +11,8 @@ import "./globals.css";
 import { Suspense } from "react";
 import CompletarLogin from "@/components/CompletarLogin";
 import Casca from "@/components/vidro/Casca";
+import { RoupaDaFeira } from "@/components/vidro/Feira";
+import { temaAtivo } from "@/lib/temas";
 import ContarAcesso from "@/components/ContarAcesso";
 import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 
@@ -68,7 +70,11 @@ export const viewport: Viewport = {
   themeColor: "#147a59",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  // A feira que estiver valendo hoje. Fora de feira volta nada, e o site
+  // continua no desenho de sempre.
+  const feira = await temaAtivo();
+
   return (
     <html
       lang="pt-BR"
@@ -88,7 +94,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <ContarAcesso />
         </Suspense>
         <FaixaDemonstracao />
-        <Casca>{children}</Casca>
+        <RoupaDaFeira tema={feira}>
+          <Casca>{children}</Casca>
+        </RoupaDaFeira>
       </body>
     </html>
   );
