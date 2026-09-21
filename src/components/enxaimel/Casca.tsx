@@ -18,7 +18,10 @@ import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
  * de baixo do celular — "Explorar", "Roteiros" — sob a tela de quem está
  * editando o próprio cadastro.
  */
-const CASCA_PROPRIA = ["/painel", "/admin"];
+// "/componentes" entra aqui enquanto o desenho novo nao vira o site: a
+// vitrine traz as pecas de vidro e a propria barra de baixo, e o cabecalho
+// de madeira por cima delas so atrapalhava a leitura do que esta em prova.
+const CASCA_PROPRIA = ["/painel", "/admin", "/componentes"];
 
 export default function Casca({ children }: { children: React.ReactNode }) {
   const caminho = usePathname();

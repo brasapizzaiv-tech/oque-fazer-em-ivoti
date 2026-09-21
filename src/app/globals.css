@@ -294,3 +294,97 @@ h4 {
     color: var(--color-texto-suave);
   }
 }
+
+/* ==================================================================== */
+/* A paleta de vidro                                                    */
+/* ==================================================================== */
+/* O desenho novo troca madeira e textura por foto e vidro. As cores
+   entram como tokens proprios, com prefixo "v-", e nao por cima dos
+   antigos: quando o --color-creme foi redefinido numa migracao anterior,
+   o fundo do site em producao mudou entre dois commits sem ninguem pedir.
+   Enquanto as duas linguagens convivem, cada uma tem os seus nomes. */
+
+@theme {
+  --color-v-texto: #2b2320;
+  --color-v-texto-suave: #6e6660;
+  --color-v-fundo: #faf7f1;
+
+  /* uma cor por assunto, e so por esse assunto */
+  --color-v-torii: #e03a2f; /* acao principal */
+  --color-v-azul: #1f4e9c; /* links, cabecalhos internos, roteiro */
+  --color-v-ouro: #f2b705; /* favoritos, "sou comerciante" */
+  --color-v-petunia: #c9408f; /* eventos e flores */
+  --color-v-laranja: #f28c28; /* promocoes e avisos */
+  --color-v-verde: #3e9b5b; /* aberto, mapa, natureza */
+  --color-v-fechado-claro: #b5533a; /* "fechado" sobre fundo claro */
+  --color-v-fechado-escuro: #f28c28; /* "fechado" sobre foto */
+  --color-v-rosa-clara: #ffd3e8; /* a assinatura do logo sobre foto */
+}
+
+@layer components {
+  /* O vidro branco: o cartao padrao de tudo o que nao tem foto.
+     Nunca leva borda escura — a borda e um brilho branco, como a quina
+     de um vidro de verdade pegando luz. */
+  /* Sem "-webkit-backdrop-filter" escrito a mao: o minificador do Tailwind
+     trata os dois como a mesma declaracao e guarda so o ultimo — escrever os
+     dois apagava o moderno e o desfoque nao acontecia em lugar nenhum. Ele
+     mesmo poe o prefixo quando o navegador alvo precisa. */
+  .vidro {
+    /* 0,70 e nao os 0,66 do documento. Sobre a parte clara da foto — o
+       letreiro branco do "Eu amo Ivoti" — o texto secundario #6E6660 dava
+       4,39 de contraste, abaixo do minimo de 4,5. A 0,70 da 4,50 exatos.
+       A diferenca nao se ve; a leitura, sim. */
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(20, 30, 60, 0.12);
+  }
+
+  /* O vidro azul: os blocos de destaque. Texto sempre branco. */
+  .vidro-azul {
+    /* 0,78 e nao os 0,60 do documento, pela mesma razao e com folga maior:
+       branco sobre azul a 60% dava 3,15 sobre a parte clara da foto, longe
+       dos 4,5. O minimo seria 0,76; 0,78 deixa margem para a foto de fundo
+       mudar sem o texto sair do limite. */
+    background-color: rgba(31, 78, 156, 0.78);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(20, 30, 60, 0.18);
+    color: #ffffff;
+  }
+
+  /* A pilula de categoria e a barra de baixo: vidro mais leve, porque
+     ficam em cima de outro vidro ou de foto e nao podem pesar. */
+  .vidro-leve {
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+  }
+
+  /* O degrade que salva o texto branco na base de uma foto. Comeca
+     transparente aos 30% para nao sujar a imagem inteira. */
+  .veu-da-foto {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(46, 26, 16, 0) 30%,
+      rgba(46, 26, 16, 0.9) 100%
+    );
+  }
+
+  /* O escurecimento do topo de uma capa, onde ficam logo e menu. */
+  .veu-do-topo {
+    background-image: linear-gradient(
+      to bottom,
+      rgba(20, 14, 10, 0.65) 0%,
+      rgba(20, 14, 10, 0.2) 45%,
+      rgba(20, 14, 10, 0) 70%
+    );
+  }
+
+  /* Texto branco sobre foto precisa de sombra, senao some num ceu claro. */
+  .sobre-foto {
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+  }
+}
