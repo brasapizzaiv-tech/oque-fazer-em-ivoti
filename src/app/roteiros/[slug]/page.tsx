@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ContarAcesso from "@/components/ContarAcesso";
 import ListaDeParadas from "@/components/vidro/ListaDeParadas";
-import { CasaEnxaimel } from "@/components/enxaimel/icones";
+import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
 import { FileiraDePetunias } from "@/components/vidro/blocos";
 import { roteiroCurado } from "@/lib/roteiros-curados";

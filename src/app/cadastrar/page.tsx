@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FileiraDePetunias } from "@/components/vidro/blocos";
 import CabecalhoSimples from "@/components/vidro/CabecalhoSimples";
 import {
   CasaEnxaimel,
@@ -6,8 +7,7 @@ import {
   IconeGuia,
   IconeRoteiros,
   Petunia,
-} from "@/components/enxaimel/icones";
-import { FaixaEnxaimel } from "@/components/enxaimel/pecas";
+} from "@/components/vidro/icones";
 import FormularioCadastro from "./FormularioCadastro";
 
 export const metadata: Metadata = {
@@ -106,9 +106,8 @@ export default function Cadastrar() {
               </li>
             ))}
           </ul>
-
           <div className="mt-8 lg:hidden">
-            <FaixaEnxaimel />
+            <FileiraDePetunias />
           </div>
         </div>
 

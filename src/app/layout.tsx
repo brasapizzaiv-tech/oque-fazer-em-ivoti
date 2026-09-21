@@ -10,7 +10,7 @@ import {
 import "./globals.css";
 import { Suspense } from "react";
 import CompletarLogin from "@/components/CompletarLogin";
-import Casca from "@/components/enxaimel/Casca";
+import Casca from "@/components/vidro/Casca";
 import ContarAcesso from "@/components/ContarAcesso";
 import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 
