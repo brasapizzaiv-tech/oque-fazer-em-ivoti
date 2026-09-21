@@ -9,14 +9,13 @@ import {
   AcoesDoLocal,
   CardPromocao,
   ConviteAoGuia,
+  FileiraDePetunias,
   LinhaEvento,
-} from "@/components/enxaimel/blocos";
-import { Trelica } from "@/components/enxaimel/icones";
-import {
-  FaixaEnxaimel,
-  SeloStatus,
   TituloSecao,
-} from "@/components/enxaimel/pecas";
+} from "@/components/vidro/blocos";
+import { IconeVoltar } from "@/components/vidro/icones";
+import { CardVidro, SeloStatus } from "@/components/vidro/pecas";
+import { quandoVale } from "@/lib/promocoes";
 import { localPorSlug } from "@/lib/locais";
 import { porDia, situacao } from "@/lib/horarios";
 import { createClient } from "@/lib/supabase/server";
@@ -97,166 +96,197 @@ export default async function PaginaLocal({
   ].filter(Boolean) as { rotulo: string; href: string; icone: string }[];
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-10">
-        <ContarAcesso local={local.id} />
+    <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-10">
+      <ContarAcesso local={local.id} />
 
-        <div className="relative h-[250px]">
-          {local.capa_url ? (
-            <Image
-              src={local.capa_url}
-              alt={local.nome}
-              fill
-              priority
-              sizes="100vw"
-              className="object-cover"
-            />
-          ) : (
-            <Trelica />
-          )}
-
-          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-            <Link
-              href="/explorar"
-              aria-label="Voltar"
-              className="grid h-11 w-11 place-items-center rounded-full text-[19px]"
-              style={{
-                backgroundColor: "rgba(46, 26, 16, 0.72)",
-                color: "var(--color-creme-claro)",
-              }}
-            >
-              ‹
-            </Link>
-            <Favoritar slug={local.slug} />
-          </div>
-        </div>
-
-        <div className="px-4 pt-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
-            <span
-              className="text-[13px]"
-              style={{ color: "var(--color-texto-suave)" }}
-            >
-              {textoDoHorario}
-            </span>
-          </div>
-
-          <h1
-            className="mt-2 text-[26px] leading-tight font-bold"
+      <div className="relative h-[250px] overflow-hidden lg:mt-4 lg:rounded-[18px]">
+        {local.capa_url ? (
+          <Image
+            src={local.capa_url}
+            alt={local.nome}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        ) : (
+          <span
+            aria-hidden
+            className="absolute inset-0"
             style={{
-              color: "var(--color-texto)",
-              fontFamily: "var(--fonte-titulo-nova)",
+              background:
+                "linear-gradient(135deg, #d8cfc2 0%, #bfb3a2 50%, #a99c8a 100%)",
+            }}
+          />
+        )}
+
+        <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+          <Link
+            href="/explorar"
+            aria-label="Voltar"
+            className="grid h-11 w-11 place-items-center rounded-full"
+            style={{
+              backgroundColor: "rgba(20, 14, 10, 0.55)",
+              backdropFilter: "blur(10px)",
+              color: "#FFFFFF",
             }}
           >
-            {local.nome}
-          </h1>
+            <IconeVoltar tamanho={22} />
+          </Link>
+          <Favoritar slug={local.slug} />
+        </div>
+      </div>
 
-          <p
-            className="mt-1 text-[14px]"
-            style={{ color: "var(--color-texto-suave)" }}
+      <div className="px-4 pt-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+          <span
+            className="text-[13px]"
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
-            {local.categoria?.nome}
-            {endereco ? ` · ${endereco}` : ""}
+            {textoDoHorario}
+          </span>
+        </div>
+
+        <h1
+          className="mt-2 text-[26px] leading-tight font-bold"
+          style={{
+            color: "var(--color-v-texto)",
+            fontFamily: "var(--fonte-titulo-nova)",
+          }}
+        >
+          {local.nome}
+        </h1>
+
+        <p
+          className="mt-1 text-[14px]"
+          style={{ color: "var(--color-v-texto-suave)" }}
+        >
+          {local.categoria?.nome}
+          {endereco ? ` · ${endereco}` : ""}
+        </p>
+
+        {local.resumo && (
+          <p
+            className="mt-3 text-[14px]"
+            style={{ color: "var(--color-v-texto)" }}
+          >
+            {local.resumo}
           </p>
+        )}
 
-          {local.resumo && (
-            <p
-              className="mt-3 text-[14px]"
-              style={{ color: "var(--color-texto)" }}
-            >
-              {local.resumo}
-            </p>
-          )}
+        <div className="mt-4">
+          <AcoesDoLocal acoes={acoes} />
+        </div>
+      </div>
 
-          <div className="mt-4">
-            <AcoesDoLocal acoes={acoes} />
+      {promocoes.length > 0 && (
+        <section className="px-4 pt-6">
+          <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
+          <div className="mt-3 space-y-3">
+            {promocoes.map((p) => (
+              <CardPromocao
+                key={p.id}
+                href="#"
+                titulo={p.titulo}
+                quando={quandoVale(p)}
+              />
+            ))}
           </div>
-        </div>
+        </section>
+      )}
 
-        {promocoes.length > 0 && (
-          <section className="px-4 pt-6">
-            <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
-            <div className="mt-3 space-y-3">
-              {promocoes.map((p, i) => (
-                <CardPromocao
-                  key={p.id}
-                  promocao={p}
-                  variante={i % 2 === 0 ? 1 : 2}
-                />
-              ))}
-            </div>
-          </section>
-        )}
+      <FileiraDePetunias />
 
-        <div className="pt-6">
-          <FaixaEnxaimel />
-        </div>
+      {local.descricao && (
+        <section className="px-4 pt-5">
+          <TituloSecao>Sobre</TituloSecao>
+          <p
+            className="mt-2 text-[14px] whitespace-pre-line"
+            style={{ color: "var(--color-v-texto)" }}
+          >
+            {local.descricao}
+          </p>
+        </section>
+      )}
 
-        {local.descricao && (
-          <section className="px-4 pt-5">
-            <TituloSecao>Sobre</TituloSecao>
-            <p
-              className="mt-2 text-[14px] whitespace-pre-line"
-              style={{ color: "var(--color-texto)" }}
-            >
-              {local.descricao}
-            </p>
-          </section>
-        )}
-
-        {semana.some((d) => !d.fechado) && (
-          <section className="px-4 pt-6">
-            <TituloSecao>Horários</TituloSecao>
-            <dl className="mt-2">
+      {semana.some((d) => !d.fechado) && (
+        <section className="px-4 pt-6">
+          <TituloSecao>Horários</TituloSecao>
+          <CardVidro className="mt-2 px-4 py-2">
+            <dl>
               {semana.map((d) => (
                 <div
                   key={d.dia}
                   className="flex justify-between border-b py-1.5 text-[14px] last:border-b-0"
-                  style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
+                  style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
                 >
-                  <dt style={{ color: "var(--color-texto)" }}>{d.nome}</dt>
-                  <dd style={{ color: "var(--color-texto-suave)" }}>
+                  <dt style={{ color: "var(--color-v-texto)" }}>{d.nome}</dt>
+                  <dd style={{ color: "var(--color-v-texto-suave)" }}>
                     {d.fechado ? "Fechado" : d.faixas.join(", ")}
                   </dd>
                 </div>
               ))}
             </dl>
-          </section>
-        )}
+          </CardVidro>
+        </section>
+      )}
 
-        {eventos.length > 0 && (
-          <section className="px-4 pt-6">
-            <TituloSecao selo="evento">Próximos eventos</TituloSecao>
-            <div className="mt-3 space-y-3">
-              {eventos.map((e) => (
-                <LinhaEvento key={e.id} evento={e} />
-              ))}
-            </div>
-          </section>
-        )}
+      {eventos.length > 0 && (
+        <section className="px-4 pt-6">
+          <TituloSecao selo="evento">Próximos eventos</TituloSecao>
+          <div className="mt-3 space-y-3">
+            {eventos.map((e) => {
+              const d = new Date(e.inicio);
+              return (
+                <LinhaEvento
+                  key={e.id}
+                  titulo={e.titulo}
+                  dia={new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                    day: "2-digit",
+                  }).format(d)}
+                  mes={new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                    month: "short",
+                  })
+                    .format(d)
+                    .replace(".", "")}
+                  hora={new Intl.DateTimeFormat("pt-BR", {
+                    timeZone: "America/Sao_Paulo",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }).format(d)}
+                  onde={e.local_texto ?? undefined}
+                />
+              );
+            })}
+          </div>
+        </section>
+      )}
 
-        {(local.itens ?? []).length > 0 && (
-          <section id="cardapio" className="px-4 pt-6">
-            <TituloSecao>Cardápio</TituloSecao>
-            <ul className="mt-2">
+      {(local.itens ?? []).length > 0 && (
+        <section id="cardapio" className="px-4 pt-6">
+          <TituloSecao>Cardápio</TituloSecao>
+          <CardVidro className="mt-2 px-4 py-2">
+            <ul>
               {local.itens.map((item) => (
                 <li
                   key={item.id}
                   className="flex justify-between gap-3 border-b py-2 text-[14px] last:border-b-0"
-                  style={{ borderColor: "rgba(59, 36, 24, 0.14)" }}
+                  style={{ borderColor: "rgba(43, 35, 32, 0.14)" }}
                 >
                   <span>
                     <span
                       className="block font-medium"
-                      style={{ color: "var(--color-texto)" }}
+                      style={{ color: "var(--color-v-texto)" }}
                     >
                       {item.nome}
                     </span>
                     {item.descricao && (
                       <span
                         className="block text-[13px]"
-                        style={{ color: "var(--color-texto-suave)" }}
+                        style={{ color: "var(--color-v-texto-suave)" }}
                       >
                         {item.descricao}
                       </span>
@@ -265,7 +295,7 @@ export default async function PaginaLocal({
                   {item.preco != null && (
                     <span
                       className="shrink-0 font-bold"
-                      style={{ color: "var(--color-texto)" }}
+                      style={{ color: "var(--color-v-texto)" }}
                     >
                       R$ {Number(item.preco).toFixed(2).replace(".", ",")}
                     </span>
@@ -273,12 +303,12 @@ export default async function PaginaLocal({
                 </li>
               ))}
             </ul>
-          </section>
-        )}
+          </CardVidro>
+        </section>
+      )}
 
-        <div className="pt-7">
-          <ConviteAoGuia nome={local.nome} />
-        </div>
+      <div className="px-4 pt-7 pb-8">
+        <ConviteAoGuia nome={local.nome} />
       </div>
     </div>
   );

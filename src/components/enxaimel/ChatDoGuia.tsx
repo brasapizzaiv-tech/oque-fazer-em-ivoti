@@ -30,9 +30,8 @@ const SUGESTOES = [
 /**
  * A conversa com o Guia.
  *
- * O fundo leva a trama asanoha, o padrão de folha de cânhamo — é o traço
- * japonês da cidade, e aqui ele cabe bem: fica atrás de tudo, dá textura sem
- * competir com o que está escrito.
+ * O fundo e a foto fixa do site: os baloes de vidro precisam de imagem
+ * por baixo para o desfoque ter o que desfocar.
  *
  * Quando a resposta traz um roteiro, ele sai do texto e vira um cartão com a
  * rota pronta. Ler cinco paradas escritas em linha e depois ter de copiar
@@ -132,12 +131,13 @@ export default function ChatDoGuia() {
       // Desconta a barra de baixo, que so existe no celular: sem isso a
       // conversa fica mais alta do que o espaco disponivel e o campo de
       // escrever some por tras dela.
-      className="mx-auto flex min-h-[calc(100dvh-72px)] flex-col lg:min-h-[calc(100dvh-84px)] lg:max-w-[760px]"
-      style={{ backgroundColor: "var(--color-reboco)" }}
+      className="mx-auto flex min-h-[calc(100dvh-76px)] flex-col lg:min-h-[calc(100dvh-84px)] lg:max-w-[760px]"
     >
       <Cabecalho />
 
-      <div className="asanoha flex-1 overflow-y-auto px-4 py-4">
+      {/* Sem textura de fundo: a foto fixa do site aparece por tras dos
+          baloes, e e ela que faz o vidro deles funcionar. */}
+      <div className="flex-1 overflow-y-auto px-4 py-4">
         <div className="space-y-3">
           {mensagens.map((m, i) => (
             <Balao key={i} mensagem={m} locais={locais} />
@@ -152,9 +152,9 @@ export default function ChatDoGuia() {
                   onClick={() => enviar(s)}
                   className="h-9 rounded-full border-[1.5px] px-3.5 text-[13px] font-medium"
                   style={{
-                    borderColor: "var(--color-torii)",
-                    color: "var(--color-torii)",
-                    backgroundColor: "var(--color-superficie)",
+                    borderColor: "var(--color-v-torii)",
+                    color: "var(--color-v-torii)",
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
                   }}
                 >
                   {s}
@@ -174,8 +174,9 @@ export default function ChatDoGuia() {
         }}
         className="sticky bottom-[72px] flex gap-2 px-4 py-3 lg:bottom-0"
         style={{
-          backgroundColor: "var(--color-reboco)",
-          borderTop: "2px solid var(--color-madeira)",
+          backgroundColor: "rgba(250, 247, 241, 0.86)",
+          backdropFilter: "blur(14px)",
+          borderTop: "1px solid rgba(255, 255, 255, 0.8)",
         }}
       >
         <input
@@ -185,9 +186,10 @@ export default function ChatDoGuia() {
           aria-label="Pergunte ao Guia"
           className="h-12 flex-1 rounded-[11px] px-4 text-[14px] outline-none"
           style={{
-            backgroundColor: "var(--color-superficie)",
-            border: "2px solid var(--color-madeira)",
-            color: "var(--color-texto)",
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            backdropFilter: "blur(14px)",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            color: "var(--color-v-texto)",
           }}
         />
         <button
@@ -195,7 +197,7 @@ export default function ChatDoGuia() {
           disabled={pensando || !texto.trim()}
           aria-label="Enviar"
           className="grid h-12 w-12 shrink-0 place-items-center rounded-full text-[18px] disabled:opacity-40"
-          style={{ backgroundColor: "var(--color-torii)", color: "#fff7ea" }}
+          style={{ backgroundColor: "var(--color-v-torii)", color: "#FFFFFF" }}
         >
           ↑
         </button>
@@ -209,36 +211,31 @@ function Cabecalho() {
     <header
       className="flex items-center gap-3 px-4 py-3"
       style={{
-        backgroundColor: "var(--color-superficie)",
-        borderBottom: "2px solid var(--color-madeira)",
+        backgroundColor: "rgba(31, 78, 156, 0.86)",
+        backdropFilter: "blur(14px)",
+        borderBottom: "1px solid rgba(255, 255, 255, 0.25)",
       }}
     >
       <span
         className="grid h-11 w-11 shrink-0 place-items-center rounded-full"
-        style={{ backgroundColor: "var(--color-torii)" }}
+        style={{ backgroundColor: "var(--color-v-torii)" }}
       >
-        <Torii tamanho={22} style={{ color: "#fff7ea" }} />
+        <Torii tamanho={22} style={{ color: "#FFFFFF" }} />
       </span>
       <span>
         <span className="flex items-center gap-1.5">
           <span
             className="text-[18px] leading-none font-bold"
             style={{
-              color: "var(--color-texto)",
+              color: "#FFFFFF",
               fontFamily: "var(--fonte-titulo-nova)",
             }}
           >
             O Guia
           </span>
-          <CasaEnxaimel
-            tamanho={20}
-            style={{ color: "var(--color-madeira)" }}
-          />
+          <CasaEnxaimel tamanho={20} style={{ color: "#FFFFFF" }} />
         </span>
-        <span
-          className="mt-0.5 block text-[12px]"
-          style={{ color: "var(--color-texto-suave)" }}
-        >
+        <span className="mt-0.5 block text-[12px] text-white/85">
           Seu assistente em Ivoti
         </span>
       </span>
@@ -261,8 +258,9 @@ function Balao({
         <p
           className="max-w-[85%] rounded-[14px] px-3.5 py-2.5 text-[14px] whitespace-pre-wrap"
           style={{
-            backgroundColor: "var(--color-madeira)",
-            color: "var(--color-creme-claro)",
+            backgroundColor: "rgba(31, 78, 156, 0.86)",
+            backdropFilter: "blur(14px)",
+            color: "#FFFFFF",
           }}
         >
           {mensagem.texto}
@@ -301,13 +299,13 @@ function Balao({
         <p
           className="max-w-[85%] rounded-[14px] px-3.5 py-2.5 text-[14px] whitespace-pre-wrap"
           style={{
-            backgroundColor: "var(--color-superficie)",
-            border: "2px solid var(--color-madeira)",
-            color: "var(--color-texto)",
+            backgroundColor: "rgba(255, 255, 255, 0.7)",
+            border: "1px solid rgba(255, 255, 255, 0.8)",
+            color: "var(--color-v-texto)",
           }}
         >
           {semMarcadores || (
-            <span style={{ color: "var(--color-texto-suave)" }}>
+            <span style={{ color: "var(--color-v-texto-suave)" }}>
               escrevendo...
             </span>
           )}
@@ -327,13 +325,14 @@ function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
     <div
       className="rounded-[14px] p-3"
       style={{
-        backgroundColor: "var(--color-superficie)",
-        border: "2px solid var(--color-torii)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        backdropFilter: "blur(14px)",
+        border: "1.5px solid var(--color-v-azul)",
       }}
     >
       <p
         className="text-[11px] font-bold tracking-[0.12em] uppercase"
-        style={{ color: "var(--color-torii)" }}
+        style={{ color: "var(--color-v-torii)" }}
       >
         Roteiro sugerido
       </p>
@@ -343,21 +342,21 @@ function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
           <li key={p.slug} className="flex items-baseline gap-2 text-[14px]">
             <span
               className="w-4 shrink-0 text-[12px] font-bold"
-              style={{ color: "var(--color-torii)" }}
+              style={{ color: "var(--color-v-torii)" }}
             >
               {i + 1}
             </span>
             <Link
               href={`/local/${p.slug}`}
               className="font-medium"
-              style={{ color: "var(--color-texto)" }}
+              style={{ color: "var(--color-v-texto)" }}
             >
               {p.nome}
             </Link>
             {p.hora && (
               <span
                 className="text-[12px]"
-                style={{ color: "var(--color-texto-suave)" }}
+                style={{ color: "var(--color-v-texto-suave)" }}
               >
                 {p.hora}
               </span>
@@ -372,7 +371,7 @@ function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
           target="_blank"
           rel="noopener noreferrer"
           className="mt-3 flex h-11 items-center justify-center rounded-[10px] text-[14px] font-bold"
-          style={{ backgroundColor: "var(--color-torii)", color: "#fff7ea" }}
+          style={{ backgroundColor: "var(--color-v-torii)", color: "#FFFFFF" }}
         >
           Ver rota
         </a>

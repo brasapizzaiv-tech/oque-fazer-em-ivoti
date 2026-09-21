@@ -1,18 +1,18 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import Cabecalho, { BuscaCabecalho } from "@/components/enxaimel/Cabecalho";
+import Busca from "@/components/vidro/Busca";
+import CardComFoto from "@/components/vidro/CardComFoto";
 import PertoDeMim from "@/components/enxaimel/PertoDeMim";
-import { CardLugar, Fileira, Vazio } from "@/components/enxaimel/blocos";
-import { Chip, FaixaEnxaimel } from "@/components/enxaimel/pecas";
-import { CasaEnxaimel } from "@/components/enxaimel/icones";
+import { CabecalhoDeTela, Fileira, Vazio } from "@/components/vidro/blocos";
+import { CardAzul, Chip, Legenda } from "@/components/vidro/pecas";
+import { CasaEnxaimel } from "@/components/vidro/icones";
 import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
-import { distancia } from "@/lib/geo";
+import { distancia, formatarDistancia } from "@/lib/geo";
 import Mapa from "@/components/Mapa";
-import CardMadeira from "@/components/enxaimel/CardMadeira";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { hojeEmIvoti } from "@/lib/planos";
-import { quandoPorExtenso } from "@/lib/horarios";
+import { quandoPorExtenso, situacao } from "@/lib/horarios";
 
 export const revalidate = 60;
 
@@ -97,67 +97,28 @@ export default async function Explorar({
     : locais.map((l) => ({ local: l, metros: null }));
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <Cabecalho foto="/fotos/portico-ivoti.jpg" alt="">
-        <div className="flex items-center gap-2">
-          <h1
-            className="text-[22px] leading-none font-bold"
-            style={{
-              color: "var(--color-creme-claro)",
-              fontFamily: "var(--fonte-titulo-nova)",
-            }}
-          >
-            Explorar
-          </h1>
-          <CasaEnxaimel
-            tamanho={26}
-            style={{ color: "var(--color-creme-claro)" }}
-          />
-        </div>
-        <div className="mt-3">
-          <BuscaCabecalho placeholder="Pizza, trilha, café..." />
-        </div>
-      </Cabecalho>
+    <>
+      <CabecalhoDeTela titulo="Explorar" foto="/fotos/portico-ivoti.jpg">
+        <Busca placeholder="Pizza, trilha, café..." valor={q} />
+      </CabecalhoDeTela>
 
-      {/* No computador o cabecalho de tela nao existe, entao o titulo e a
-          busca aparecem aqui. */}
+      {/* No computador não há cabeçalho de tela: o título e a busca vêm aqui. */}
       <div className="mx-auto hidden max-w-[1440px] px-16 pt-8 lg:block">
         <div className="flex items-center gap-2">
           <h1
             className="text-[30px] leading-none font-bold"
             style={{
-              color: "var(--color-texto)",
+              color: "var(--color-v-texto)",
               fontFamily: "var(--fonte-titulo-nova)",
             }}
           >
             Explorar
           </h1>
-          <CasaEnxaimel
-            tamanho={30}
-            style={{ color: "var(--color-madeira)" }}
-          />
+          <CasaEnxaimel tamanho={30} />
         </div>
-        <form action="/explorar" className="mt-4 flex max-w-lg gap-2">
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Pizza, trilha, café..."
-            aria-label="Buscar no guia"
-            className="h-12 flex-1 rounded-[11px] px-4 text-[14px] outline-none"
-            style={{
-              backgroundColor: "var(--color-superficie)",
-              border: "2px solid var(--color-madeira)",
-              color: "var(--color-texto)",
-            }}
-          />
-          <button
-            type="submit"
-            className="h-12 shrink-0 rounded-[11px] px-6 text-[14px] font-bold"
-            style={{ backgroundColor: "var(--color-torii)", color: "#fff7ea" }}
-          >
-            Buscar
-          </button>
-        </form>
+        <div className="mt-4 max-w-lg">
+          <Busca placeholder="Pizza, trilha, café..." valor={q} />
+        </div>
       </div>
 
       <div className="pt-4 lg:mx-auto lg:max-w-[1440px] lg:px-16">
@@ -180,11 +141,7 @@ export default async function Explorar({
 
       <div className="pt-2 lg:mx-auto lg:max-w-[1440px] lg:px-16">
         <Fileira semRolagemNoComputador>
-          <Chip
-            href={url({ aberto: aberto ? undefined : "1" })}
-            ativo={aberto}
-            destaque
-          >
+          <Chip href={url({ aberto: aberto ? undefined : "1" })} ativo={aberto}>
             Aberto agora
           </Chip>
           {todasTags.map((t) => {
@@ -206,19 +163,15 @@ export default async function Explorar({
         </Fileira>
       </div>
 
-      <div className="pt-5">
-        <FaixaEnxaimel />
-      </div>
-
       <div className="lg:mx-auto lg:max-w-[1440px] lg:px-16">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-7">
-            <div className="flex items-start justify-between gap-3 px-4 pt-4 lg:px-0">
+            <div className="flex items-center justify-between gap-3 px-4 pt-5 lg:px-0">
               <p
                 className="text-[14px]"
-                style={{ color: "var(--color-texto-suave)" }}
+                style={{ color: "var(--color-v-texto-suave)" }}
               >
-                <strong style={{ color: "var(--color-texto)" }}>
+                <strong style={{ color: "var(--color-v-texto)" }}>
                   {locais.length}
                 </strong>{" "}
                 {locais.length === 1 ? "lugar" : "lugares"} em Ivoti
@@ -234,12 +187,24 @@ export default async function Explorar({
                   Nada encontrado com esses filtros. Tente afrouxar a busca.
                 </Vazio>
               ) : (
-                comDistancia.map(({ local, metros }, i) => (
-                  <CardLugar
+                comDistancia.map(({ local, metros }) => (
+                  <CardComFoto
                     key={local.id}
-                    local={local}
-                    distancia={metros ?? undefined}
-                    variante={i % 2 === 0 ? 1 : 2}
+                    href={`/local/${local.slug}`}
+                    foto={local.capa_url}
+                    etiqueta={local.bairro ?? undefined}
+                    titulo={local.nome}
+                    apoio={local.categoria?.nome ?? undefined}
+                    status={
+                      situacao(local.horarios ?? []).aberto
+                        ? "aberto"
+                        : "fechado"
+                    }
+                    canto={
+                      metros != null ? formatarDistancia(metros) : undefined
+                    }
+                    alto={150}
+                    className="lg:h-[180px]"
                   />
                 ))
               )}
@@ -247,29 +212,18 @@ export default async function Explorar({
           </div>
 
           {/* A coluna da direita acompanha a rolagem: quem varre uma lista
-              longa quer o mapa sempre a vista, nao ter de voltar ao topo. */}
+              longa quer o mapa sempre à vista, não ter de voltar ao topo. */}
           <aside className="hidden lg:col-span-5 lg:block">
-            <div className="sticky top-6 space-y-4 pt-4">
-              <CardMadeira variante={1} maosFrancesas={false}>
+            <div className="sticky top-[100px] space-y-4 pt-5">
+              <div className="vidro overflow-hidden p-2">
                 <Mapa locais={locais} altura="h-[380px]" />
-              </CardMadeira>
+              </div>
 
-              <div
-                className="rounded-[4px] p-4"
-                style={{ backgroundColor: "var(--color-madeira)" }}
-              >
-                <p
-                  className="text-[11px] font-bold tracking-[0.12em] uppercase"
-                  style={{ color: "var(--color-petunia-clara)" }}
-                >
-                  Acontece hoje
-                </p>
+              <CardAzul className="p-4">
+                <Legenda cor="#FFFFFF">Acontece hoje</Legenda>
 
                 {eventosDeHoje.length === 0 && promocoes.length === 0 ? (
-                  <p
-                    className="mt-2 text-[13px]"
-                    style={{ color: "var(--color-creme-fundo)" }}
-                  >
+                  <p className="mt-2 text-[13px] text-white/85">
                     Nada marcado para hoje.
                   </p>
                 ) : (
@@ -278,17 +232,11 @@ export default async function Explorar({
                       <li key={ev.id}>
                         <p
                           className="text-[14px] leading-tight font-bold"
-                          style={{
-                            color: "var(--color-creme-claro)",
-                            fontFamily: "var(--fonte-titulo-nova)",
-                          }}
+                          style={{ fontFamily: "var(--fonte-titulo-nova)" }}
                         >
                           {ev.titulo}
                         </p>
-                        <p
-                          className="text-[12px]"
-                          style={{ color: "var(--color-creme-fundo)" }}
-                        >
+                        <p className="text-[12px] text-white/85">
                           {quandoPorExtenso(ev.inicio)}
                         </p>
                       </li>
@@ -297,28 +245,22 @@ export default async function Explorar({
                       <li key={pr.id}>
                         <p
                           className="text-[14px] leading-tight font-bold"
-                          style={{
-                            color: "var(--color-creme-claro)",
-                            fontFamily: "var(--fonte-titulo-nova)",
-                          }}
+                          style={{ fontFamily: "var(--fonte-titulo-nova)" }}
                         >
                           {pr.titulo}
                         </p>
-                        <p
-                          className="text-[12px]"
-                          style={{ color: "var(--color-creme-fundo)" }}
-                        >
+                        <p className="text-[12px] text-white/85">
                           {pr.local?.nome ?? "Promoção de hoje"}
                         </p>
                       </li>
                     ))}
                   </ul>
                 )}
-              </div>
+              </CardAzul>
             </div>
           </aside>
         </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -1,22 +1,33 @@
 import Image from "next/image";
 import Link from "next/link";
-import Cabecalho, { BuscaCabecalho } from "@/components/enxaimel/Cabecalho";
-import CardMadeira from "@/components/enxaimel/CardMadeira";
+import CardComFoto from "@/components/vidro/CardComFoto";
 import {
   BlocoRoteiro,
-  CardEvento,
   CardPromocao,
-  FileiraDePetunias,
   Fileira,
-  SobreIvoti,
+  FileiraDePetunias,
+  TituloSecao,
   Vazio,
-} from "@/components/enxaimel/blocos";
-import { Petunia } from "@/components/enxaimel/icones";
-import { Chip, FaixaEnxaimel, TituloSecao } from "@/components/enxaimel/pecas";
+} from "@/components/vidro/blocos";
+import {
+  CasaEnxaimel,
+  IconeGuia,
+  Petunia,
+  Torii,
+} from "@/components/vidro/icones";
+import {
+  Botao,
+  CardVidro,
+  Chip,
+  Legenda,
+  Logo,
+} from "@/components/vidro/pecas";
 import { listarCategorias } from "@/lib/locais";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
+import { quandoVale } from "@/lib/promocoes";
 import { hojeEmIvoti } from "@/lib/planos";
+import { quandoPorExtenso } from "@/lib/horarios";
 
 export const revalidate = 60;
 
@@ -41,65 +52,82 @@ export default async function Inicio() {
   const deHoje = daSemana.filter((e) => e.inicio <= limiteDeHoje);
 
   return (
-    <div style={{ backgroundColor: "var(--color-reboco)" }}>
-      <Cabecalho foto="/fotos/eu-amo-ivoti.jpg" alt="">
-        <BuscaCabecalho />
-      </Cabecalho>
+    <>
+      {/* ================= a capa ================= */}
+      <section className="relative isolate h-[420px] lg:h-[760px]">
+        <Image
+          src="/fotos/portico-ivoti.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div aria-hidden className="veu-do-topo absolute inset-0" />
 
-      {/* ---------------- capa, só no computador ---------------- */}
-      <section className="mx-auto hidden max-w-[1440px] gap-10 px-16 pt-10 pb-6 lg:grid lg:grid-cols-12">
-        <div className="lg:col-span-5">
-          <p className="flex items-center gap-2">
-            <Petunia tamanho={16} />
-            <span
-              className="text-[11px] font-bold tracking-[0.12em] uppercase"
-              style={{ color: "var(--color-petunia)" }}
+        {/* ---- celular ---- */}
+        <div className="relative flex h-full flex-col px-4 pt-4 lg:hidden">
+          <div className="flex items-start justify-between gap-3">
+            <Logo sobreFoto />
+            <Link
+              href="/chat"
+              aria-label="Falar com o Guia"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full"
+              style={{
+                backgroundColor: "var(--color-v-torii)",
+                color: "#FFFFFF",
+              }}
             >
+              <IconeGuia tamanho={22} />
+            </Link>
+          </div>
+
+          <div className="mt-auto pb-5">
+            <h1
+              className="sobre-foto text-[30px] leading-[1.08] font-bold text-white"
+              style={{ fontFamily: "var(--fonte-titulo-nova)" }}
+            >
+              Flores, casas enxaimel e colônia japonesa
+            </h1>
+
+            <form action="/explorar" className="mt-4">
+              <input
+                name="q"
+                placeholder="O que você procura em Ivoti?"
+                aria-label="Buscar no guia"
+                className="vidro h-12 w-full px-4 text-[14px] outline-none"
+                style={{ color: "var(--color-v-texto)", borderRadius: 12 }}
+              />
+            </form>
+          </div>
+        </div>
+
+        {/* ---- computador ---- */}
+        <div className="relative mx-auto hidden h-full max-w-[1440px] flex-col justify-center px-16 lg:flex">
+          <p className="flex items-center gap-2">
+            <Petunia tamanho={18} />
+            <span className="sobre-foto text-[12px] font-bold tracking-[0.12em] text-white uppercase">
               Ivoti · A Cidade das Flores
             </span>
           </p>
 
           <h1
-            className="mt-3 text-[42px] leading-[1.06] font-bold"
-            style={{
-              color: "var(--color-texto)",
-              fontFamily: "var(--fonte-titulo-nova)",
-            }}
+            className="sobre-foto mt-4 max-w-[19ch] text-[72px] leading-[1.02] font-bold text-white"
+            style={{ fontFamily: "var(--fonte-titulo-nova)" }}
           >
             Flores, casas enxaimel, colônia japonesa e tudo o que a cidade tem
             para você.
           </h1>
 
-          <p
-            className="mt-4 max-w-[46ch] text-[15px]"
-            style={{ color: "var(--color-texto-suave)" }}
-          >
-            Onde comer, beber, passear e se hospedar — com horário de hoje,
-            endereço e rota no mapa. Feito por gente daqui.
-          </p>
-
-          <form action="/explorar" className="mt-6 flex gap-2">
+          <form action="/explorar" className="mt-8 flex max-w-[620px] gap-2">
             <input
               name="q"
               placeholder="O que você procura em Ivoti?"
               aria-label="Buscar no guia"
-              className="h-12 flex-1 rounded-[11px] px-4 text-[14px] outline-none"
-              style={{
-                backgroundColor: "var(--color-superficie)",
-                border: "2px solid var(--color-madeira)",
-                color: "var(--color-texto)",
-              }}
+              className="vidro h-12 flex-1 px-4 text-[15px] outline-none"
+              style={{ color: "var(--color-v-texto)", borderRadius: 12 }}
             />
-            <button
-              type="submit"
-              className="h-12 shrink-0 rounded-[11px] px-6 text-[14px] font-bold"
-              style={{
-                backgroundColor: "var(--color-torii)",
-                color: "#fff7ea",
-              }}
-            >
-              Buscar
-            </button>
+            <Botao type="submit">Buscar</Botao>
           </form>
 
           <div className="mt-4 flex flex-wrap gap-2">
@@ -114,26 +142,9 @@ export default async function Inicio() {
             ))}
           </div>
         </div>
-
-        <div className="lg:col-span-7">
-          <CardMadeira variante={2}>
-            <div className="relative h-[420px]">
-              <Image
-                src="/fotos/portico-ivoti.jpg"
-                alt="O Pórtico de Ivoti, na entrada da cidade"
-                fill
-                priority
-                sizes="(max-width: 768px) 100vw, 55vw"
-                className="object-cover"
-              />
-            </div>
-          </CardMadeira>
-        </div>
       </section>
 
-      <FileiraDePetunias />
-
-      {/* ---------------- categorias, só no celular ---------------- */}
+      {/* ================= categorias, só no celular ================= */}
       <div className="pt-4 lg:hidden">
         <Fileira>
           <Chip href="/explorar" ativo>
@@ -151,36 +162,54 @@ export default async function Inicio() {
         </Fileira>
       </div>
 
-      <div className="hidden lg:block">
-        <FaixaEnxaimel />
-      </div>
-
-      {/* ---------------- eventos ---------------- */}
+      {/* ================= eventos ================= */}
       <section className="pt-7 lg:mx-auto lg:max-w-[1440px] lg:px-16">
         <div className="px-4 lg:px-0">
-          <TituloSecao selo="evento">
+          <TituloSecao
+            selo="evento"
+            aoLado={
+              <Link
+                href="/agenda"
+                className="text-[13px] font-semibold"
+                style={{ color: "var(--color-v-azul)" }}
+              >
+                Ver todos
+              </Link>
+            }
+          >
             <span className="lg:hidden">Acontece hoje</span>
             <span className="hidden lg:inline">Acontece esta semana</span>
           </TituloSecao>
         </div>
 
-        {/* No celular a fileira rola de lado; na tela grande os quatro
-            primeiros cabem em linha e rolar seria esconder de graça. */}
+        {/* No celular a fileira rola; na tela grande os quatro primeiros
+            cabem em linha e rolar seria esconder de graça. */}
         <div className="mt-3 lg:hidden">
           {deHoje.length === 0 ? (
-            <Vazio>
-              Nada marcado para hoje.{" "}
-              <Link href="/agenda" className="font-bold underline">
-                Ver a agenda
-              </Link>
-            </Vazio>
+            <div className="px-4">
+              <Vazio>
+                Nada marcado para hoje.{" "}
+                <Link
+                  href="/agenda"
+                  className="font-bold underline"
+                  style={{ color: "var(--color-v-azul)" }}
+                >
+                  Ver a agenda
+                </Link>
+              </Vazio>
+            </div>
           ) : (
             <Fileira>
-              {deHoje.map((e, i) => (
-                <CardEvento
+              {deHoje.map((e) => (
+                <CardComFoto
                   key={e.id}
-                  evento={e}
-                  variante={i % 2 === 0 ? 1 : 2}
+                  href={`/agenda#${e.id}`}
+                  foto={e.imagem_url}
+                  etiqueta={quandoPorExtenso(e.inicio)}
+                  titulo={e.titulo}
+                  apoio={e.local?.nome ?? e.local_texto ?? undefined}
+                  alto={180}
+                  className="w-[260px] shrink-0"
                 />
               ))}
             </Fileira>
@@ -189,58 +218,116 @@ export default async function Inicio() {
 
         <div className="mt-4 hidden gap-4 lg:grid lg:grid-cols-4">
           {daSemana.length === 0 ? (
-            <p
-              className="text-[14px] lg:col-span-4"
-              style={{ color: "var(--color-texto-suave)" }}
-            >
-              Nada marcado para os próximos dias.{" "}
-              <Link href="/agenda" className="font-bold underline">
-                Ver a agenda
-              </Link>
-            </p>
+            <div className="lg:col-span-4">
+              <Vazio>
+                Nada marcado para os próximos dias.{" "}
+                <Link
+                  href="/agenda"
+                  className="font-bold underline"
+                  style={{ color: "var(--color-v-azul)" }}
+                >
+                  Ver a agenda
+                </Link>
+              </Vazio>
+            </div>
           ) : (
-            daSemana.slice(0, 4).map((e, i) => (
-              <div key={e.id} className="[&>div>div]:w-full [&_>div]:w-full">
-                <CardEvento evento={e} variante={i % 2 === 0 ? 1 : 2} />
-              </div>
-            ))
+            daSemana
+              .slice(0, 4)
+              .map((e) => (
+                <CardComFoto
+                  key={e.id}
+                  href={`/agenda#${e.id}`}
+                  foto={e.imagem_url}
+                  etiqueta={quandoPorExtenso(e.inicio)}
+                  titulo={e.titulo}
+                  apoio={e.local?.nome ?? e.local_texto ?? undefined}
+                  alto={260}
+                />
+              ))
           )}
         </div>
       </section>
 
-      {/* ---------------- promoções e roteiro ---------------- */}
-      <section className="pt-8 lg:mx-auto lg:max-w-[1440px] lg:px-16">
+      {/* ================= promoções e roteiro ================= */}
+      <section className="px-4 pt-8 lg:mx-auto lg:max-w-[1440px] lg:px-16">
         <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-          <div className="px-4 lg:col-span-7 lg:px-0">
+          <div className="lg:col-span-7">
             <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
             <div className="mt-3 space-y-3 lg:grid lg:grid-cols-2 lg:gap-3 lg:space-y-0">
               {promocoes.length === 0 ? (
                 <Vazio>Nenhuma promoção valendo hoje.</Vazio>
               ) : (
-                promocoes.map((p, i) => (
+                promocoes.map((p) => (
                   <CardPromocao
                     key={p.id}
-                    promocao={p}
-                    variante={i % 2 === 0 ? 1 : 2}
+                    href={`/local/${p.local?.slug ?? ""}`}
+                    titulo={p.titulo}
+                    quando={quandoVale(p)}
+                    local={p.local?.nome ?? undefined}
                   />
                 ))
               )}
             </div>
           </div>
 
-          <div className="mt-8 lg:col-span-5 lg:mt-0">
-            <div className="lg:h-full [&>section]:lg:flex [&>section]:lg:h-full [&>section]:lg:flex-col [&>section]:lg:justify-center [&>section]:lg:rounded-[4px]">
-              <BlocoRoteiro />
-            </div>
+          <div className="mt-6 lg:col-span-5 lg:mt-0">
+            <BlocoRoteiro className="lg:h-full" />
           </div>
         </div>
       </section>
 
-      <div className="pt-8 lg:pt-10">
-        <FaixaEnxaimel />
-      </div>
+      <FileiraDePetunias />
 
-      <SobreIvoti />
-    </div>
+      {/* ================= sobre Ivoti ================= */}
+      <section className="px-4 pb-10 lg:mx-auto lg:max-w-[1440px] lg:px-16 lg:pb-16">
+        <TituloSecao>Sobre Ivoti</TituloSecao>
+        <div className="mt-4 space-y-3 lg:grid lg:grid-cols-3 lg:gap-4 lg:space-y-0">
+          <SobreIvoti
+            icone={<CasaEnxaimel tamanho={34} />}
+            titulo="Herança alemã"
+          >
+            As casas enxaimel do Núcleo e da Picada 48, de madeira aparente e
+            reboco branco, construídas pelos colonos que chegaram em 1826.
+          </SobreIvoti>
+          <SobreIvoti icone={<Torii tamanho={34} />} titulo="Colônia japonesa">
+            A partir de 1966, famílias japonesas se estabeleceram aqui e
+            trouxeram a floricultura que deu o apelido à cidade.
+          </SobreIvoti>
+          <SobreIvoti
+            icone={<Petunia tamanho={30} />}
+            titulo="Cidade das Flores"
+          >
+            Ivoti é o maior produtor de flores do Rio Grande do Sul, e a petúnia
+            é a flor símbolo do município.
+          </SobreIvoti>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/** Um dos três cartões de "Sobre Ivoti". */
+function SobreIvoti({
+  icone,
+  titulo,
+  children,
+}: {
+  icone: React.ReactNode;
+  titulo: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <CardVidro className="p-5">
+      <span className="flex h-9 items-end">{icone}</span>
+      <Legenda className="mt-3 block" cor="var(--color-v-petunia)">
+        {titulo}
+      </Legenda>
+      <p
+        className="mt-1.5 text-[14px]"
+        style={{ color: "var(--color-v-texto-suave)" }}
+      >
+        {children}
+      </p>
+    </CardVidro>
   );
 }

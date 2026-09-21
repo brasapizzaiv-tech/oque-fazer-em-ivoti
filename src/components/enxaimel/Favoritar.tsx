@@ -51,10 +51,9 @@ export default function Favoritar({ slug }: { slug: string }) {
       aria-label={favorito ? "Tirar dos favoritos" : "Guardar nos favoritos"}
       className="grid h-11 w-11 place-items-center rounded-full text-[19px]"
       style={{
-        backgroundColor: "rgba(46, 26, 16, 0.72)",
-        color: favorito
-          ? "var(--color-petunia-clara)"
-          : "var(--color-creme-claro)",
+        backgroundColor: "rgba(20, 14, 10, 0.55)",
+        backdropFilter: "blur(10px)",
+        color: favorito ? "var(--color-v-ouro)" : "#FFFFFF",
       }}
     >
       {favorito ? "♥" : "♡"}

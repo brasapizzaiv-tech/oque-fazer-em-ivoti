@@ -314,20 +314,29 @@ export function Logo({
 }) {
   const tinta = sobreFoto ? "#FFFFFF" : "var(--color-v-texto)";
 
+  // Encolhe abaixo de 360px em vez de quebrar. Num iPhone SE, com o botão
+  // redondo do Guia ao lado, o nome em 17px passava para a segunda linha e
+  // a casa descia junto — os dois ícones deixavam de estar na mesma altura,
+  // que é justamente o que o logo não pode perder. O `h-auto` deixa o CSS
+  // vencer a altura que o SVG traz no atributo.
+  const icone = "shrink-0 w-[27px] h-auto min-[360px]:w-[34px]";
+
   return (
-    <span className="flex items-center gap-2.5">
-      <Torii tamanho={34} className="shrink-0" />
+    <span className="flex items-center gap-2 min-[360px]:gap-2.5">
+      <Torii tamanho={34} className={icone} />
 
       <span className="flex flex-col items-center leading-none">
         <span
-          className={`text-[17px] font-bold ${sobreFoto ? "sobre-foto" : ""}`}
+          className={`text-[14px] font-bold whitespace-nowrap min-[360px]:text-[17px] ${
+            sobreFoto ? "sobre-foto" : ""
+          }`}
           style={{ color: tinta, fontFamily: "var(--fonte-titulo-nova)" }}
         >
           {nome}
         </span>
         <span className="mt-1 flex items-center gap-1">
           <span
-            className="text-[10px] font-bold tracking-[0.08em] uppercase"
+            className="text-[9px] font-bold tracking-[0.08em] whitespace-nowrap uppercase min-[360px]:text-[10px]"
             style={{
               color: sobreFoto
                 ? "var(--color-v-rosa-clara)"
@@ -336,11 +345,11 @@ export function Logo({
           >
             {ASSINATURA}
           </span>
-          <Petunia tamanho={11} />
+          <Petunia tamanho={11} className="shrink-0" />
         </span>
       </span>
 
-      <CasaEnxaimel tamanho={34} className="shrink-0" />
+      <CasaEnxaimel tamanho={34} className={icone} />
     </span>
   );
 }

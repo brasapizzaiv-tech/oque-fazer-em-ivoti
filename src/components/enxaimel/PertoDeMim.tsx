@@ -62,18 +62,17 @@ export default function PertoDeMim({ ativo }: { ativo: boolean }) {
         type="button"
         onClick={pedir}
         disabled={indo}
-        className="inline-flex h-9 items-center gap-1.5 rounded-full border-[1.5px] px-3 text-[13px] font-medium disabled:opacity-60"
+        className="inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-[13px] font-semibold disabled:opacity-60"
         style={
           ativo
             ? {
-                backgroundColor: "var(--color-madeira)",
-                borderColor: "var(--color-madeira)",
-                color: "var(--color-superficie)",
+                backgroundColor: "var(--color-v-torii)",
+                color: "#FFFFFF",
               }
             : {
-                backgroundColor: "var(--color-superficie)",
-                borderColor: "var(--color-madeira)",
-                color: "var(--color-texto)",
+                backgroundColor: "rgba(255,255,255,0.6)",
+                border: "1px solid rgba(255,255,255,0.85)",
+                color: "var(--color-v-texto)",
               }
         }
       >
@@ -82,7 +81,7 @@ export default function PertoDeMim({ ativo }: { ativo: boolean }) {
       {erro && (
         <span
           className="max-w-[220px] text-right text-[11px]"
-          style={{ color: "var(--color-telha-funda)" }}
+          style={{ color: "var(--color-v-fechado-claro)" }}
         >
           {erro}
         </span>

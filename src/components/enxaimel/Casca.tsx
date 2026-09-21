@@ -2,25 +2,36 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import CabecalhoDesktop from "./CabecalhoDesktop";
+import CabecalhoDesktopMadeira from "./CabecalhoDesktop";
+import CabecalhoDesktopVidro from "../vidro/CabecalhoDesktop";
+import FundoDaCidade from "../vidro/FundoDaCidade";
+import NavegacaoVidro from "../vidro/NavegacaoInferior";
 import { IconeExplorar, IconeGuia, IconeInicio, IconeRoteiros } from "./icones";
 
 /**
- * A casca do site.
+ * A casca do site, durante a segunda migração.
  *
- * Durante a migração esta era a ponte entre dois desenhos: tela migrada
- * recebia a casca nova, tela velha continuava com o cabeçalho e o rodapé de
- * antes. A lista de telas migradas esvaziou, e com ela a casca antiga saiu —
- * junto com os doze componentes que só ela usava.
+ * O desenho de madeira virou desenho de vidro, e outra vez as duas
+ * linguagens precisam conviver enquanto as telas viram uma a uma. A
+ * diferença agora é maior que trocar cor de card: o vidro depende de uma
+ * foto fixa atrás da página inteira, e essa foto mora aqui. Se ela
+ * aparecesse debaixo de uma tela de madeira, o reboco ficaria em cima da
+ * foto e os dois se anulariam.
  *
- * Sobrou uma regra: o painel e a administração trazem a própria casca
- * inteira. Recebiam o cabeçalho do site por cima da própria barra, e a barra
- * de baixo do celular — "Explorar", "Roteiros" — sob a tela de quem está
- * editando o próprio cadastro.
+ * Então são três caminhos:
+ *
+ *   VIDRO   — a foto de fundo, a barra de baixo de vidro e o cabeçalho
+ *             transparente do computador;
+ *   MADEIRA — o que ainda não virou: cabeçalho e barra do desenho antigo;
+ *   PRÓPRIA — painel, administração e a vitrine, que trazem tudo.
+ *
+ * A lista do vidro cresce a cada tela migrada, a de madeira encolhe, e
+ * este arquivo some quando a última virar.
  */
-// "/componentes" entra aqui enquanto o desenho novo nao vira o site: a
-// vitrine traz as pecas de vidro e a propria barra de baixo, e o cabecalho
-// de madeira por cima delas so atrapalhava a leitura do que esta em prova.
+const VIDRO = ["/", "/explorar", "/chat"];
+const VIDRO_PREFIXOS = ["/local/", "/roteiros/"];
+
+// Trazem cabeçalho, largura e navegação próprios.
 const CASCA_PROPRIA = ["/painel", "/admin", "/componentes"];
 
 export default function Casca({ children }: { children: React.ReactNode }) {
@@ -29,21 +40,37 @@ export default function Casca({ children }: { children: React.ReactNode }) {
   if (CASCA_PROPRIA.some((p) => caminho === p || caminho.startsWith(p + "/")))
     return <main className="flex-1">{children}</main>;
 
+  const vidro =
+    VIDRO.includes(caminho) ||
+    VIDRO_PREFIXOS.some((p) => caminho.startsWith(p));
+
+  if (vidro)
+    return (
+      <>
+        <FundoDaCidade />
+        <CabecalhoDesktopVidro temCapa={caminho === "/"} />
+        {/* O espaço embaixo é do tamanho da barra: sem ele o último bloco
+            da página fica escondido atrás dela. */}
+        <main className="flex-1 pb-[76px] lg:pt-[84px] lg:pb-0">
+          {children}
+        </main>
+        <NavegacaoVidro />
+      </>
+    );
+
   return (
     <>
-      {/* O espaço embaixo é do tamanho da barra: sem ele o último bloco da
-          página fica escondido atrás dela. */}
       {/* O fundo vai aqui e não só na página: o body ainda pinta o creme
-          da paleta antiga, e ele aparecia abaixo do conteúdo quando a página
-          era mais curta que a tela. */}
-      <CabecalhoDesktop />
+          da paleta antiga, e ele aparecia abaixo do conteúdo quando a
+          página era mais curta que a tela. */}
+      <CabecalhoDesktopMadeira />
       <main
         className="flex-1 pb-[72px] lg:pb-0"
         style={{ backgroundColor: "var(--color-reboco)" }}
       >
         {children}
       </main>
-      <NavegacaoInferior caminho={caminho} />
+      <NavegacaoMadeira caminho={caminho} />
     </>
   );
 }
@@ -55,14 +82,8 @@ const ITENS = [
   { href: "/chat", rotulo: "Guia", Icone: IconeGuia },
 ];
 
-/**
- * A barra de baixo, só no celular.
- *
- * Quatro destinos, que é o que cabe sem virar menu. No computador ela some:
- * lá o menu do cabeçalho dá conta, e uma barra fixa no rodapé de tela grande
- * só rouba altura.
- */
-function NavegacaoInferior({ caminho }: { caminho: string }) {
+/** A barra de baixo do desenho antigo, só nas telas que ainda não viraram. */
+function NavegacaoMadeira({ caminho }: { caminho: string }) {
   return (
     <nav
       className="fixed inset-x-0 bottom-0 z-40 flex lg:hidden"
