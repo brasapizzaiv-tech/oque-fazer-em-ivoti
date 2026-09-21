@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Mapa from "@/components/Mapa";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -6,6 +5,7 @@ import type { Metadata } from "next";
 import ContarAcesso from "@/components/ContarAcesso";
 import type { PromocaoNaTela } from "@/components/CartaoPromocao";
 import Favoritar from "@/components/enxaimel/Favoritar";
+import Galeria from "@/components/vidro/Galeria";
 import {
   AcoesDoLocal,
   CardPromocao,
@@ -102,43 +102,28 @@ export default async function PaginaLocal({
         <div className="lg:col-span-8">
           <ContarAcesso local={local.id} />
 
-          <div className="relative h-[250px] overflow-hidden lg:mt-4 lg:rounded-[18px]">
-            {local.capa_url ? (
-              <Image
-                src={local.capa_url}
-                alt={local.nome}
-                fill
-                priority
-                sizes="100vw"
-                className="object-cover"
-              />
-            ) : (
-              <span
-                aria-hidden
-                className="absolute inset-0"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #d8cfc2 0%, #bfb3a2 50%, #a99c8a 100%)",
-                }}
-              />
-            )}
-
-            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-              <Link
-                href="/explorar"
-                aria-label="Voltar"
-                className="grid h-11 w-11 place-items-center rounded-full"
-                style={{
-                  backgroundColor: "rgba(20, 14, 10, 0.55)",
-                  backdropFilter: "blur(10px)",
-                  color: "#FFFFFF",
-                }}
-              >
-                <IconeVoltar tamanho={22} />
-              </Link>
-              <Favoritar slug={local.slug} />
-            </div>
-          </div>
+          <Galeria
+            capa={local.capa_url}
+            fotos={local.fotos ?? []}
+            nome={local.nome}
+            aoLado={
+              <>
+                <Link
+                  href="/explorar"
+                  aria-label="Voltar"
+                  className="grid h-11 w-11 place-items-center rounded-full"
+                  style={{
+                    backgroundColor: "rgba(20, 14, 10, 0.55)",
+                    backdropFilter: "blur(10px)",
+                    color: "#FFFFFF",
+                  }}
+                >
+                  <IconeVoltar tamanho={22} />
+                </Link>
+                <Favoritar slug={local.slug} />
+              </>
+            }
+          />
 
           <div className="px-4 pt-4">
             <div className="flex flex-wrap items-center gap-2">

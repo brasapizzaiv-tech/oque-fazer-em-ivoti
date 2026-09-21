@@ -26,14 +26,28 @@ export default function Casca({ children }: { children: React.ReactNode }) {
   if (CASCA_PROPRIA.some((p) => caminho === p || caminho.startsWith(p + "/")))
     return <main className="flex-1">{children}</main>;
 
+  // A Inicio abre com a foto ocupando a tela toda, e o cabecalho flutua
+  // por cima dela. As outras telas comecam com conteudo, e ai o cabecalho
+  // precisa do proprio espaco.
+  const temCapa = caminho === "/";
+
   return (
     <>
       <FundoDaCidade />
-      <CabecalhoDesktop temCapa={caminho === "/"} />
-      {/* O espaço embaixo é do tamanho da barra: sem ele o último bloco da
-          página fica escondido atrás dela. No computador a barra some e o
-          espaço de cima passa a ser o do cabeçalho fixo. */}
-      <main className="flex-1 pb-[76px] lg:pt-[84px] lg:pb-0">{children}</main>
+      <CabecalhoDesktop temCapa={temCapa} />
+      {/* O espaço embaixo é do tamanho da barra de baixo: sem ele o último
+          bloco da página fica escondido atrás dela.
+
+          O espaço de cima é o do cabeçalho fixo — MENOS na tela que tem
+          capa. Com ele, a foto comecava 84px abaixo e o cabecalho
+          transparente ficava sobre o fundo claro do site: o logo branco e o
+          "Sou comerciante" quase sumiam. A capa tem de passar por baixo da
+          barra, que e o que faz o texto branco ter foto atras. */}
+      <main
+        className={`flex-1 pb-[76px] lg:pb-0 ${temCapa ? "" : "lg:pt-[84px]"}`}
+      >
+        {children}
+      </main>
       <NavegacaoInferior />
     </>
   );

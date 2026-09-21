@@ -217,10 +217,18 @@ export function IconeGuia(p: IconeProps) {
   );
 }
 
+/**
+ * Voltar: seta com cauda, e nao o mesmo chevron da galeria.
+ *
+ * Na pagina do estabelecimento os dois ficam do mesmo lado da foto, a um
+ * palmo um do outro. Com o mesmo desenho, o botao de sair da pagina e o de
+ * ver a foto anterior viravam o mesmo botao aos olhos de quem chega.
+ */
 export function IconeVoltar(p: IconeProps) {
   return (
     <Traco {...p}>
-      <path d="m14.5 5-7 7 7 7" />
+      <path d="M19 12H5" />
+      <path d="m11 6-6 6 6 6" />
     </Traco>
   );
 }
