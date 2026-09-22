@@ -117,7 +117,7 @@ export default function EditorFotos({
       titulo="Fotos"
       descricao="Foto boa é o que faz a pessoa escolher. Capriche na primeira — ela vira a capa."
     >
-      <label className="block cursor-pointer border-2 border-dashed border-[color:var(--color-madeira)]/40 bg-[color:var(--color-reboco)]/60 p-6 text-center transition hover:border-carvalho">
+      <label className="block cursor-pointer border-2 border-dashed border-[color:var(--color-v-texto)]/40 bg-[color:var(--color-v-fundo)]/60 p-6 text-center transition hover:border-carvalho">
         <input
           type="file"
           accept="image/*"
@@ -136,7 +136,7 @@ export default function EditorFotos({
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
           {erro}
         </p>
       )}
@@ -146,7 +146,7 @@ export default function EditorFotos({
           {lista.map((foto) => (
             <div
               key={foto.id}
-              className="group relative aspect-[4/3] overflow-hidden border-2 border-[color:var(--color-madeira)]/30"
+              className="group relative aspect-[4/3] overflow-hidden border-2 border-[color:var(--color-v-texto)]/30"
             >
               <Image
                 src={foto.url}
@@ -162,7 +162,7 @@ export default function EditorFotos({
                 </span>
               )}
 
-              <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-linear-to-t from-[color:var(--color-madeira)]/80 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
+              <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-linear-to-t from-[color:var(--color-v-texto)]/80 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
                 {capaAtual !== foto.url && (
                   <button
                     type="button"
@@ -175,7 +175,7 @@ export default function EditorFotos({
                 <button
                   type="button"
                   onClick={() => void apagar(foto)}
-                  className="ml-auto rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold text-[color:var(--color-telha-funda)]"
+                  className="ml-auto rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold text-[color:var(--color-v-fechado-claro)]"
                 >
                   Apagar
                 </button>

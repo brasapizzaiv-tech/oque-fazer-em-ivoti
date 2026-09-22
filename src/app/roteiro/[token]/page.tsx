@@ -125,7 +125,7 @@ export default async function RoteiroSalvo({
         <p
           className="text-[18px] font-bold"
           style={{
-            color: "var(--color-texto)",
+            color: "var(--color-v-texto)",
             fontFamily: "var(--fonte-titulo-nova)",
           }}
         >
@@ -141,7 +141,7 @@ export default async function RoteiroSalvo({
         <Link
           href="/chat"
           className="mt-5 inline-flex h-12 items-center rounded-[11px] px-6 text-[14px] font-bold"
-          style={{ backgroundColor: "var(--color-v-torii)", color: "#fff7ea" }}
+          style={{ backgroundColor: "var(--color-v-torii)", color: "#FFFFFF" }}
         >
           Conversar com o Guia
         </Link>

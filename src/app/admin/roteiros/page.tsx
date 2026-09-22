@@ -59,7 +59,7 @@ function Secao({
         {roteiros.map((r) => (
           <li
             key={r.id}
-            className="flex items-center justify-between gap-3 border-2 border-[color:var(--color-madeira)]/30 bg-[color:var(--color-superficie)] px-4 py-3"
+            className="flex items-center justify-between gap-3 border-2 border-[color:var(--color-v-texto)]/30 bg-[color:rgba(255, 255, 255, 0.7)] px-4 py-3"
           >
             <span className="min-w-0">
               <span className="block truncate font-medium">{r.titulo}</span>

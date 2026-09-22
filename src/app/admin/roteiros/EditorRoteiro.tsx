@@ -193,11 +193,11 @@ export default function EditorRoteiro({
         </p>
 
         {paradas.length === 0 ? (
-          <p className="mt-3 border-2 border-dashed border-[color:var(--color-madeira)]/40 px-3 py-6 text-center text-sm texto-suave">
+          <p className="mt-3 border-2 border-dashed border-[color:var(--color-v-texto)]/40 px-3 py-6 text-center text-sm texto-suave">
             Nenhuma parada ainda. Escolha a primeira ali embaixo.
           </p>
         ) : (
-          <ol className="mt-3 divide-y divide-[color:var(--color-madeira)]/20">
+          <ol className="mt-3 divide-y divide-[color:var(--color-v-texto)]/20">
             {paradas.map((id, i) => {
               const l = porId.get(id);
               return (
@@ -236,7 +236,7 @@ export default function EditorRoteiro({
                         setParadas(paradas.filter((p) => p !== id))
                       }
                       aria-label="Tirar do roteiro"
-                      className="rounded-lg px-2 py-1 text-sm texto-suave transition hover:bg-red-50 hover:text-[color:var(--color-telha-funda)]"
+                      className="rounded-lg px-2 py-1 text-sm texto-suave transition hover:bg-red-50 hover:text-[color:var(--color-v-fechado-claro)]"
                     >
                       ✕
                     </button>
@@ -286,12 +286,12 @@ export default function EditorRoteiro({
         </label>
 
         {erro && (
-          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
             {erro}
           </p>
         )}
         {recado && (
-          <p className="mt-3 px-3 py-2 text-[14px] text-[color:var(--color-veneziana)]">
+          <p className="mt-3 px-3 py-2 text-[14px] text-[color:var(--color-v-verde)]">
             {recado}
           </p>
         )}
@@ -352,7 +352,7 @@ function BotaoExcluir({
       <button
         type="button"
         onClick={() => setPerguntando(true)}
-        className="ml-auto text-sm texto-suave underline transition hover:text-[color:var(--color-telha-funda)]"
+        className="ml-auto text-sm texto-suave underline transition hover:text-[color:var(--color-v-fechado-claro)]"
       >
         excluir roteiro
       </button>

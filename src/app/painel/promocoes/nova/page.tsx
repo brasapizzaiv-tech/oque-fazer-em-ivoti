@@ -16,7 +16,7 @@ export default async function NovaPromocao() {
         <h1
           className="text-[22px] font-bold sm:text-[26px]"
           style={{
-            color: "var(--color-texto)",
+            color: "var(--color-v-texto)",
             fontFamily: "var(--fonte-titulo-nova)",
           }}
         >

@@ -102,7 +102,7 @@ export function BotaoSalvar({
         {salvando ? "Salvando..." : children}
       </button>
       {salvo && !salvando && (
-        <span className="text-sm font-medium text-[color:var(--color-veneziana)]">
+        <span className="text-sm font-medium text-[color:var(--color-v-verde)]">
           Salvo ✓
         </span>
       )}

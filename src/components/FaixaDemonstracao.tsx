@@ -10,7 +10,7 @@ export default function FaixaDemonstracao() {
   const semChat = !process.env.ANTHROPIC_API_KEY;
 
   return (
-    <div className="bg-sol-500 px-4 py-2 text-center text-xs font-medium text-white">
+    <div className="bg-[color:var(--color-v-laranja)] px-4 py-2 text-center text-xs font-medium text-white">
       Modo demonstração — os lugares aqui são inventados só para você ver como
       o site fica
       {semChat && ", e o guia responde com frases prontas (o de verdade usa IA)"}

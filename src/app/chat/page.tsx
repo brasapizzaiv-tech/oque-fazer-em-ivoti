@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ChatDoGuia from "@/components/enxaimel/ChatDoGuia";
+import ChatDoGuia from "@/components/vidro/ChatDoGuia";
 
 export const metadata: Metadata = {
   title: "O Guia",

@@ -29,12 +29,12 @@ export default function BotaoSair({
       style={
         claro
           ? {
-              border: "2px solid var(--color-creme-fundo)",
-              color: "var(--color-creme-claro)",
+              border: "2px solid rgba(255,255,255,0.85)",
+              color: "#FFFFFF",
             }
           : {
-              border: "2px solid var(--color-madeira)",
-              color: "var(--color-madeira)",
+              border: "1px solid rgba(255, 255, 255, 0.8)",
+              color: "var(--color-v-texto)",
             }
       }
     >

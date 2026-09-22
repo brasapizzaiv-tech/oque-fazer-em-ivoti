@@ -37,7 +37,7 @@ export default function AcoesAdmin({ id }: { id: string }) {
   }
 
   return (
-    <div className="mt-3 border-t border-[color:var(--color-madeira)]/20 pt-3">
+    <div className="mt-3 border-t border-[color:var(--color-v-texto)]/20 pt-3">
       {pedindoMotivo ? (
         <div className="flex flex-wrap gap-2">
           <input

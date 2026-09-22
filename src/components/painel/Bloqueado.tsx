@@ -48,11 +48,11 @@ export default function Bloqueado({
           "grid place-items-center px-6 py-10 text-center",
           children
             ? "absolute inset-0 bg-white/70 backdrop-blur-[2px]"
-            : "bg-[color:var(--color-reboco)]/60",
+            : "bg-[color:var(--color-v-fundo)]/60",
         ].join(" ")}
       >
         <div className="max-w-sm">
-          <span className="grid h-11 w-11 place-items-center rounded-full bg-[color:var(--color-reboco)] text-xl mx-auto">
+          <span className="grid h-11 w-11 place-items-center rounded-full bg-[color:var(--color-v-fundo)] text-xl mx-auto">
             🔒
           </span>
           <p className="mt-3 font-semibold">{titulo} é do plano Premium</p>
@@ -61,7 +61,7 @@ export default function Bloqueado({
             href={`https://wa.me/${WHATSAPP_DO_GUIA}?text=${mensagem}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-block rounded-[9px] bg-[color:var(--color-torii)] px-6 py-3 text-[14px] font-bold text-[#fff7ea] transition"
+            className="mt-5 inline-block rounded-[9px] bg-[color:var(--color-v-torii)] px-6 py-3 text-[14px] font-bold text-[#FFFFFF] transition"
           >
             Quero saber mais
           </a>

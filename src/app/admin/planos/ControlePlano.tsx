@@ -95,10 +95,10 @@ export default function ControlePlano({
   }
 
   return (
-    <div className="mt-3 border-t border-[color:var(--color-madeira)]/20 pt-3">
+    <div className="mt-3 border-t border-[color:var(--color-v-texto)]/20 pt-3">
       {ativo === "premium" ? (
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-[color:var(--color-petunia)] px-3 py-1 text-[11px] font-bold text-[#fff7ea]">
+          <span className="rounded-full bg-[color:var(--color-v-petunia)] px-3 py-1 text-[11px] font-bold text-[#FFFFFF]">
             ⭐ Premium
           </span>
           <span className="text-sm texto-suave">
@@ -122,7 +122,7 @@ export default function ControlePlano({
               type="button"
               onClick={desligar}
               disabled={indo}
-              className="botao-vazado px-3.5 py-2 text-[14px] text-[color:var(--color-telha-funda)] disabled:opacity-50"
+              className="botao-vazado px-3.5 py-2 text-[14px] text-[color:var(--color-v-fechado-claro)] disabled:opacity-50"
             >
               Encerrar
             </button>
@@ -132,7 +132,7 @@ export default function ControlePlano({
         <div className="flex flex-wrap items-center gap-3">
           <span className="pilula px-3 py-1 text-[11px]">Gratuito</span>
           {plano === "premium" && (
-            <span className="text-sm text-[color:var(--color-telha-funda)]">
+            <span className="text-sm text-[color:var(--color-v-fechado-claro)]">
               venceu em {porExtenso(planoAte)}
             </span>
           )}
@@ -187,7 +187,7 @@ export default function ControlePlano({
           />
 
           {erro && (
-            <p className="mt-2 text-sm text-[color:var(--color-telha-funda)]">
+            <p className="mt-2 text-sm text-[color:var(--color-v-fechado-claro)]">
               {erro}
             </p>
           )}

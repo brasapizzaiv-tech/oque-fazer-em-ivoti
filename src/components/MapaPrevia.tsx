@@ -55,7 +55,7 @@ export default function MapaPrevia({
               onClick={() => setAberto(aberto?.id === l.id ? null : l)}
               style={posicao(l)}
               title={l.nome}
-              className="pointer-events-auto absolute grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-mata-600 text-sm shadow-md transition hover:scale-110"
+              className="pointer-events-auto absolute grid h-8 w-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-2 border-white bg-[color:var(--color-v-verde)] text-sm shadow-md transition hover:scale-110"
             >
               {l.categoria?.emoji ?? "📍"}
             </button>
@@ -65,26 +65,26 @@ export default function MapaPrevia({
         {aberto && (
           <div className="absolute right-3 bottom-3 left-3 rounded-xl bg-white p-3 shadow-xl sm:left-auto sm:w-64">
             <p className="text-sm font-semibold">{aberto.nome}</p>
-            <p className="mt-0.5 text-xs text-tinta/55">
+            <p className="mt-0.5 text-xs texto-suave">
               {aberto.categoria?.nome}
               {aberto.bairro ? ` · ${aberto.bairro}` : ""}
             </p>
             {aberto.resumo && (
-              <p className="mt-1 line-clamp-2 text-xs text-tinta/70">
+              <p className="mt-1 line-clamp-2 text-xs texto-suave">
                 {aberto.resumo}
               </p>
             )}
             <div className="mt-2 flex gap-2">
               <Link
                 href={`/local/${aberto.slug}`}
-                className="flex-1 rounded-lg bg-mata-600 px-2 py-1.5 text-center text-xs font-semibold text-white"
+                className="flex-1 rounded-lg bg-[color:var(--color-v-verde)] px-2 py-1.5 text-center text-xs font-semibold text-white"
               >
                 Ver
               </Link>
               <button
                 type="button"
                 onClick={() => setAberto(null)}
-                className="rounded-lg border border-mata-200 px-3 py-1.5 text-xs font-semibold text-tinta/60"
+                className="rounded-lg border border-[color:var(--color-v-azul)] px-3 py-1.5 text-xs font-semibold texto-suave"
               >
                 Fechar
               </button>
@@ -93,7 +93,7 @@ export default function MapaPrevia({
         )}
       </div>
 
-      <p className="mt-2 text-xs text-tinta/45">
+      <p className="mt-2 text-xs texto-suave">
         Prévia com mapa aberto. O mapa definitivo é o Google Maps — com rota,
         satélite e “onde eu estou” — e entra sozinho quando a chave for
         configurada.

@@ -15,7 +15,7 @@ export default function LayoutComponentes({
   return (
     <div
       className="fixed inset-0 z-[60] overflow-y-auto"
-      style={{ backgroundColor: "var(--color-reboco)" }}
+      style={{ backgroundColor: "var(--color-v-fundo)" }}
     >
       {children}
     </div>

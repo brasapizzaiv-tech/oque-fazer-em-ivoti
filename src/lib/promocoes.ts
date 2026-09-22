@@ -74,3 +74,14 @@ export function valendoAgora(
   if (fim <= comeco) return minutos >= comeco || minutos < fim;
   return minutos >= comeco && minutos < fim;
 }
+
+/**
+ * A promoção com o nome do lugar junto.
+ *
+ * Morava no componente do cartão antigo, que saiu com o desenho de
+ * madeira — e o tipo ficou de refém dele. Aqui, ao lado do que descreve,
+ * ninguém precisa importar uma tela para usar um dado.
+ */
+export type PromocaoNaTela = Promocao & {
+  local?: { slug: string; nome: string } | null;
+};

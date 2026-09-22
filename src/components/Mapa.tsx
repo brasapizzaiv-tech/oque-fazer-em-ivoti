@@ -73,7 +73,7 @@ export default function Mapa({
               <p className="text-2xl">🗺️</p>
               <p
                 className="mt-2 text-[14px] font-medium"
-                style={{ color: "var(--color-texto-suave)" }}
+                style={{ color: "var(--color-v-texto-suave)" }}
               >
                 Carregando o mapa...
               </p>
@@ -190,8 +190,8 @@ function Conteudo({
             <span
               className="grid h-9 w-9 place-items-center rounded-full border-2 text-base shadow-md"
               style={{
-                borderColor: "#fff7ea",
-                backgroundColor: "var(--color-veneziana)",
+                borderColor: "#FFFFFF",
+                backgroundColor: "var(--color-v-verde)",
               }}
             >
               {l.categoria?.emoji ?? "📍"}
@@ -215,8 +215,8 @@ function Conteudo({
             <span
               className="block h-4 w-4 rounded-full border-2 shadow"
               style={{
-                borderColor: "#fff7ea",
-                backgroundColor: "var(--color-petunia)",
+                borderColor: "#FFFFFF",
+                backgroundColor: "var(--color-v-petunia)",
               }}
             />
           </AdvancedMarker>
@@ -245,7 +245,7 @@ function Conteudo({
             <p className="text-sm leading-tight font-semibold">{aberto.nome}</p>
             <p
               className="mt-0.5 text-xs"
-              style={{ color: "var(--color-texto-suave)" }}
+              style={{ color: "var(--color-v-texto-suave)" }}
             >
               {aberto.categoria?.nome}
               {aberto.bairro ? ` · ${aberto.bairro}` : ""}
@@ -261,7 +261,7 @@ function Conteudo({
                 className="flex-1 rounded-[9px] px-2 py-1.5 text-center text-xs font-bold"
                 style={{
                   backgroundColor: "var(--color-v-torii)",
-                  color: "#fff7ea",
+                  color: "#FFFFFF",
                 }}
               >
                 Ver
@@ -288,7 +288,7 @@ function Conteudo({
         onClick={ondeEstou}
         className="absolute bottom-4 left-4 rounded-full px-3.5 py-2 text-xs font-bold shadow-lg"
         style={{
-          backgroundColor: "var(--color-superficie)",
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           border: "1.5px solid var(--color-v-azul)",
           color: "var(--color-v-azul)",
         }}

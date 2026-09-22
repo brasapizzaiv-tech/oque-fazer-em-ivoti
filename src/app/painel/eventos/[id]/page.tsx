@@ -35,7 +35,7 @@ export default async function EditarEvento({
         <h1
           className="text-[22px] font-bold sm:text-[26px]"
           style={{
-            color: "var(--color-texto)",
+            color: "var(--color-v-texto)",
             fontFamily: "var(--fonte-titulo-nova)",
           }}
         >
@@ -44,7 +44,7 @@ export default async function EditarEvento({
       </div>
 
       {evento.status === "rejeitado" && (
-        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
           Este evento precisa de ajuste antes de entrar na agenda.
         </p>
       )}
@@ -57,7 +57,7 @@ export default async function EditarEvento({
         />
       </div>
 
-      <div className="mt-10 border-t-2 border-[color:var(--color-madeira)]/20 pt-6">
+      <div className="mt-10 border-t-2 border-[color:var(--color-v-texto)]/20 pt-6">
         <ApagarEvento id={evento.id} titulo={evento.titulo} />
       </div>
     </>

@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ContarAcesso from "@/components/ContarAcesso";
-import type { PromocaoNaTela } from "@/components/CartaoPromocao";
-import Favoritar from "@/components/enxaimel/Favoritar";
+import type { PromocaoNaTela } from "@/lib/promocoes";
+import Favoritar from "@/components/vidro/Favoritar";
 import Galeria from "@/components/vidro/Galeria";
 import {
   AcoesDoLocal,

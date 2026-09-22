@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { planoAtivo, diasParaVencer } from "@/lib/planos";
-import { Botao } from "@/components/enxaimel/pecas";
+import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
   Nenhum,
@@ -32,9 +32,9 @@ function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
       className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
       style={{
         backgroundColor: acabando
-          ? "var(--color-telha)"
-          : "var(--color-petunia)",
-        color: "#fff7ea",
+          ? "var(--color-v-fechado-claro)"
+          : "var(--color-v-petunia)",
+        color: "#FFFFFF",
       }}
       title={ate ? `Vale até ${ate}` : "Sem data de vencimento"}
     >
@@ -121,8 +121,8 @@ export default async function Painel() {
                   <div
                     className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-[4px] text-2xl"
                     style={{
-                      border: "2px solid var(--color-madeira)",
-                      backgroundColor: "var(--color-reboco)",
+                      border: "2px solid var(--color-v-texto)",
+                      backgroundColor: "var(--color-v-fundo)",
                     }}
                   >
                     {l.capa_url ? (
@@ -142,7 +142,7 @@ export default async function Painel() {
                     <div className="flex flex-wrap items-center gap-2">
                       <p
                         className="text-[16px] font-bold"
-                        style={{ color: "var(--color-texto)" }}
+                        style={{ color: "var(--color-v-texto)" }}
                       >
                         {l.nome}
                       </p>
@@ -154,14 +154,14 @@ export default async function Painel() {
                     </div>
                     <p
                       className="mt-0.5 text-[13px]"
-                      style={{ color: "var(--color-texto-suave)" }}
+                      style={{ color: "var(--color-v-texto-suave)" }}
                     >
                       {s.dica}
                     </p>
                     {l.status === "rejeitado" && l.motivo_rejeicao && (
                       <p
                         className="mt-1 text-[13px] font-medium"
-                        style={{ color: "var(--color-telha-funda)" }}
+                        style={{ color: "var(--color-v-fechado-claro)" }}
                       >
                         Motivo: {l.motivo_rejeicao}
                       </p>
@@ -174,8 +174,8 @@ export default async function Painel() {
                         href={`/local/${l.slug}`}
                         className="inline-flex h-11 items-center rounded-[9px] px-4 text-[14px] font-semibold"
                         style={{
-                          border: "2px solid var(--color-madeira)",
-                          color: "var(--color-madeira)",
+                          border: "2px solid var(--color-v-texto)",
+                          color: "var(--color-v-texto)",
                         }}
                       >
                         Ver no site
@@ -185,8 +185,8 @@ export default async function Painel() {
                       href={`/painel/${l.id}`}
                       className="inline-flex h-11 items-center rounded-[9px] px-5 text-[14px] font-bold"
                       style={{
-                        backgroundColor: "var(--color-torii)",
-                        color: "#fff7ea",
+                        backgroundColor: "var(--color-v-torii)",
+                        color: "#FFFFFF",
                       }}
                     >
                       Editar

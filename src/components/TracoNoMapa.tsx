@@ -33,7 +33,7 @@ export default function TracoNoMapa({
 
     const contorno = new google.maps.Polyline({
       path: pontos,
-      strokeColor: "#fff7ea",
+      strokeColor: "#FFFFFF",
       strokeOpacity: 0.95,
       strokeWeight: 9,
       zIndex: 1,

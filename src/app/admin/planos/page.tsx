@@ -50,7 +50,7 @@ export default async function Planos() {
         <span className="aviso-painel px-4 py-2.5">
           <strong className="text-lg">{premium.length}</strong> premium
         </span>
-        <span className="border-2 border-[color:var(--color-madeira)]/25 bg-[color:var(--color-reboco)] px-4 py-2.5">
+        <span className="border-2 border-[color:var(--color-v-texto)]/25 bg-[color:var(--color-v-fundo)] px-4 py-2.5">
           <strong className="text-lg">{gratuitos.length}</strong> gratuitos
         </span>
       </div>

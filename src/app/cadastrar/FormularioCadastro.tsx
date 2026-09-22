@@ -74,7 +74,7 @@ export default function FormularioCadastro() {
     return (
       <div className="mt-4 vidro p-4 text-[14px]">
         <p className="font-semibold">Confira seu e-mail 📬</p>
-        <p className="mt-1 text-tinta/70">
+        <p className="mt-1 texto-suave">
           Mandamos um link de confirmação para <strong>{email}</strong>. Clique
           nele e depois volte aqui para entrar.
         </p>
@@ -127,7 +127,7 @@ export default function FormularioCadastro() {
         {indo ? "Criando..." : "Criar conta e cadastrar meu local"}
       </button>
 
-      <p className="text-center text-sm text-tinta/60">
+      <p className="text-center text-sm texto-suave">
         Já tem conta?{" "}
         <Link
           href="/entrar"

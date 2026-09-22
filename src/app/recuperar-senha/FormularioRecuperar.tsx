@@ -62,11 +62,11 @@ export default function FormularioRecuperar() {
     return (
       <div className="mt-6 vidro p-4 text-[14px]">
         <p className="font-semibold">Confira seu e-mail 📬</p>
-        <p className="mt-1 text-tinta/70">
+        <p className="mt-1 texto-suave">
           Se houver uma conta com <strong>{email.trim()}</strong>, o link para
           criar uma senha nova chega em instantes. Ele vale por uma hora.
         </p>
-        <p className="mt-2 text-tinta/60">
+        <p className="mt-2 texto-suave">
           Não chegou? Veja o lixo eletrônico antes de pedir de novo.
         </p>
         <Link
@@ -109,7 +109,7 @@ export default function FormularioRecuperar() {
         {indo ? "Enviando..." : "Enviar o link"}
       </button>
 
-      <p className="text-center text-sm text-tinta/60">
+      <p className="text-center text-sm texto-suave">
         Lembrou a senha?{" "}
         <Link
           href="/entrar"

@@ -35,7 +35,7 @@ export default async function EditarPromocao({
         <h1
           className="text-[22px] font-bold sm:text-[26px]"
           style={{
-            color: "var(--color-texto)",
+            color: "var(--color-v-texto)",
             fontFamily: "var(--fonte-titulo-nova)",
           }}
         >
@@ -47,7 +47,7 @@ export default async function EditarPromocao({
         <FormularioPromocao promocao={promocao as Promocao} locais={locais} />
       </div>
 
-      <div className="mt-10 border-t-2 border-[color:var(--color-madeira)]/20 pt-6">
+      <div className="mt-10 border-t-2 border-[color:var(--color-v-texto)]/20 pt-6">
         <ApagarPromocao id={promocao.id} titulo={promocao.titulo} />
       </div>
     </>

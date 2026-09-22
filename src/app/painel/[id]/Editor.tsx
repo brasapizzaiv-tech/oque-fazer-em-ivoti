@@ -45,7 +45,7 @@ export default function Editor({
           <h1
             className="text-[22px] font-bold sm:text-[26px]"
             style={{
-              color: "var(--color-texto)",
+              color: "var(--color-v-texto)",
               fontFamily: "var(--fonte-titulo-nova)",
             }}
           >
@@ -72,7 +72,7 @@ export default function Editor({
           Mesma decisao das abas do painel. */}
       <nav
         className="mt-6 flex flex-wrap gap-x-1 gap-y-0.5 sm:flex-nowrap"
-        style={{ borderBottom: "2px solid var(--color-madeira)" }}
+        style={{ borderBottom: "2px solid var(--color-v-texto)" }}
         aria-label="Partes do cadastro"
       >
         {ABAS.map((a) => (
@@ -83,11 +83,11 @@ export default function Editor({
             aria-current={aba === a.id ? "true" : undefined}
             className="-mb-[2px] px-3 py-2.5 text-[14px] font-semibold whitespace-nowrap transition sm:px-4"
             style={{
-              borderBottom: `3px solid ${aba === a.id ? "var(--color-torii)" : "transparent"}`,
+              borderBottom: `3px solid ${aba === a.id ? "var(--color-v-torii)" : "transparent"}`,
               color:
                 aba === a.id
-                  ? "var(--color-texto)"
-                  : "var(--color-texto-suave)",
+                  ? "var(--color-v-texto)"
+                  : "var(--color-v-texto-suave)",
             }}
           >
             {a.nome}
@@ -148,7 +148,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
 
   if (local.status === "publicado") {
     return (
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-[color:var(--color-madeira)]/25 bg-[color:var(--color-reboco)] px-4 py-3 text-sm text-mata-900">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-2 border-[color:var(--color-v-texto)]/25 bg-[color:var(--color-v-fundo)] px-4 py-3 text-sm text-mata-900">
         <span>
           ✅ <strong>No ar.</strong> Toda alteração que você salvar aparece no
           site em poucos minutos.
@@ -185,7 +185,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
   return (
     <div className="mt-4 caixa-painel p-4">
       {local.status === "rejeitado" && local.motivo_rejeicao && (
-        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
           <strong>Precisa de ajuste:</strong> {local.motivo_rejeicao}
         </p>
       )}
@@ -384,7 +384,7 @@ function Sobre({
         </div>
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
             {erro}
           </p>
         )}
@@ -452,7 +452,7 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
                   "rounded-full border px-3 py-1.5 text-sm transition",
                   ativa
                     ? "pilula-ativa"
-                    : "pilula bg-[color:var(--color-superficie)] texto-suave ",
+                    : "pilula bg-[color:rgba(255, 255, 255, 0.7)] texto-suave ",
                 ].join(" ")}
               >
                 {t.emoji} {t.nome}
@@ -563,7 +563,7 @@ function Endereco({ local }: { local: LocalCompleto }) {
         />
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
             {erro}
           </p>
         )}

@@ -99,7 +99,7 @@ export default function EditorItens({
           {linhas.map((linha, i) => (
             <div
               key={i}
-              className="grid gap-2 rounded-xl border border-[color:var(--color-madeira)]/20 p-3 sm:grid-cols-[1fr_2fr_1fr_auto]"
+              className="grid gap-2 rounded-xl border border-[color:var(--color-v-texto)]/20 p-3 sm:grid-cols-[1fr_2fr_1fr_auto]"
             >
               <input
                 value={linha.secao}
@@ -135,7 +135,7 @@ export default function EditorItens({
                   setLinhas((a) => a.filter((_, j) => j !== i));
                   setSalvo(false);
                 }}
-                className="h-min rounded-lg px-2 py-2 texto-suave hover:text-[color:var(--color-telha)]"
+                className="h-min rounded-lg px-2 py-2 texto-suave hover:text-[color:var(--color-v-fechado-claro)]"
               >
                 ✕
               </button>
@@ -162,7 +162,7 @@ export default function EditorItens({
         </button>
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
             {erro}
           </p>
         )}

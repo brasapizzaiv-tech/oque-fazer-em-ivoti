@@ -82,7 +82,7 @@ export default function Cadastrar() {
                 <span
                   className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-[9px]"
                   style={{
-                    backgroundColor: "var(--color-superficie)",
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
                     border: "2px solid var(--color-v-texto)",
                     color: "var(--color-v-texto)",
                   }}
@@ -116,7 +116,7 @@ export default function Cadastrar() {
           <div
             className="rounded-[4px] p-5 lg:p-7"
             style={{
-              backgroundColor: "var(--color-superficie)",
+              backgroundColor: "rgba(255, 255, 255, 0.7)",
               border: "3px solid var(--color-v-texto)",
               boxShadow: "4px 4px 0 var(--color-v-texto)",
             }}

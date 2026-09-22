@@ -72,7 +72,7 @@ export default function FormularioNovaSenha() {
   }
 
   if (situacao === "conferindo") {
-    return <p className="mt-6 text-sm text-tinta/55">Conferindo o link...</p>;
+    return <p className="mt-6 text-sm texto-suave">Conferindo o link...</p>;
   }
 
   if (situacao === "semSessao") {
@@ -97,7 +97,7 @@ export default function FormularioNovaSenha() {
     return (
       <div className="mt-6 vidro p-4 text-[14px]">
         <p className="font-semibold">Senha trocada 🎉</p>
-        <p className="mt-1 text-tinta/70">
+        <p className="mt-1 texto-suave">
           Você já está com a conta aberta. Pode ir direto para o painel.
         </p>
         <Link
@@ -124,7 +124,7 @@ export default function FormularioNovaSenha() {
           className="vidro mt-1 h-12 w-full px-4 text-[14px] outline-none focus:border-[color:var(--color-v-torii)]"
           style={{ borderRadius: 12, color: "var(--color-v-texto)" }}
         />
-        <span className="mt-1 block text-xs text-tinta/50">
+        <span className="mt-1 block text-xs texto-suave">
           Pelo menos 8 caracteres.
         </span>
       </label>

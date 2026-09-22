@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { quandoPorExtenso } from "@/lib/horarios";
-import { Botao } from "@/components/enxaimel/pecas";
+import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
   Editar,
@@ -12,9 +12,12 @@ import {
 export const dynamic = "force-dynamic";
 
 const SITUACAO: Record<string, { texto: string; fundo: string }> = {
-  em_analise: { texto: "Em análise", fundo: "var(--color-petunia)" },
-  publicado: { texto: "Na agenda", fundo: "var(--color-veneziana)" },
-  rejeitado: { texto: "Precisa de ajuste", fundo: "var(--color-telha)" },
+  em_analise: { texto: "Em análise", fundo: "var(--color-v-petunia)" },
+  publicado: { texto: "Na agenda", fundo: "var(--color-v-verde)" },
+  rejeitado: {
+    texto: "Precisa de ajuste",
+    fundo: "var(--color-v-fechado-claro)",
+  },
 };
 
 type Linha = {
@@ -127,7 +130,7 @@ function Lista({
       {eventos.length === 0 ? (
         <p
           className="mt-2 text-[14px]"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
           {vazio}
         </p>
@@ -141,13 +144,13 @@ function Lista({
                   <div className="min-w-0 flex-1">
                     <p
                       className="text-[15px] font-bold"
-                      style={{ color: "var(--color-texto)" }}
+                      style={{ color: "var(--color-v-texto)" }}
                     >
                       {e.titulo}
                     </p>
                     <p
                       className="text-[13px]"
-                      style={{ color: "var(--color-texto-suave)" }}
+                      style={{ color: "var(--color-v-texto-suave)" }}
                     >
                       {quandoPorExtenso(e.inicio)}
                       {e.local?.nome
@@ -159,7 +162,7 @@ function Lista({
                   </div>
                   <span
                     className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
-                    style={{ backgroundColor: s.fundo, color: "#fff7ea" }}
+                    style={{ backgroundColor: s.fundo, color: "#FFFFFF" }}
                   >
                     {s.texto}
                   </span>

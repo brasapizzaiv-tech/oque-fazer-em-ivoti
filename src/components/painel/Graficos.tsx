@@ -41,8 +41,8 @@ export function GraficoDias({
               <div
                 className={`absolute right-0 bottom-0 left-0 rounded-t-[4px] transition-colors ${
                   d.contagem === 0
-                    ? "bg-[color:var(--color-fechado)]"
-                    : "bg-[color:var(--color-torii)]"
+                    ? "bg-[color:rgba(43, 35, 32, 0.12)]"
+                    : "bg-[color:var(--color-v-torii)]"
                 }`}
                 style={{ height: `${altura}%` }}
               />
@@ -101,9 +101,9 @@ export function BarrasRanqueadas({
         >
           <div className="min-w-0">
             <p className="truncate text-sm">{i.rotulo}</p>
-            <div className="mt-1 h-1.5 bg-[color:var(--color-fechado)]">
+            <div className="mt-1 h-1.5 bg-[color:rgba(43, 35, 32, 0.12)]">
               <div
-                className="h-1.5 bg-[color:var(--color-torii)]"
+                className="h-1.5 bg-[color:var(--color-v-torii)]"
                 style={{ width: `${Math.max(3, (i.contagem / maior) * 100)}%` }}
               />
             </div>
@@ -133,13 +133,13 @@ export function Numero({
     <div
       className={`rounded-2xl p-4 ${
         destaque
-          ? "bg-[color:var(--color-madeira)] text-[color:var(--color-creme-claro)]"
+          ? "bg-[color:var(--color-v-texto)] text-[color:#FFFFFF]"
           : "caixa-painel"
       }`}
     >
       <p
         className={`font-[family-name:var(--fonte-titulo)] text-3xl font-bold tabular-nums ${
-          destaque ? "" : "text-tinta"
+          destaque ? "" : "text-[color:var(--color-v-texto)]"
         }`}
       >
         {valor}

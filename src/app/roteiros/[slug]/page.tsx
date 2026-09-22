@@ -103,8 +103,8 @@ export default async function RoteiroPronto({
           <div
             className="sticky bottom-0 z-30 flex gap-2 px-4 py-3"
             style={{
-              backgroundColor: "var(--color-reboco)",
-              borderTop: "2px solid var(--color-madeira)",
+              backgroundColor: "var(--color-v-fundo)",
+              borderTop: "1px solid rgba(255, 255, 255, 0.8)",
             }}
           >
             {rota && (

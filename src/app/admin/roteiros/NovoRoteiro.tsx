@@ -80,7 +80,7 @@ export default function NovoRoteiro() {
       </label>
 
       {erro && (
-        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+        <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
           {erro}
         </p>
       )}

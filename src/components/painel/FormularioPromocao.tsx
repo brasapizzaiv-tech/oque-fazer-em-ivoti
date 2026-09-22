@@ -163,8 +163,8 @@ export default function FormularioPromocao({
                 aria-pressed={marcado}
                 className={`h-11 w-12 rounded-xl text-sm font-semibold transition ${
                   marcado
-                    ? "bg-[color:var(--color-madeira)] text-[color:var(--color-creme-claro)]"
-                    : "border pilula bg-[color:var(--color-superficie)] texto-suave "
+                    ? "bg-[color:var(--color-v-texto)] text-[color:#FFFFFF]"
+                    : "border pilula bg-[color:rgba(255, 255, 255, 0.7)] texto-suave "
                 }`}
               >
                 {nome}
@@ -231,7 +231,7 @@ export default function FormularioPromocao({
             type="file"
             accept="image/*"
             onChange={(e) => enviarImagem(e.target.files)}
-            className="block w-full text-sm file:mr-3 file:mr-3 file:rounded-[9px] file:border-0 file:bg-[color:var(--color-madeira)] file:px-4 file:py-2 file:text-[13px] file:font-bold file:text-[#fff7ea]"
+            className="block w-full text-sm file:mr-3 file:mr-3 file:rounded-[9px] file:border-0 file:bg-[color:var(--color-v-texto)] file:px-4 file:py-2 file:text-[13px] file:font-bold file:text-[#FFFFFF]"
           />
         )}
       </Bloco>
@@ -252,7 +252,7 @@ export default function FormularioPromocao({
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
           {erro}
         </p>
       )}

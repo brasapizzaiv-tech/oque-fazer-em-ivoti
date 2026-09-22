@@ -84,7 +84,7 @@ export default async function Admin() {
         <TituloBloco>
           Esperando aprovação{" "}
           {naFila.length > 0 && (
-            <span className="ml-1 rounded-full bg-[color:var(--color-torii)] px-2 py-0.5 text-[11px] font-bold text-[#fff7ea]">
+            <span className="ml-1 rounded-full bg-[color:var(--color-v-torii)] px-2 py-0.5 text-[11px] font-bold text-[#FFFFFF]">
               {naFila.length}
             </span>
           )}
@@ -99,7 +99,7 @@ export default async function Admin() {
             {naFila.map((l) => (
               <li
                 key={l.id}
-                className="caixa-painel border-[color:var(--color-petunia)] p-4"
+                className="caixa-painel border-[color:var(--color-v-petunia)] p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -128,7 +128,7 @@ export default async function Admin() {
         <TituloBloco>
           Eventos esperando aprovação{" "}
           {eventosNaFila.length > 0 && (
-            <span className="ml-1 rounded-full bg-[color:var(--color-torii)] px-2 py-0.5 text-[11px] font-bold text-[#fff7ea]">
+            <span className="ml-1 rounded-full bg-[color:var(--color-v-torii)] px-2 py-0.5 text-[11px] font-bold text-[#FFFFFF]">
               {eventosNaFila.length}
             </span>
           )}
@@ -143,7 +143,7 @@ export default async function Admin() {
             {eventosNaFila.map((e) => (
               <li
                 key={e.id}
-                className="caixa-painel border-[color:var(--color-petunia)] p-4"
+                className="caixa-painel border-[color:var(--color-v-petunia)] p-4"
               >
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -188,7 +188,7 @@ export default async function Admin() {
             {noAr.map((l) => (
               <li
                 key={l.id}
-                className="flex items-center justify-between gap-2 border-2 border-[color:var(--color-madeira)]/30 bg-[color:var(--color-superficie)] px-3 py-2 text-[14px]"
+                className="flex items-center justify-between gap-2 border-2 border-[color:var(--color-v-texto)]/30 bg-[color:rgba(255, 255, 255, 0.7)] px-3 py-2 text-[14px]"
               >
                 <Link
                   href={`/local/${l.slug}`}
@@ -199,7 +199,7 @@ export default async function Admin() {
                 <span className="flex shrink-0 items-center gap-2">
                   <Link
                     href={`/painel/${l.id}`}
-                    className="text-[12px] font-semibold text-[color:var(--color-torii)] underline"
+                    className="text-[12px] font-semibold text-[color:var(--color-v-torii)] underline"
                   >
                     editar
                   </Link>
@@ -256,7 +256,7 @@ export default async function Admin() {
             {(perguntas ?? []).map((p) => (
               <li
                 key={p.id}
-                className="rounded-[9px] bg-[color:var(--color-superficie)] px-3 py-2 texto-suave"
+                className="rounded-[9px] bg-[color:rgba(255, 255, 255, 0.7)] px-3 py-2 texto-suave"
               >
                 “{p.pergunta}”
               </li>

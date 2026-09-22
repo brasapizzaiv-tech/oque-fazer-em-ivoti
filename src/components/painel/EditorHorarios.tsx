@@ -97,7 +97,7 @@ export default function EditorHorarios({
           {DIAS.map((nome, dia) => (
             <div
               key={dia}
-              className="flex flex-wrap items-center gap-2 rounded-xl border border-[color:var(--color-madeira)]/20 p-2"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-[color:var(--color-v-texto)]/20 p-2"
             >
               <span className="w-20 shrink-0 text-sm font-medium">{nome}</span>
 
@@ -108,7 +108,7 @@ export default function EditorHorarios({
                   {semana[dia].map((faixa, i) => (
                     <div
                       key={i}
-                      className="flex items-center gap-1 border border-[color:var(--color-madeira)]/20 px-2 py-1"
+                      className="flex items-center gap-1 border border-[color:var(--color-v-texto)]/20 px-2 py-1"
                     >
                       <input
                         type="time"
@@ -141,7 +141,7 @@ export default function EditorHorarios({
                         onClick={() =>
                           mexer(dia, (f) => f.filter((_, j) => j !== i))
                         }
-                        className="ml-1 texto-suave hover:text-[color:var(--color-telha)]"
+                        className="ml-1 texto-suave hover:text-[color:var(--color-v-fechado-claro)]"
                       >
                         ✕
                       </button>
@@ -171,13 +171,13 @@ export default function EditorHorarios({
         <button
           type="button"
           onClick={repetirNaSemana}
-          className="text-[14px] font-semibold text-[color:var(--color-torii)] underline"
+          className="text-[14px] font-semibold text-[color:var(--color-v-torii)] underline"
         >
           Repetir a segunda de terça a sexta
         </button>
 
         {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
             {erro}
           </p>
         )}

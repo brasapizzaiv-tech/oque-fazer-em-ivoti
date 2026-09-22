@@ -119,8 +119,8 @@ export default function ChatDoPainel({
               className={[
                 "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap",
                 m.papel === "pessoa"
-                  ? "bg-[color:var(--color-madeira)] text-[color:var(--color-creme-claro)]"
-                  : "bg-[color:var(--color-reboco)] text-tinta",
+                  ? "bg-[color:var(--color-v-texto)] text-[color:#FFFFFF]"
+                  : "bg-[color:var(--color-v-fundo)] text-[color:var(--color-v-texto)]",
               ].join(" ")}
             >
               {m.texto || <span className="texto-suave">escrevendo...</span>}
@@ -149,7 +149,7 @@ export default function ChatDoPainel({
           e.preventDefault();
           enviar(texto);
         }}
-        className="flex gap-2 border-t-2 border-[color:var(--color-madeira)]/20 p-3"
+        className="flex gap-2 border-t-2 border-[color:var(--color-v-texto)]/20 p-3"
       >
         <input
           value={texto}

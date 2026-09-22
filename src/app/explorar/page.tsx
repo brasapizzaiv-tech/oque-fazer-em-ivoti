@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Busca from "@/components/vidro/Busca";
 import CardComFoto from "@/components/vidro/CardComFoto";
-import PertoDeMim from "@/components/enxaimel/PertoDeMim";
+import PertoDeMim from "@/components/vidro/PertoDeMim";
 import { CabecalhoDeTela, Fileira, Vazio } from "@/components/vidro/blocos";
 import { CardAzul, Chip, Legenda } from "@/components/vidro/pecas";
 import { CasaEnxaimel } from "@/components/vidro/icones";

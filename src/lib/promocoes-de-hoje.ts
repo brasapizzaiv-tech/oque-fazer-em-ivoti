@@ -1,6 +1,6 @@
 import { createClient } from "./supabase/server";
 import { SUPABASE_CONFIGURADO } from "./supabase/config";
-import type { PromocaoNaTela } from "@/components/CartaoPromocao";
+import type { PromocaoNaTela } from "@/lib/promocoes";
 
 /**
  * As promoções que valem hoje, na cidade inteira.

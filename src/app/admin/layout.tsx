@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BotaoSair from "@/components/BotaoSair";
-import { FaixaTelhas, Logo } from "@/components/enxaimel/pecas";
+import FundoDaCidade from "@/components/vidro/FundoDaCidade";
+import { Logo } from "@/components/vidro/pecas";
 import AbasAdmin from "@/components/painel/AbasAdmin";
 
 /**
@@ -13,22 +14,26 @@ import AbasAdmin from "@/components/painel/AbasAdmin";
  */
 export default function LayoutAdmin({ children }: LayoutProps<"/admin">) {
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: "var(--color-reboco)" }}
-    >
+    <div className="min-h-screen">
+      <FundoDaCidade />
+
       <header>
-        <div style={{ backgroundColor: "var(--color-madeira)" }}>
+        <div
+          style={{
+            backgroundColor: "rgba(43, 35, 32, 0.9)",
+            backdropFilter: "blur(14px)",
+          }}
+        >
           <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
             <Link href="/" className="shrink-0">
-              <Logo claro />
+              <Logo sobreFoto />
             </Link>
 
             <span
               className="rounded-[4px] px-2 py-1 text-[10px] font-bold tracking-[0.12em] uppercase"
               style={{
-                backgroundColor: "var(--color-petunia)",
-                color: "#fff7ea",
+                backgroundColor: "var(--color-v-petunia)",
+                color: "#FFFFFF",
               }}
             >
               Administração
@@ -39,8 +44,8 @@ export default function LayoutAdmin({ children }: LayoutProps<"/admin">) {
                 href="/painel"
                 className="rounded-[9px] px-3.5 py-2 text-[13px] font-semibold"
                 style={{
-                  border: "2px solid var(--color-creme-fundo)",
-                  color: "var(--color-creme-claro)",
+                  border: "2px solid rgba(255,255,255,0.85)",
+                  color: "#FFFFFF",
                 }}
               >
                 Meu painel
@@ -49,7 +54,6 @@ export default function LayoutAdmin({ children }: LayoutProps<"/admin">) {
             </span>
           </div>
         </div>
-        <FaixaTelhas />
       </header>
 
       <div className="mx-auto max-w-5xl px-4 pt-5 pb-10">

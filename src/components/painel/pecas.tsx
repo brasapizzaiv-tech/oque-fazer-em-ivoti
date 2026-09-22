@@ -9,7 +9,7 @@ import type React from "react";
  * mas em tom mais seco: aqui a pessoa vem trabalhar, não passear. Menos
  * textura, menos sombra dura, mais espaço em branco e campos grandes.
  *
- * Estas peças ficam separadas das de `enxaimel/` de propósito: as de lá
+ * Estas peças ficam separadas das de `vidro/` de propósito: as de lá
  * atendem a quem visita a cidade, e mudar uma delas para caber num formulário
  * do painel estragaria a tela pública correspondente.
  */
@@ -29,8 +29,8 @@ export function Caixa({
     <div
       className={`rounded-[4px] ${padding ? "p-4 sm:p-5" : ""} ${className}`}
       style={{
-        backgroundColor: "var(--color-superficie)",
-        border: "2px solid var(--color-madeira)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        border: "2px solid var(--color-v-texto)",
       }}
     >
       {children}
@@ -55,7 +55,7 @@ export function TituloPainel({
         <h1
           className="text-[22px] leading-tight font-bold sm:text-[26px]"
           style={{
-            color: "var(--color-texto)",
+            color: "var(--color-v-texto)",
             fontFamily: "var(--fonte-titulo-nova)",
           }}
         >
@@ -64,7 +64,7 @@ export function TituloPainel({
         {apoio && (
           <p
             className="mt-1 text-[14px]"
-            style={{ color: "var(--color-texto-suave)" }}
+            style={{ color: "var(--color-v-texto-suave)" }}
           >
             {apoio}
           </p>
@@ -88,32 +88,32 @@ export function TituloPainel({
 export const SITUACOES = {
   rascunho: {
     texto: "Rascunho",
-    fundo: "var(--color-fechado)",
-    tinta: "var(--color-texto)",
+    fundo: "rgba(43, 35, 32, 0.12)",
+    tinta: "var(--color-v-texto)",
     dica: "Só você enxerga. Termine de preencher e mande para análise.",
   },
   em_analise: {
     texto: "Em análise",
-    fundo: "var(--color-petunia)",
-    tinta: "#fff7ea",
+    fundo: "var(--color-v-petunia)",
+    tinta: "#FFFFFF",
     dica: "Recebemos. Em breve publicamos no guia.",
   },
   publicado: {
     texto: "No ar",
-    fundo: "var(--color-veneziana)",
-    tinta: "#fff7ea",
+    fundo: "var(--color-v-verde)",
+    tinta: "#FFFFFF",
     dica: "Está aparecendo no guia para todo mundo.",
   },
   rejeitado: {
     texto: "Precisa de ajuste",
-    fundo: "var(--color-telha)",
-    tinta: "#fff7ea",
+    fundo: "var(--color-v-fechado-claro)",
+    tinta: "#FFFFFF",
     dica: "Veja o motivo, corrija e mande de novo.",
   },
   inativo: {
     texto: "Fora do ar",
-    fundo: "var(--color-fechado)",
-    tinta: "var(--color-texto)",
+    fundo: "rgba(43, 35, 32, 0.12)",
+    tinta: "var(--color-v-texto)",
     dica: "Não aparece no guia. Nada foi perdido: dá para voltar quando quiser.",
   },
 } as const;
@@ -156,14 +156,14 @@ export function Nenhum({
     <div
       className="rounded-[4px] px-6 py-10 text-center"
       style={{
-        border: "2px dashed var(--color-madeira)",
-        backgroundColor: "var(--color-superficie)",
+        border: "2px dashed var(--color-v-texto)",
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
       }}
     >
       <p
         className="text-[17px] font-bold"
         style={{
-          color: "var(--color-texto)",
+          color: "var(--color-v-texto)",
           fontFamily: "var(--fonte-titulo-nova)",
         }}
       >
@@ -172,7 +172,7 @@ export function Nenhum({
       {children && (
         <p
           className="mx-auto mt-1.5 max-w-[46ch] text-[14px]"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
           {children}
         </p>
@@ -194,12 +194,12 @@ export function Nenhum({
  * próprios — embrulhar os três num componente só multiplicaria as exceções.
  */
 export const CAMPO =
-  "mt-1 w-full rounded-[9px] px-3 py-2.5 text-[15px] outline-none focus:border-[color:var(--color-torii)]";
+  "mt-1 w-full rounded-[9px] px-3 py-2.5 text-[15px] outline-none focus:border-[color:var(--color-v-torii)]";
 
 export const ESTILO_CAMPO: React.CSSProperties = {
-  backgroundColor: "var(--color-superficie)",
-  border: "2px solid var(--color-madeira)",
-  color: "var(--color-texto)",
+  backgroundColor: "rgba(255, 255, 255, 0.7)",
+  border: "2px solid var(--color-v-texto)",
+  color: "var(--color-v-texto)",
 };
 
 /** O rótulo acima de um campo. */
@@ -214,14 +214,14 @@ export function Rotulo({
     <>
       <span
         className="text-[14px] font-semibold"
-        style={{ color: "var(--color-texto)" }}
+        style={{ color: "var(--color-v-texto)" }}
       >
         {children}
       </span>
       {dica && (
         <span
           className="mt-0.5 block text-[12px]"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
           {dica}
         </span>
@@ -243,9 +243,9 @@ export function Aviso({
     <p
       className="rounded-[9px] px-3 py-2 text-[13px] font-medium"
       style={{
-        border: `2px solid ${erro ? "var(--color-telha)" : "var(--color-veneziana)"}`,
-        backgroundColor: "var(--color-superficie)",
-        color: erro ? "var(--color-telha-funda)" : "var(--color-veneziana)",
+        border: `2px solid ${erro ? "var(--color-v-fechado-claro)" : "var(--color-v-verde)"}`,
+        backgroundColor: "rgba(255, 255, 255, 0.7)",
+        color: erro ? "var(--color-v-fechado-claro)" : "var(--color-v-verde)",
       }}
     >
       {children}
@@ -262,7 +262,7 @@ export function SubTitulo({ children }: { children: React.ReactNode }) {
   return (
     <h2
       className="text-[11px] font-bold tracking-[0.12em] uppercase"
-      style={{ color: "var(--color-texto-suave)" }}
+      style={{ color: "var(--color-v-texto-suave)" }}
     >
       {children}
     </h2>
@@ -276,8 +276,8 @@ export function Editar({ href }: { href: string }) {
       href={href}
       className="inline-flex h-10 shrink-0 items-center rounded-[9px] px-4 text-[14px] font-semibold"
       style={{
-        border: "2px solid var(--color-madeira)",
-        color: "var(--color-madeira)",
+        border: "2px solid var(--color-v-texto)",
+        color: "var(--color-v-texto)",
       }}
     >
       Editar
@@ -297,7 +297,7 @@ export function TituloBloco({ children }: { children: React.ReactNode }) {
     <h2
       className="text-[17px] font-bold"
       style={{
-        color: "var(--color-texto)",
+        color: "var(--color-v-texto)",
         fontFamily: "var(--fonte-titulo-nova)",
       }}
     >

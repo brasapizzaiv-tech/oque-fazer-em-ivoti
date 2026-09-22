@@ -99,7 +99,7 @@ function Grupo({ titulo, temas }: { titulo: string; temas: Tema[] }) {
               <span className="min-w-0 flex-1">
                 <span
                   className="block text-[16px] font-bold"
-                  style={{ color: "var(--color-texto)" }}
+                  style={{ color: "var(--color-v-texto)" }}
                 >
                   {t.subtitulo ? `${t.subtitulo} ${t.nome}` : t.nome}
                 </span>
@@ -111,8 +111,8 @@ function Grupo({ titulo, temas }: { titulo: string; temas: Tema[] }) {
                 <span
                   className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
                   style={{
-                    backgroundColor: "var(--color-veneziana)",
-                    color: "#fff7ea",
+                    backgroundColor: "var(--color-v-verde)",
+                    color: "#FFFFFF",
                   }}
                 >
                   No ar
@@ -121,8 +121,8 @@ function Grupo({ titulo, temas }: { titulo: string; temas: Tema[] }) {
                 <span
                   className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
                   style={{
-                    backgroundColor: "var(--color-fechado)",
-                    color: "var(--color-texto)",
+                    backgroundColor: "rgba(43, 35, 32, 0.12)",
+                    color: "var(--color-v-texto)",
                   }}
                 >
                   Rascunho

@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { quandoVale, type Promocao } from "@/lib/promocoes";
-import { Botao } from "@/components/enxaimel/pecas";
+import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
   Editar,
@@ -106,7 +106,7 @@ function Lista({
       {promocoes.length === 0 ? (
         <p
           className="mt-2 text-[14px]"
-          style={{ color: "var(--color-texto-suave)" }}
+          style={{ color: "var(--color-v-texto-suave)" }}
         >
           {vazio}
         </p>
@@ -118,13 +118,13 @@ function Lista({
                 <div className="min-w-0 flex-1">
                   <p
                     className="text-[15px] font-bold"
-                    style={{ color: "var(--color-texto)" }}
+                    style={{ color: "var(--color-v-texto)" }}
                   >
                     {p.titulo}
                   </p>
                   <p
                     className="text-[13px]"
-                    style={{ color: "var(--color-texto-suave)" }}
+                    style={{ color: "var(--color-v-texto-suave)" }}
                   >
                     {quandoVale(p)}
                     {p.local?.nome ? ` · ${p.local.nome}` : ""}

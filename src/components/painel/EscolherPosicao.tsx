@@ -69,7 +69,7 @@ export default function EscolherPosicao({
                     if (p) onMudar(p.lat(), p.lng());
                   }}
                 >
-                  <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-[color:var(--color-veneziana)] text-base shadow-md">
+                  <span className="grid h-9 w-9 place-items-center rounded-full border-2 border-white bg-[color:var(--color-v-verde)] text-base shadow-md">
                     📍
                   </span>
                 </AdvancedMarker>

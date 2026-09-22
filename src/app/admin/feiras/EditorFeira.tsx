@@ -336,8 +336,8 @@ export default function EditorFeira({ tema }: { tema: Tema }) {
           <span
             className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
             style={{
-              backgroundColor: "var(--color-veneziana)",
-              color: "#fff7ea",
+              backgroundColor: "var(--color-v-verde)",
+              color: "#FFFFFF",
             }}
           >
             No ar
@@ -345,7 +345,7 @@ export default function EditorFeira({ tema }: { tema: Tema }) {
         )}
 
         {salvo && !salvando && (
-          <span className="text-[14px] font-medium text-[color:var(--color-veneziana)]">
+          <span className="text-[14px] font-medium text-[color:var(--color-v-verde)]">
             Salvo ✓
           </span>
         )}
@@ -380,7 +380,7 @@ function Imagem({
             className={`relative block shrink-0 overflow-hidden rounded-[9px] ${
               quadrado ? "h-20 w-20" : "h-20 w-36"
             }`}
-            style={{ border: "2px solid var(--color-madeira)" }}
+            style={{ border: "2px solid var(--color-v-texto)" }}
           >
             <Image
               src={url}
@@ -396,8 +396,8 @@ function Imagem({
               quadrado ? "h-20 w-20" : "h-20 w-36"
             }`}
             style={{
-              border: "2px dashed var(--color-madeira)",
-              color: "var(--color-texto-suave)",
+              border: "2px dashed var(--color-v-texto)",
+              color: "var(--color-v-texto-suave)",
             }}
           >
             sem imagem
@@ -418,7 +418,7 @@ function Imagem({
           <button
             type="button"
             onClick={aoTirar}
-            className="text-[13px] font-semibold text-[color:var(--color-telha-funda)] underline"
+            className="text-[13px] font-semibold text-[color:var(--color-v-fechado-claro)] underline"
           >
             Tirar
           </button>

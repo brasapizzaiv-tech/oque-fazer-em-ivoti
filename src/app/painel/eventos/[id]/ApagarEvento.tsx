@@ -40,7 +40,7 @@ export default function ApagarEvento({
       <button
         type="button"
         onClick={() => setConfirmando(true)}
-        className="text-sm font-medium text-[color:var(--color-telha-funda)] underline"
+        className="text-sm font-medium text-[color:var(--color-v-fechado-claro)] underline"
       >
         Apagar este evento
       </button>

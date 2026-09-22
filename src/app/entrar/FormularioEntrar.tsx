@@ -121,13 +121,13 @@ export default function FormularioEntrar() {
       <p className="text-center text-sm">
         <Link
           href="/recuperar-senha"
-          className="font-medium text-tinta/60 underline hover:text-[color:var(--color-v-torii)]"
+          className="font-medium texto-suave underline hover:text-[color:var(--color-v-torii)]"
         >
           Esqueci minha senha
         </Link>
       </p>
 
-      <p className="text-center text-sm text-tinta/60">
+      <p className="text-center text-sm texto-suave">
         Ainda não tem conta?{" "}
         <Link
           href="/cadastrar"

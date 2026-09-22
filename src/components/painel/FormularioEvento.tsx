@@ -259,14 +259,14 @@ export default function FormularioEvento({
               type="file"
               accept="image/*"
               onChange={(e) => enviarImagem(e.target.files)}
-              className="mt-2 block w-full text-sm file:mr-3 file:mr-3 file:rounded-[9px] file:border-0 file:bg-[color:var(--color-madeira)] file:px-4 file:py-2 file:text-[13px] file:font-bold file:text-[#fff7ea]"
+              className="mt-2 block w-full text-sm file:mr-3 file:mr-3 file:rounded-[9px] file:border-0 file:bg-[color:var(--color-v-texto)] file:px-4 file:py-2 file:text-[13px] file:font-bold file:text-[#FFFFFF]"
             />
           )}
         </div>
       </Bloco>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-telha-funda)]">
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
           {erro}
         </p>
       )}
