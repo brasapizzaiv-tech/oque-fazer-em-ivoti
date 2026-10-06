@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { TituloBloco } from "@/components/painel/pecas";
 import { createClient } from "@/lib/supabase/server";
-import { resumoDoLocal, resumoDeExemplo } from "@/lib/metricas-resumo";
+import {
+  acessosDoLocal,
+  resumoDeExemplo,
+  resumoDoLocal,
+} from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO } from "@/lib/metricas";
 import { planoAtivo, podeUsar } from "@/lib/planos";
 import {
@@ -70,11 +74,21 @@ export default async function Metricas({
   // comerciante: no login dele, so o premium abre os numeros.
   const liberado = admin || podeUsar("metricas", plano);
   const vendoComoAdmin = admin && !podeUsar("metricas", plano);
-  const resumo = await resumoDoLocal(local.id, dias, supabase);
 
-  // Numeros de mentira para a previa desfocada. O desfoque e so CSS: os
-  // valores reais nao podem sair do servidor para quem nao pode ve-los.
-  const exemplo = liberado ? resumo : resumoDeExemplo(dias);
+  // No gratuito nem se pede o resumo: a regra do banco nao devolveria as
+  // linhas, e pedir o que vai voltar vazio so ensina a tela a conviver
+  // com buraco. O total de acessos, que e de graca, vem pela funcao que
+  // devolve so ele.
+  const resumo = liberado
+    ? await resumoDoLocal(local.id, dias, supabase)
+    : null;
+  const acessos = resumo
+    ? resumo.acessos
+    : await acessosDoLocal(local.id, dias, supabase);
+
+  // Numeros de mentira para a previa desfocada. O desfoque hoje e so o
+  // aviso de que ha uma tranca; a tranca esta na politica do banco.
+  const exemplo = resumo ?? resumoDeExemplo(dias);
 
   return (
     <>
@@ -123,7 +137,7 @@ export default async function Metricas({
           comerciante querer saber o resto. */}
       <div className="mt-6 grid gap-3 sm:grid-cols-3">
         <Numero
-          valor={resumo.acessos}
+          valor={acessos}
           rotulo="Acessos à sua página"
           dica={`nos últimos ${dias} dias`}
           destaque
@@ -131,12 +145,12 @@ export default async function Metricas({
         {liberado ? (
           <>
             <Numero
-              valor={resumo.indicacoes}
+              valor={exemplo.indicacoes}
               rotulo="Indicações do Guia"
               dica="pessoas que saíram daqui para você"
             />
             <Numero
-              valor={resumo.cliques.reduce((s, c) => s + c.contagem, 0)}
+              valor={exemplo.cliques.reduce((s, c) => s + c.contagem, 0)}
               rotulo="Cliques nos seus contatos"
               dica="telefone, WhatsApp, site, rota"
             />
@@ -161,7 +175,7 @@ export default async function Metricas({
 
       {liberado ? (
         <>
-          <Detalhes resumo={resumo} dias={dias} />
+          <Detalhes resumo={exemplo} dias={dias} />
 
           {/* Quem paga costuma querer os numeros fora daqui: juntar com o
               faturamento, mandar para o contador, guardar o historico antes

@@ -207,3 +207,31 @@ export function resumoDeExemplo(dias: number): ResumoLocal {
     promocoesVistas: 27,
   };
 }
+
+/**
+ * O total de acessos do período — o único número que o plano gratuito vê.
+ *
+ * Vem por uma função do banco e não por consulta à tabela porque a tabela
+ * fechou: ela agora só se abre para premium e para a administração. A
+ * função devolve esse total e mais nada, e recusa quem não é dono do
+ * local.
+ */
+export async function acessosDoLocal(
+  localId: string,
+  dias: number,
+  supabase?: SupabaseClient,
+): Promise<number> {
+  if (!SUPABASE_CONFIGURADO) return 0;
+  const sb = supabase ?? (await createClient());
+
+  const { data, error } = await sb.rpc("acessos_do_local", {
+    p_local: localId,
+    p_dias: dias,
+  });
+
+  if (error) {
+    console.error("Nao consegui ler os acessos:", error.message);
+    return 0;
+  }
+  return Number(data ?? 0);
+}
