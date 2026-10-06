@@ -28,7 +28,7 @@ import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
 import { linkWhatsapp, usuarioInstagram } from "@/lib/texto";
 
-export const revalidate = 120;
+export const revalidate = 600;
 
 export async function generateMetadata({
   params,

@@ -1,8 +1,11 @@
 import { LOCAIS_DEMO } from "@/lib/demo";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
-import { createClient } from "@/lib/supabase/server";
+import { createClientPublico } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
+// Lista pública e estável: a Vercel guarda a resposta por 5 min em vez de
+// consultar o Supabase a cada visita (o chat pede isto em toda página).
+export const revalidate = 300;
 
 // Lista enxuta de todos os locais publicados: nome, foto e categoria.
 // O chat usa isso pra transformar os marcadores [[slug]] em cartoes.
@@ -26,7 +29,7 @@ export async function GET() {
     });
   }
 
-  const supabase = await createClient();
+  const supabase = createClientPublico();
   const { data } = await supabase
     .from("locais")
     .select(
