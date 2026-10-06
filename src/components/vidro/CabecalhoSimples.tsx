@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { imagemDoSite } from "@/lib/imagens";
 import { Logo } from "./pecas";
 
 /**
@@ -17,11 +18,13 @@ import { Logo } from "./pecas";
  *
  * No computador some: lá a barra da casca já faz esse papel.
  */
-export default function CabecalhoSimples() {
+export default async function CabecalhoSimples() {
+  const foto = await imagemDoSite("capa-conta");
+
   return (
     <header className="relative isolate px-4 py-3 lg:hidden">
       <Image
-        src="/fotos/eu-amo-ivoti.jpg"
+        src={foto}
         alt=""
         fill
         priority

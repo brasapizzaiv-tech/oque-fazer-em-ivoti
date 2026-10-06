@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { imagemDoSite } from "@/lib/imagens";
 import { Suspense } from "react";
 import Busca from "@/components/vidro/Busca";
 import CardComFoto from "@/components/vidro/CardComFoto";
@@ -55,7 +56,7 @@ export default async function Explorar({
   const soComPromocao = texto(params.promocao) === "1";
   const soComEvento = texto(params.evento) === "1";
 
-  const [categorias, todasTags, todos, eventosDeHoje, promocoes, feira] =
+  const [categorias, todasTags, todos, eventosDeHoje, promocoes, feira, capa] =
     await Promise.all([
       listarCategorias(),
       listarTags(),
@@ -63,6 +64,7 @@ export default async function Explorar({
       eventosVisiveis({ ate: hojeEmIvoti(), limite: 200 }),
       promocoesDeHoje(200),
       temaAtivo(),
+      imagemDoSite("capa-explorar"),
     ]);
 
   // "Na feira" e um filtro que so existe durante a feira: a lista de quem
@@ -127,7 +129,7 @@ export default async function Explorar({
 
   return (
     <>
-      <CabecalhoDeTela titulo="Explorar" foto="/fotos/portico-ivoti.jpg">
+      <CabecalhoDeTela titulo="Explorar" foto={capa}>
         <Busca placeholder="Pizza, trilha, café..." valor={q} />
       </CabecalhoDeTela>
 

@@ -9,6 +9,7 @@ const ABAS = [
   { href: "/admin/roteiros", rotulo: "Roteiros" },
   { href: "/admin/planos", rotulo: "Planos" },
   { href: "/admin/feiras", rotulo: "Feiras" },
+  { href: "/admin/imagens", rotulo: "Imagens" },
 ];
 
 /** Navegação entre as seções da administração. Mesmas regras das do painel. */

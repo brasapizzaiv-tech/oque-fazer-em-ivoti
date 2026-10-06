@@ -16,6 +16,7 @@ import {
   tempoAPe,
   tempoDeCarro,
 } from "@/lib/caminhos";
+import { imagemDoSite } from "@/lib/imagens";
 import { buscarLocais } from "@/lib/locais";
 
 export const revalidate = 300;
@@ -44,7 +45,10 @@ export default async function PaginaCaminho({
   const caminho = caminhoPorSlug(slug);
   if (!caminho) notFound();
 
-  const locais = await buscarLocais({ limite: 300 });
+  const [locais, capa] = await Promise.all([
+    buscarLocais({ limite: 300 }),
+    imagemDoSite("capa-caminhos"),
+  ]);
   const naBeira = lugaresNoCaminho(caminho, locais);
   const outros = CAMINHOS.filter((c) => c.slug !== caminho.slug);
 
@@ -55,7 +59,7 @@ export default async function PaginaCaminho({
       <div className="mx-auto lg:max-w-[900px] lg:px-8 lg:pb-12">
         <header className="relative isolate px-4 pt-4 pb-4">
           <Image
-            src="/fotos/portico-ivoti.jpg"
+            src={capa}
             alt=""
             fill
             priority

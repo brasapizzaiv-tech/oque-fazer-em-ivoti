@@ -8,6 +8,7 @@ import CompletarLogin from "@/components/CompletarLogin";
 import Casca from "@/components/vidro/Casca";
 import { RoupaDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
+import { imagemDoSite } from "@/lib/imagens";
 import ContarAcesso from "@/components/ContarAcesso";
 import FaixaDemonstracao from "@/components/FaixaDemonstracao";
 
@@ -55,6 +56,9 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   // continua no desenho de sempre.
   const feira = await temaAtivo();
 
+  // A foto de fundo e trocavel pelo painel; sem cadastro, a do codigo.
+  const fundo = await imagemDoSite("fundo");
+
   return (
     <html
       lang="pt-BR"
@@ -75,7 +79,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         </Suspense>
         <FaixaDemonstracao />
         <RoupaDaFeira tema={feira}>
-          <Casca>{children}</Casca>
+          <Casca fundo={fundo}>{children}</Casca>
         </RoupaDaFeira>
       </body>
     </html>

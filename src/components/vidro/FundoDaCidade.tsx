@@ -17,7 +17,7 @@ import Image from "next/image";
 export default function FundoDaCidade({
   foto = "/fotos/eu-amo-ivoti.jpg",
 }: {
-  /** Trocável pelo painel mais adiante; por ora vem do código. */
+  /** Trocável pelo painel. Sem cadastro, a do código. */
   foto?: string;
 }) {
   return (

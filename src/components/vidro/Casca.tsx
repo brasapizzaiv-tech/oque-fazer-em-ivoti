@@ -20,7 +20,14 @@ import NavegacaoInferior from "./NavegacaoInferior";
  */
 const CASCA_PROPRIA = ["/painel", "/admin", "/componentes"];
 
-export default function Casca({ children }: { children: React.ReactNode }) {
+export default function Casca({
+  children,
+  fundo,
+}: {
+  children: React.ReactNode;
+  /** A foto de fundo, vinda do painel. */
+  fundo?: string;
+}) {
   const caminho = usePathname();
 
   if (CASCA_PROPRIA.some((p) => caminho === p || caminho.startsWith(p + "/")))
@@ -33,7 +40,7 @@ export default function Casca({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      <FundoDaCidade />
+      <FundoDaCidade foto={fundo} />
       <CabecalhoDesktop temCapa={temCapa} />
       {/* O espaço embaixo é do tamanho da barra de baixo: sem ele o último
           bloco da página fica escondido atrás dela.

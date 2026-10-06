@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { imagemDoSite } from "@/lib/imagens";
 import type { Metadata } from "next";
 import {
   CabecalhoDeTela,
@@ -42,12 +43,15 @@ function porDia(eventos: Awaited<ReturnType<typeof eventosVisiveis>>) {
 }
 
 export default async function Agenda() {
-  const eventos = await eventosVisiveis({ limite: 40 });
+  const [eventos, capa] = await Promise.all([
+    eventosVisiveis({ limite: 40 }),
+    imagemDoSite("capa-agenda"),
+  ]);
   const dias = porDia(eventos);
 
   return (
     <>
-      <CabecalhoDeTela titulo="Agenda" foto="/fotos/portico-ivoti.jpg" />
+      <CabecalhoDeTela titulo="Agenda" foto={capa} />
 
       <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-12">
         <div className="hidden px-4 pt-8 lg:block lg:px-0">

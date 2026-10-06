@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { imagemDoSite } from "@/lib/imagens";
 import { CabecalhoDeTela, FileiraDePetunias } from "@/components/vidro/blocos";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -22,16 +23,16 @@ export const metadata: Metadata = {
 };
 
 export default async function Roteiros() {
-  const roteiros = await listarRoteirosCurados();
+  const [roteiros, capa] = await Promise.all([
+    listarRoteirosCurados(),
+    imagemDoSite("capa-roteiros"),
+  ]);
 
   return (
     <>
       <ContarAcesso />
 
-      <CabecalhoDeTela
-        titulo="Roteiros prontos"
-        foto="/fotos/eu-amo-ivoti.jpg"
-      />
+      <CabecalhoDeTela titulo="Roteiros prontos" foto={capa} />
 
       <div className="mx-auto lg:max-w-[1000px] lg:px-8 lg:pb-12">
         <div className="hidden pt-8 lg:block">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { imagemDoSite } from "@/lib/imagens";
 import Link from "next/link";
 import {
   CabecalhoDeTela,
@@ -24,9 +25,10 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
     ? params.categoria[0]
     : params.categoria;
 
-  const [categorias, locais] = await Promise.all([
+  const [categorias, locais, capa] = await Promise.all([
     listarCategorias(),
     buscarLocais({ categoria, limite: 300 }),
+    imagemDoSite("capa-mapa"),
   ]);
 
   const principais = categorias.filter((c) => c.pai_id === null);
@@ -35,7 +37,7 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
 
   return (
     <>
-      <CabecalhoDeTela titulo="Mapa de Ivoti" foto="/fotos/portico-ivoti.jpg" />
+      <CabecalhoDeTela titulo="Mapa de Ivoti" foto={capa} />
 
       <div className="mx-auto lg:max-w-[1440px] lg:px-16 lg:pb-12">
         <div className="hidden pt-8 lg:block">

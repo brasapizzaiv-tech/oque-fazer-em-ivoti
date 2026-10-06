@@ -24,6 +24,7 @@ import {
 } from "@/components/vidro/pecas";
 import { BlocoDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
+import { imagemDoSite } from "@/lib/imagens";
 import { listarCategorias } from "@/lib/locais";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
@@ -41,11 +42,12 @@ function daquiA(dias: number) {
 }
 
 export default async function Inicio() {
-  const [categorias, daSemana, promocoes, feira] = await Promise.all([
+  const [categorias, daSemana, promocoes, feira, capa] = await Promise.all([
     listarCategorias(),
     eventosVisiveis({ ate: daquiA(7), limite: 8 }),
     promocoesDeHoje(4),
     temaAtivo(),
+    imagemDoSite("capa-inicio"),
   ]);
 
   const principais = categorias.filter((c) => c.pai_id === null);
@@ -63,7 +65,7 @@ export default async function Inicio() {
           nada. */}
       <section className="relative isolate h-[min(420px,86dvh)] lg:h-[760px]">
         <Image
-          src={feira?.capa_url ?? "/fotos/portico-ivoti.jpg"}
+          src={feira?.capa_url ?? capa}
           alt=""
           fill
           priority
