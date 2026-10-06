@@ -2,21 +2,27 @@
  * O endereco do guia, em um lugar so.
  *
  * Era uma variavel de ambiente na Vercel, digitada a mao. Em 16/09/2026 ela
- * ficou com o nome antigo do site (oquefazeremivoti.com.br), um dominio que
- * nem existe — e como e ela que monta os enderecos absolutos, o estrago saiu
- * silencioso: a imagem de compartilhamento apontava para o vazio, e os
- * roteiros que os visitantes salvavam e mandavam no WhatsApp viravam links
- * mortos. O site respondia normalmente o tempo todo.
+ * ficou apontando para um dominio que nem existia — e como e ela que monta
+ * os enderecos absolutos, o estrago saiu silencioso: a imagem de
+ * compartilhamento apontava para o vazio, e os roteiros que os visitantes
+ * salvavam e mandavam no WhatsApp viravam links mortos. O site respondia
+ * normalmente o tempo todo.
  *
- * O dominio agora e registrado e definitivo, entao ele mora aqui: uma
- * constante que muda junto com o codigo, passa pela revisao e nao depende de
- * ninguem acertar a digitacao num painel.
+ * Por isso mora aqui: uma constante que muda junto com o codigo, passa pela
+ * revisao e nao depende de ninguem acertar a digitacao num painel.
+ *
+ * Em 06/10/2026 passou a ser oquefazeremivoti.com.br, que e o nome do site
+ * letra por letra e a frase que as pessoas digitam na busca. O
+ * oguiaivoti.com.br continua registrado e redireciona para ca com 308 —
+ * e o 308, e nao o 307, que faz o buscador transferir para o endereco novo
+ * a posicao que o antigo tinha. Tudo o que ja foi compartilhado continua
+ * chegando.
  *
  * Endereco absoluto e sempre o de producao, mesmo rodando aqui no
  * computador. E o certo para o que ele serve: o que o buscador guarda como
  * endereco oficial da pagina e o link que a pessoa manda para alguem.
  */
-export const SITE = "https://oguiaivoti.com.br";
+export const SITE = "https://oquefazeremivoti.com.br";
 
 /** O mesmo endereco sem o "https://", para mostrar na tela. */
 export const SITE_LIMPO = SITE.replace(/^https?:\/\//, "");
