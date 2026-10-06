@@ -1,4 +1,6 @@
 import { ehTipoValido, somar, origemDoAcesso } from "@/lib/metricas";
+import { ehRobo } from "@/lib/robo";
+import { contaAcesso } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -14,6 +16,21 @@ export const runtime = "nodejs";
  * nada a fazer com a resposta, e assim um contador nunca vira erro na tela.
  */
 export async function POST(request: Request) {
+  // Dois filtros antes de qualquer coisa, e os dois respondem 204 igual a
+  // uma contagem bem-sucedida: quem chamou nao tem o que fazer com a
+  // resposta, e um robo que descobre que foi barrado so tentaria de outro
+  // jeito.
+  //
+  // 1. So conta no site de verdade. O ambiente de desenvolvimento gravava
+  //    nesta mesma tabela, e cada tela aberta para conferir largura virava
+  //    acesso no painel do comerciante.
+  const host = request.headers.get("host");
+  if (!contaAcesso(host)) return new Response(null, { status: 204 });
+
+  // 2. So conta gente.
+  if (ehRobo(request.headers.get("user-agent")))
+    return new Response(null, { status: 204 });
+
   try {
     const corpo = (await request.json()) as {
       tipo?: string;
