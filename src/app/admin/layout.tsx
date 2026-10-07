@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BotaoSair from "@/components/BotaoSair";
 import FundoDaCidade from "@/components/vidro/FundoDaCidade";
+import { imagemDoSite } from "@/lib/imagens";
 import { Logo } from "@/components/vidro/pecas";
 import AbasAdmin from "@/components/painel/AbasAdmin";
 
@@ -12,10 +13,10 @@ import AbasAdmin from "@/components/painel/AbasAdmin";
  * confundir esta tela com o painel do próprio estabelecimento é o tipo de
  * engano que acaba em cadastro alheio editado por acidente.
  */
-export default function LayoutAdmin({ children }: LayoutProps<"/admin">) {
+export default async function LayoutAdmin({ children }: LayoutProps<"/admin">) {
   return (
     <div className="min-h-screen">
-      <FundoDaCidade />
+      <FundoDaCidade foto={await imagemDoSite("fundo")} />
 
       <header>
         <div

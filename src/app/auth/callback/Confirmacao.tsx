@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { irParaRecarregando } from "@/lib/ir-para";
 
 /**
  * Conclui a confirmacao de e-mail e joga a pessoa logada no painel.
@@ -59,8 +60,7 @@ export default function Confirmacao() {
         const { data } = await supabase.auth.getSession();
         if (!data.session) throw new Error("sem sessao");
 
-        router.replace(destino);
-        router.refresh();
+        irParaRecarregando(destino);
       } catch (erro) {
         console.error("Confirmacao de e-mail falhou:", erro);
         router.replace("/entrar?erro=confirmacao");

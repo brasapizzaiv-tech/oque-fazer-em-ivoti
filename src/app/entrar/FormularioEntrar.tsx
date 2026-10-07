@@ -1,19 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
+import { irParaRecarregando } from "@/lib/ir-para";
 
 export default function FormularioEntrar() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [indo, setIndo] = useState(false);
-  const relogio = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const router = useRouter();
   const params = useSearchParams();
   const voltar = params.get("voltar") ?? "/painel";
 
@@ -24,13 +23,6 @@ export default function FormularioEntrar() {
     params.get("erro") === "confirmacao"
       ? "Esse link de confirmação não vale mais — pode ter vencido, já ter sido usado, ou ter sido aberto em outro navegador. Entre com seu e-mail e senha aqui embaixo."
       : null;
-
-  useEffect(
-    () => () => {
-      if (relogio.current) clearTimeout(relogio.current);
-    },
-    [],
-  );
 
   async function entrar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -56,18 +48,9 @@ export default function FormularioEntrar() {
       const destino =
         voltar.startsWith("/") && !voltar.startsWith("//") ? voltar : "/painel";
 
-      router.push(destino);
-      router.refresh();
-
-      // O painel e montado no servidor. Se ele demorar demais para responder,
-      // esta tela ficaria em "Entrando..." sem fim e sem explicacao — entao
-      // depois de alguns segundos devolvemos o botao e contamos o que houve.
-      relogio.current = setTimeout(() => {
-        setErro(
-          "O painel está demorando para abrir. Sua entrada deu certo: tente de novo ou recarregue a página.",
-        );
-        setIndo(false);
-      }, 10000);
+      // Recarrega em vez de navegar por dentro: ver ir-para.ts. O botao
+      // fica em "Entrando..." ate a tela nova chegar, de proposito.
+      irParaRecarregando(destino);
     } catch (falha) {
       // Sem isto a tela travava de vez: a excecao subia sem ninguem pegar, o
       // botao continuava em "Entrando..." e nenhum recado aparecia.

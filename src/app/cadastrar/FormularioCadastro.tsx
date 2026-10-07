@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
+import { irParaRecarregando } from "@/lib/ir-para";
 
 export default function FormularioCadastro() {
   const [nome, setNome] = useState("");
@@ -14,7 +14,6 @@ export default function FormularioCadastro() {
   const [erro, setErro] = useState<string | null>(null);
   const [confirmar, setConfirmar] = useState(false);
   const [indo, setIndo] = useState(false);
-  const router = useRouter();
 
   async function cadastrar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -56,8 +55,7 @@ export default function FormularioCadastro() {
         return;
       }
 
-      router.push("/painel/novo");
-      router.refresh();
+      irParaRecarregando("/painel/novo");
     } catch (falha) {
       // Excecao solta aqui deixava o botao preso em "Criando..." para sempre.
       console.error("Nao consegui cadastrar:", falha);

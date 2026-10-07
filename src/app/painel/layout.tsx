@@ -1,6 +1,7 @@
 import Link from "next/link";
 import BotaoSair from "@/components/BotaoSair";
 import FundoDaCidade from "@/components/vidro/FundoDaCidade";
+import { imagemDoSite } from "@/lib/imagens";
 import { Logo } from "@/components/vidro/pecas";
 import AbasPainel from "@/components/painel/AbasPainel";
 import { createClient } from "@/lib/supabase/server";
@@ -31,7 +32,7 @@ export default async function LayoutPainel({
 
   return (
     <div className="min-h-screen">
-      <FundoDaCidade />
+      <FundoDaCidade foto={await imagemDoSite("fundo")} />
 
       <header>
         <div

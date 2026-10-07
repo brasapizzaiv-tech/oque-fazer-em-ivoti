@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { irParaRecarregando } from "@/lib/ir-para";
 
 /**
  * Sai da conta e volta para a capa.
@@ -15,15 +15,12 @@ export default function BotaoSair({
 }: {
   claro?: boolean;
 }) {
-  const router = useRouter();
-
   return (
     <button
       type="button"
       onClick={async () => {
         await createClient().auth.signOut();
-        router.push("/");
-        router.refresh();
+        irParaRecarregando("/");
       }}
       className="rounded-[9px] px-3.5 py-2 text-[13px] font-semibold transition"
       style={

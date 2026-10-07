@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { irParaRecarregando } from "@/lib/ir-para";
 
 /**
  * Rede de seguranca para o link de confirmacao de e-mail.
@@ -40,8 +41,7 @@ export default function CompletarLogin() {
         return;
       }
 
-      router.replace("/painel/novo");
-      router.refresh();
+      irParaRecarregando("/painel/novo");
     })();
   }, [params, caminho, router]);
 
