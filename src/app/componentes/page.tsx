@@ -15,6 +15,8 @@ import {
   Petunia,
   Torii,
 } from "@/components/vidro/icones";
+import { BlocoDaFeira, RoupaDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
+import type { Tema } from "@/lib/temas";
 import {
   Botao,
   CardAzul,
@@ -393,6 +395,25 @@ export default function Componentes() {
             </p>
           </CardVidro>
         </Secao>
+
+        {/* ---------------- 12. a roupa da feira ---------------- */}
+        <Secao numero="12" titulo="A feira vestindo o site">
+          <p
+            className="mb-4 max-w-[62ch] text-[14px]"
+            style={{ color: "var(--color-v-texto-suave)" }}
+          >
+            Com os dados reais da 19ª Feira das Flores. A programação de seis
+            dias vira uma dobra por dia, e a de hoje nasce aberta — em lista
+            corrida, as 28 linhas do folheto passariam de um metro de tela no
+            celular.
+          </p>
+          <RoupaDaFeira tema={FEIRA_DE_EXEMPLO}>
+            <div className="space-y-4">
+              <SeloDaFeira tema={FEIRA_DE_EXEMPLO} />
+              <BlocoDaFeira tema={FEIRA_DE_EXEMPLO} />
+            </div>
+          </RoupaDaFeira>
+        </Secao>
       </div>
 
       <NavegacaoInferior />
@@ -496,3 +517,73 @@ function Simbolo({
     </span>
   );
 }
+
+/* ------------------------------------------------------------------ */
+
+/**
+ * A 19ª Feira das Flores, com os dados do folheto da prefeitura.
+ *
+ * Fixo aqui e não lido do banco: a vitrine é para olhar o desenho, e ela
+ * precisa mostrar a feira mesmo em janeiro, quando nenhum tema está
+ * valendo. Os valores são os mesmos que estão cadastrados.
+ */
+const FEIRA_DE_EXEMPLO: Tema = {
+  id: "exemplo",
+  slug: "feira-das-flores",
+  nome: "Feira das Flores",
+  subtitulo: "19ª",
+  inicio: "2026-10-16",
+  fim: "2026-10-25",
+  cor: "#3F4E2C",
+  cor_destaque: "#E8571F",
+  cor_escura: null,
+  logo_url: null,
+  capa_url: null,
+  programacao: [
+    "Sex 16/10 · 9h — Início da feira",
+    "Sex 16/10 · 14h às 18h — Bandinha típica Vira Copos",
+    "Sex 16/10 · 18h — Encerramento",
+    "Sáb 17/10 · 9h — Início da feira",
+    "Sáb 17/10 · 10h — Solenidade de abertura do evento",
+    "Sáb 17/10 · 9h às 13h e 14h às 18h — Bandinha típica Bremen",
+    "Sáb 17/10 · 18h — Encerramento",
+    "Dom 18/10 · 9h — Início da feira",
+    "Dom 18/10 · 9h às 13h — Bandinha típica Klabunde e Cia",
+    "Dom 18/10 · 14h às 18h — Bandinha típica Klabunde e Cia",
+    "Dom 18/10 · Talentos locais em cena, pelos 62 anos de Ivoti:",
+    "Dom 18/10 · 13h30 — Diálogo no dialeto Hunsrik com alunos da Rede Municipal de Ensino",
+    "Dom 18/10 · 13h40 — Projeto Vida Saudável: danças folclóricas alemãs",
+    "Dom 18/10 · 14h10 — Grupo de Danças Alemãs Volkstanzgruppe Berghanschneiss",
+    "Dom 18/10 · 14h45 — CTG Harmonia Gaúcha: invernadas artísticas, declamação e chula",
+    "Dom 18/10 · 15h45 — Grupo Folclórico de Danças Roda Alegre",
+    "Dom 18/10 · 16h45 — Diálogo com alunos de Língua Japonesa",
+    "Dom 18/10 · 17h — Ivoti Wadaiko, grupo de taikos da Colônia Japonesa",
+    "Dom 18/10 · 18h — Encerramento",
+    "Sex 23/10 · 9h — Início da feira",
+    "Sex 23/10 · 14h às 18h — Bandinha típica Vira Copos",
+    "Sex 23/10 · 18h — Encerramento",
+    "Sáb 24/10 · 9h — Início da feira",
+    "Sáb 24/10 · 9h às 13h e 14h às 18h — Bandinha típica Bremen",
+    "Sáb 24/10 · 18h — Encerramento",
+    "Dom 25/10 · 9h — Início da feira",
+    "Dom 25/10 · 9h às 13h e 14h às 18h — Bandinha típica Bremen",
+    "Dom 25/10 · 18h — Encerramento da 19ª Feira das Flores",
+  ].join("\n"),
+  expositores: [
+    "Flores",
+    "Folhagens",
+    "Aromas",
+    "Artesanato",
+    "Oficinas florais",
+    "Produtos coloniais",
+    "Cachaças",
+    "Cervejas artesanais",
+    "Gastronomia variada",
+  ].join("\n"),
+  onde: "Núcleo de Casas Enxaimel",
+  lat: -29.582604,
+  lng: -51.156966,
+  link_programacao: null,
+  locais: [],
+  publicado: true,
+};

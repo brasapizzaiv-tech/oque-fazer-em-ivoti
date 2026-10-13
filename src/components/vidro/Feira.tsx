@@ -6,6 +6,7 @@ import {
   variaveisDoTema,
   type Tema,
 } from "@/lib/temas";
+import { hojeEmIvoti } from "@/lib/planos";
 import { CardAzul, CardVidro, Legenda } from "./pecas";
 import { Petunia } from "./icones";
 
@@ -155,20 +156,14 @@ export function BlocoDaFeira({ tema }: { tema: Tema }) {
         <div className="mt-4">
           <RiscoDoTema />
           <Legenda cor="#FFFFFF">Programação</Legenda>
-          <ul className="mt-2 space-y-1">
-            {programacao.map((linha) => (
-              <li key={linha} className="text-[14px] text-white/90">
-                {linha}
-              </li>
-            ))}
-          </ul>
+          <Programacao linhas={programacao} />
         </div>
       )}
 
       {expositores.length > 0 && (
         <div className="mt-4">
           <RiscoDoTema />
-          <Legenda cor="#FFFFFF">Expositores</Legenda>
+          <Legenda cor="#FFFFFF">O que você encontra</Legenda>
           <p className="mt-2 text-[14px] text-white/90">
             {expositores.join(" · ")}
           </p>
@@ -191,6 +186,121 @@ export function BlocoDaFeira({ tema }: { tema: Tema }) {
         )}
       </div>
     </CardAzul>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* A programação                                                       */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Quebra a programação em dias, pelo começo de cada linha.
+ *
+ * O combinado é "Sex 16/10 · 9h — Início da feira": o que vem antes do
+ * " · " é o dia. Linha sem esse começo NÃO some — ela sai solta, antes
+ * das dobras. É a diferença entre um formato que organiza e um que
+ * engole o que não entendeu.
+ */
+function porDia(linhas: string[]) {
+  const soltas: string[] = [];
+  const dias: { dia: string; itens: string[] }[] = [];
+
+  for (const linha of linhas) {
+    const corte = linha.indexOf(" · ");
+    if (corte < 0) {
+      soltas.push(linha);
+      continue;
+    }
+    const dia = linha.slice(0, corte);
+    const item = linha.slice(corte + 3);
+    const ultimo = dias[dias.length - 1];
+    if (ultimo && ultimo.dia === dia) ultimo.itens.push(item);
+    else dias.push({ dia, itens: [item] });
+  }
+
+  return { soltas, dias };
+}
+
+/** "13" e "10" de hoje viram "13/10", para achar o dia na programação. */
+function hojeEmDiaEMes(): string {
+  const [, mes, dia] = hojeEmIvoti().split("-");
+  return `${dia}/${mes}`;
+}
+
+/**
+ * A programação, um dia por dobra.
+ *
+ * O folheto da Feira das Flores tem 28 linhas em seis dias. Em lista
+ * corrida isso passa de um metro de tela no celular, empurrando o resto
+ * da Início para baixo justamente nas duas semanas em que mais gente
+ * nova chega ao site.
+ *
+ * Dobrado, cada dia é uma linha, e o de hoje nasce aberto: quem abre o
+ * site durante a feira quer saber o que tem HOJE. Os outros ficam a um
+ * toque.
+ *
+ * É `<details>` e não um botão com estado: abre e fecha sem programa
+ * nenhum, funciona antes de o navegador carregar o site inteiro, e o
+ * leitor de tela já sabe o que é.
+ *
+ * Programação curta (um ou dois dias) não dobra nada — dobrar três
+ * linhas seria esconder o que já cabia.
+ */
+function Programacao({ linhas }: { linhas: string[] }) {
+  const { soltas, dias } = porDia(linhas);
+  const hoje = hojeEmDiaEMes();
+
+  const itens = dias.reduce((n, d) => n + d.itens.length, 0);
+  if (dias.length < 3 || itens <= 6) {
+    return (
+      <ul className="mt-2 space-y-1">
+        {linhas.map((linha) => (
+          <li key={linha} className="text-[14px] text-white/90">
+            {linha}
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
+  // Fora dos dias de feira ninguém tem um "hoje" na lista: abre o
+  // primeiro, para a dobra não aparecer toda fechada e muda.
+  const algumEHoje = dias.some((d) => d.dia.includes(hoje));
+
+  return (
+    <div className="mt-2">
+      {soltas.length > 0 && (
+        <ul className="mb-2 space-y-1">
+          {soltas.map((linha) => (
+            <li key={linha} className="text-[14px] text-white/90">
+              {linha}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {dias.map((d, i) => (
+        <details
+          key={d.dia}
+          open={algumEHoje ? d.dia.includes(hoje) : i === 0}
+          className="border-t border-white/25 first:border-t-0"
+        >
+          <summary className="cursor-pointer list-none py-2.5 text-[14px] font-bold text-white marker:hidden">
+            {d.dia}{" "}
+            <span className="font-normal text-white/70">
+              {d.itens.length} {d.itens.length === 1 ? "atração" : "atrações"}
+            </span>
+          </summary>
+          <ul className="space-y-1 pb-3">
+            {d.itens.map((item) => (
+              <li key={item} className="text-[14px] text-white/90">
+                {item}
+              </li>
+            ))}
+          </ul>
+        </details>
+      ))}
+    </div>
   );
 }
 
