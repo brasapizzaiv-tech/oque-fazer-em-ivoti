@@ -37,14 +37,37 @@ const CAMPOS =
   "id, slug, nome, subtitulo, inicio, fim, cor, cor_destaque, cor_escura, logo_url, capa_url, programacao, expositores, onde, lat, lng, link_programacao, locais, publicado";
 
 /**
- * O tema que está valendo hoje, ou nada.
+ * Quantos dias antes o site já veste a roupa da feira.
+ *
+ * Uma semana. Feira que só aparece no dia em que começa chega tarde:
+ * quem decide se vai, se chama alguém e se atravessa a cidade decide
+ * alguns dias antes, e é exatamente nesses dias que o site ficava mudo.
+ *
+ * O bloco não mente nesse período — ele diz "Começa na sexta-feira" em
+ * vez de "Acontecendo agora". Quem cuida disso é `chamadaDoTema`.
+ */
+export const DIAS_DE_ANTECEDENCIA = 7;
+
+/** Soma dias a uma data AAAA-MM-DD, pelo calendário de Ivoti. */
+function emDias(data: string, dias: number): string {
+  const d = new Date(`${data}T12:00:00-03:00`);
+  d.setDate(d.getDate() + dias);
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "America/Sao_Paulo",
+  }).format(d);
+}
+
+/**
+ * O tema que está valendo hoje — ou o que começa na semana que vem.
  *
  * A comparação é por data de Ivoti e não pela do servidor: a Vercel roda
  * em UTC, e no fim da noite de uma sexta de feira lá já é sábado — o site
  * trocaria de roupa três horas antes da hora.
  *
- * Se dois temas se sobrepuserem por engano, vence o que começou por
- * último: é o que a pessoa que cadastrou provavelmente quis dizer.
+ * Quando há mais de um candidato, uma feira que JÁ está acontecendo
+ * ganha de uma que ainda vai começar, sempre: no meio do Kerb ninguém
+ * quer o site vestido da feira do mês que vem. Entre duas acontecendo,
+ * vence a que começou por último; entre duas por vir, a mais próxima.
  */
 export async function temaAtivo(
   supabase?: SupabaseClient,
@@ -61,11 +84,10 @@ export async function temaAtivo(
     .eq("publicado", true)
     .not("inicio", "is", null)
     .not("fim", "is", null)
-    .lte("inicio", hoje)
+    .lte("inicio", emDias(hoje, DIAS_DE_ANTECEDENCIA))
     .gte("fim", hoje)
     .order("inicio", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(4);
 
   if (error) {
     // Um tema que não carrega não pode derrubar a capa do site: sem ele a
@@ -74,7 +96,12 @@ export async function temaAtivo(
     return null;
   }
 
-  return (data as Tema) ?? null;
+  const candidatos = (data ?? []) as Tema[];
+  // A lista vem do início mais recente para o mais antigo: a primeira que
+  // já começou é a que começou por último, e a última da lista é a que
+  // começa mais cedo entre as que ainda vêm.
+  const acontecendo = candidatos.find((t) => !t.inicio || t.inicio <= hoje);
+  return acontecendo ?? candidatos[candidatos.length - 1] ?? null;
 }
 
 /** Todos os temas, para a administração. */
@@ -184,6 +211,65 @@ export function emLinhas(texto: string | null): string[] {
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean);
+}
+
+/* ------------------------------------------------------------------ */
+/* Antes e durante                                                      */
+/* ------------------------------------------------------------------ */
+
+/** Dias inteiros entre duas datas AAAA-MM-DD, pelo calendário de Ivoti. */
+function diasEntre(de: string, para: string): number {
+  const umDia = 24 * 60 * 60 * 1000;
+  const a = new Date(`${de}T12:00:00-03:00`).getTime();
+  const b = new Date(`${para}T12:00:00-03:00`).getTime();
+  // Meio-dia nos dois lados: assim o horário de verão, que tira ou põe
+  // uma hora, nunca vira um dia a mais ou a menos na conta.
+  return Math.round((b - a) / umDia);
+}
+
+/** A feira já começou? */
+export function jaComecou(tema: Tema, hoje = hojeEmIvoti()): boolean {
+  return !tema.inicio || tema.inicio <= hoje;
+}
+
+/**
+ * A chamada do bloco: "Acontecendo agora" ou quando começa.
+ *
+ * Durante os dias de antecedência o site já está vestido de feira, e
+ * dizer "acontecendo agora" ali seria mandar gente para um portão
+ * fechado. Então a mesma peça conta a verdade do dia:
+ *
+ *   amanhã          -> "Começa amanhã"
+ *   de 2 a 6 dias   -> "Começa na sexta-feira"
+ *   7 dias ou mais  -> "Começa dia 16 de outubro"
+ *
+ * O dia da semana some a partir de uma semana porque "começa na sexta"
+ * dito numa sexta-feira não diz se é hoje ou daqui a sete dias.
+ */
+export function chamadaDoTema(tema: Tema, hoje = hojeEmIvoti()): string {
+  if (jaComecou(tema, hoje)) return "Acontecendo agora";
+
+  const dias = diasEntre(hoje, tema.inicio!);
+  if (dias <= 1) return "Começa amanhã";
+
+  const quando = new Date(`${tema.inicio}T12:00:00-03:00`);
+
+  if (dias <= 6) {
+    const semana = new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      weekday: "long",
+    }).format(quando);
+    // Sábado e domingo pedem "no"; os dias terminados em -feira, "na".
+    const artigo = semana.endsWith("-feira") ? "na" : "no";
+    return `Começa ${artigo} ${semana}`;
+  }
+
+  const data = new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "numeric",
+    month: "long",
+  }).format(quando);
+  return `Começa dia ${data}`;
 }
 
 /** "12 a 15 de outubro" — o período do selo, por extenso. */

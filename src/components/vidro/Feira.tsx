@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  chamadaDoTema,
   emLinhas,
   periodoPorExtenso,
   variaveisDoTema,
@@ -136,7 +137,7 @@ export function BlocoDaFeira({ tema }: { tema: Tema }) {
           </span>
         )}
         <div className="min-w-0">
-          <Legenda cor="#FFFFFF">Acontecendo agora</Legenda>
+          <Legenda cor="#FFFFFF">{chamadaDoTema(tema)}</Legenda>
           <p
             className="mt-1 text-[20px] leading-tight font-bold"
             style={{ fontFamily: "var(--fonte-titulo-nova)" }}
@@ -370,7 +371,7 @@ export function AvisoDaFeira({ tema }: { tema: Tema }) {
           style={{ backgroundColor: "var(--color-v-azul)" }}
         />
         <span className="min-w-0 flex-1">
-          <Legenda cor="var(--color-v-azul)">Acontecendo agora</Legenda>
+          <Legenda cor="var(--color-v-azul)">{chamadaDoTema(tema)}</Legenda>
           <span
             className="block text-[15px] leading-tight font-bold"
             style={{
