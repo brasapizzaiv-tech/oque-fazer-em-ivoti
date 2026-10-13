@@ -1,6 +1,6 @@
 import { ehTipoValido, somar, origemDoAcesso } from "@/lib/metricas";
 import { ehRobo } from "@/lib/robo";
-import { contaAcesso } from "@/lib/site";
+import { contaAcesso, contaPagina } from "@/lib/site";
 
 export const runtime = "nodejs";
 
@@ -37,18 +37,38 @@ export async function POST(request: Request) {
       local?: string;
       alvo?: string;
       chave?: string;
+      de?: string;
     };
 
     if (!corpo.tipo || !ehTipoValido(corpo.tipo)) {
       return new Response(null, { status: 204 });
     }
 
-    // A origem o servidor descobre sozinho; nao se aceita do navegador, senao
-    // qualquer um poderia inflar "veio do Instagram" sem ter vindo de la.
+    // 3. Painel, administracao e telas de conta nao sao visita ao guia.
+    //    O navegador ja nao manda, mas a regra mora aqui tambem: endereco
+    //    publico e quem decide o que entra na conta e o servidor.
+    const daPagina = caminhoDoReferer(request.headers.get("referer"));
+    if (corpo.tipo === "site_pagina" && !contaPagina(corpo.chave ?? null)) {
+      return new Response(null, { status: 204 });
+    }
+    if (corpo.tipo === "site_origem" && daPagina && !contaPagina(daPagina)) {
+      return new Response(null, { status: 204 });
+    }
+
     if (corpo.tipo === "site_origem") {
+      // De onde a pessoa veio quem sabe e o navegador, em
+      // document.referrer. O cabeçalho "referer" DESTA chamada e sempre a
+      // propria pagina do guia, entao a conta antiga so sabia dizer
+      // "direto": foram 755 registros, todos iguais, sem uma excecao.
+      //
+      // Aceitar do navegador abre a porta para alguem escrever "veio do
+      // Instagram" sem ter vindo. E um risco pequeno e assumido: o numero
+      // e para o dono do site se orientar, nao para cobrar ninguem, e
+      // metrica que so sabe dizer uma coisa nao informa nada. O servidor
+      // ainda assim so guarda o nome do servidor de origem, curto.
       const host = new URL(request.url).hostname;
       await somar("site_origem", {
-        chave: origemDoAcesso(request.headers.get("referer"), host),
+        chave: origemDoAcesso(corpo.de ?? null, host).slice(0, 80),
       });
       return new Response(null, { status: 204 });
     }
@@ -64,4 +84,14 @@ export async function POST(request: Request) {
   }
 
   return new Response(null, { status: 204 });
+}
+
+/** O caminho da pagina que fez esta chamada, para saber se ela conta. */
+function caminhoDoReferer(referer: string | null): string | null {
+  if (!referer) return null;
+  try {
+    return new URL(referer).pathname;
+  } catch {
+    return null;
+  }
 }

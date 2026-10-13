@@ -8,7 +8,7 @@
  */
 export function contar(
   tipo: string,
-  onde: { local?: string; alvo?: string; chave?: string } = {},
+  onde: { local?: string; alvo?: string; chave?: string; de?: string } = {},
 ): void {
   if (typeof window === "undefined") return;
 

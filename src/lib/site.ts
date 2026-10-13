@@ -56,3 +56,37 @@ export function contaAcesso(host: string | null): boolean {
   if (!host) return false;
   return HOSTS_QUE_CONTAM.includes(host.toLowerCase().split(":")[0]);
 }
+
+/**
+ * As páginas que NÃO são visita ao guia.
+ *
+ * O painel e a administração são trabalho, não passeio: quem abre essas
+ * telas é o dono do site e os comerciantes mexendo no próprio cadastro.
+ * Em 06/10/2026, de 40 acessos registrados num dia, 11 eram uma pessoa só
+ * trabalhando — e o número existe justamente para dizer quanta gente de
+ * fora chegou.
+ *
+ * As telas de entrar e de trocar senha entram na lista pelo mesmo motivo:
+ * são o corredor até o painel, não um destino.
+ *
+ * O /cadastrar FICA de fora da lista, ou seja, continua contando: é uma
+ * página pública, está no mapa do site, e um comerciante que a encontra
+ * sozinho é exatamente a notícia que o número deveria dar.
+ */
+export const PAGINAS_QUE_NAO_CONTAM = [
+  "/painel",
+  "/admin",
+  "/entrar",
+  "/recuperar-senha",
+  "/nova-senha",
+  "/auth",
+  "/componentes",
+];
+
+/** Se a visita a esta página entra na conta. */
+export function contaPagina(caminho: string | null | undefined): boolean {
+  if (!caminho) return false;
+  return !PAGINAS_QUE_NAO_CONTAM.some(
+    (p) => caminho === p || caminho.startsWith(p + "/"),
+  );
+}

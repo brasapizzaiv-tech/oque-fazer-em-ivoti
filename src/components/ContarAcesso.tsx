@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { contar } from "@/lib/contar";
+import { contaPagina } from "@/lib/site";
 
 /**
  * Conta o acesso a uma pagina. Nao desenha nada.
@@ -23,6 +24,11 @@ export default function ContarAcesso({ local }: { local?: string }) {
     // garante uma contagem por pagina, e nao uma por renderizacao.
     const chave = `${caminho}|${local ?? ""}`;
     if (jaContou.current === chave) return;
+
+    // Painel, administração e as telas de conta não são visita ao guia:
+    // ver PAGINAS_QUE_NAO_CONTAM. O servidor recusa de novo — isto aqui
+    // só evita a viagem.
+    if (!local && !contaPagina(caminho)) return;
 
     const relogio = setTimeout(() => {
       jaContou.current = chave;
@@ -47,7 +53,11 @@ export default function ContarAcesso({ local }: { local?: string }) {
           // navegacao anonima pode recusar; contar duas vezes e melhor que
           // travar a pagina
         }
-        contar("site_origem");
+        // De onde veio quem o navegador conhece — o buscador, a rede
+        // social, o site que linkou. Vai daqui porque só o navegador
+        // sabe: o cabeçalho que chega ao servidor nesta chamada é a
+        // própria página, nunca a de fora.
+        contar("site_origem", { de: document.referrer });
       }
     }, 2500);
 
