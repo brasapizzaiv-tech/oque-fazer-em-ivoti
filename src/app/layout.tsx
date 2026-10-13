@@ -31,6 +31,11 @@ const corpoNovo = DM_Sans({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
+  // O codigo que o Google Search Console pede para provar que o site e
+  // nosso. Nao e segredo: ele sai no HTML de todas as paginas, que e
+  // justamente como o Google o encontra. Tirar daqui derruba a conta do
+  // Search Console e o site some do relatorio de buscas.
+  verification: { google: "CdEbKlbES_6awbOPFR_2VOwNRijIdTtPbsZ8EIeXnVA" },
   title: {
     default: NOME_DO_SITE,
     template: `%s · ${NOME_DO_SITE}`,
