@@ -211,7 +211,7 @@ function Cabecalho() {
     <header
       className="flex items-center gap-3 px-4 py-3"
       style={{
-        backgroundColor: "rgba(31, 78, 156, 0.86)",
+        backgroundColor: "rgb(var(--vidro-azul-rgb) / var(--vidro-azul-alfa))",
         backdropFilter: "blur(14px)",
         borderBottom: "1px solid rgba(255, 255, 255, 0.25)",
       }}
@@ -258,7 +258,8 @@ function Balao({
         <p
           className="max-w-[85%] rounded-[14px] px-3.5 py-2.5 text-[14px] whitespace-pre-wrap"
           style={{
-            backgroundColor: "rgba(31, 78, 156, 0.86)",
+            backgroundColor:
+              "rgb(var(--vidro-azul-rgb) / var(--vidro-azul-alfa))",
             backdropFilter: "blur(14px)",
             color: "#FFFFFF",
           }}
@@ -291,8 +292,6 @@ function Balao({
     })
     .filter(Boolean) as Parada[];
 
-  const semMarcadores = limpo.replace(/\[\[[a-z0-9-]+\]\]/gi, "").trim();
-
   return (
     <div className="space-y-2">
       <div className="flex">
@@ -304,7 +303,9 @@ function Balao({
             color: "var(--color-v-texto)",
           }}
         >
-          {semMarcadores || (
+          {limpo.trim() ? (
+            <TextoDoGuia texto={limpo} locais={locais} />
+          ) : (
             <span style={{ color: "var(--color-v-texto-suave)" }}>
               escrevendo...
             </span>
@@ -377,5 +378,159 @@ function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
         </a>
       )}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* O texto do Guia                                                     */
+/* ------------------------------------------------------------------ */
+
+/** Um pedaço da resposta: palavra comum, negrito, ou nome de um lugar. */
+type Pedaco =
+  | { tipo: "texto"; valor: string }
+  | { tipo: "forte"; valor: string }
+  | { tipo: "lugar"; slug: string };
+
+/** Compara nomes sem ligar para maiúscula ou espaço nas pontas. */
+function igual(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+/**
+ * Tira o nome do lugar que acabou de ser escrito, logo antes do marcador.
+ *
+ * O Guia escreve o nome e depois o marcador, mas nunca do mesmo jeito.
+ * Numa frase sai "relaxe na **Praça Neldo Holler** [[praca-neldo-holler]]",
+ * com o negrito em cima do nome; na seguinte sai "**Comece visitando o
+ * Memorial da Colônia Japonesa** [[memorial-da-colonia-japonesa]]", com a
+ * frase inteira em negrito e o nome no fim dela.
+ *
+ * Por isso a conta é "termina com o nome", e não "é o nome": a primeira
+ * versão disto só pegava o caso fácil, e a tela mostrava "Memorial da
+ * Colônia Japonesa Memorial da Colônia Japonesa".
+ */
+function tiraNomeRepetido(pedacos: Pedaco[], nome: string) {
+  let i = pedacos.length - 1;
+
+  // Entre o nome e o marcador costuma haver um espaço, em um pedaço só dele.
+  let espaco = -1;
+  const ultimo = pedacos[i];
+  if (ultimo && ultimo.tipo === "texto" && ultimo.valor.trim() === "") {
+    espaco = i;
+    i--;
+  }
+  if (i < 0) return;
+
+  const alvo = pedacos[i];
+  if (alvo.tipo === "lugar") return;
+
+  const semEspaco = alvo.valor.trimEnd();
+  if (nome.length > semEspaco.length) return;
+  if (!igual(semEspaco.slice(-nome.length), nome)) return;
+
+  const resto = semEspaco.slice(0, semEspaco.length - nome.length).trimEnd();
+
+  // Sobrou só o nome: o pedaço inteiro sai, e o espaço que vinha depois
+  // dele vai junto, senão fica um buraco duplo antes do link.
+  if (resto === "") {
+    pedacos.splice(i, espaco >= 0 ? 2 : 1);
+    return;
+  }
+
+  // O negrito não leva espaço no fim — quem separa é o pedaço seguinte.
+  alvo.valor = alvo.tipo === "forte" ? resto : resto + " ";
+}
+
+/**
+ * Quebra a resposta do Guia em pedaços para a tela montar.
+ *
+ * Dois defeitos moravam aqui, os dois visíveis em 20/10/2026:
+ *
+ *   1. O marcador [[slug]] era APAGADO. Quando o Guia escrevia só o
+ *      marcador, confiando que a tela sabia o nome, a frase saía sem
+ *      ele: "visitando a , uma obra de 1864".
+ *   2. O negrito saía cru, com os asteriscos na tela.
+ *
+ * Agora o marcador vira o nome do lugar, em link para a página dele —
+ * que é melhor que o texto de antes, porque dali a pessoa chega no
+ * endereço, no horário e na rota. Marcador de lugar que não existe some,
+ * como antes: a frase sem ele é melhor que um colchete cru.
+ */
+function emPedacos(texto: string, locais: Record<string, LocalMini>): Pedaco[] {
+  const pedacos: Pedaco[] = [];
+  const padrao = /\[\[([a-z0-9-]+)\]\]|\*\*([^*]+)\*\*/gi;
+  let fim = 0;
+  let achado: RegExpExecArray | null;
+
+  // Quando um marcador some, o espaço antes dele e o espaço depois
+  // ficariam lado a lado: "Passe no  também". Esta marca manda colar.
+  let colar = false;
+  function empurraTexto(valor: string) {
+    let v = valor;
+    if (colar) {
+      while (v.startsWith(" ")) v = v.slice(1);
+      colar = false;
+    }
+    if (v) pedacos.push({ tipo: "texto", valor: v });
+  }
+
+  while ((achado = padrao.exec(texto)) !== null) {
+    if (achado.index > fim) empurraTexto(texto.slice(fim, achado.index));
+    fim = padrao.lastIndex;
+
+    if (achado[2] !== undefined) {
+      pedacos.push({ tipo: "forte", valor: achado[2].trim() });
+      continue;
+    }
+
+    const slug = achado[1].toLowerCase();
+    // Marcador de um lugar que não existe some, como sempre foi: a frase
+    // sem ele é melhor que um colchete cru na tela.
+    if (!locais[slug]) {
+      colar = true;
+      continue;
+    }
+
+    tiraNomeRepetido(pedacos, locais[slug].nome);
+    pedacos.push({ tipo: "lugar", slug });
+  }
+
+  if (fim < texto.length) empurraTexto(texto.slice(fim));
+  return pedacos;
+}
+
+/** A resposta do Guia na tela, com os nomes virando link. */
+function TextoDoGuia({
+  texto,
+  locais,
+}: {
+  texto: string;
+  locais: Record<string, LocalMini>;
+}) {
+  return (
+    <>
+      {emPedacos(texto, locais).map((p, i) => {
+        if (p.tipo === "forte") {
+          return (
+            <strong key={i} className="font-bold">
+              {p.valor}
+            </strong>
+          );
+        }
+        if (p.tipo === "lugar") {
+          return (
+            <Link
+              key={i}
+              href={`/local/${p.slug}`}
+              className="font-bold underline decoration-1 underline-offset-2"
+              style={{ color: "var(--color-v-azul)" }}
+            >
+              {locais[p.slug].nome}
+            </Link>
+          );
+        }
+        return <span key={i}>{p.valor}</span>;
+      })}
+    </>
   );
 }

@@ -1,7 +1,14 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NOME_DO_ASSISTENTE, NOME_DO_SITE } from "@/lib/marca";
 import { catalogo } from "@/lib/catalogo";
-import { emLinhas, periodoPorExtenso, temaAtivo } from "@/lib/temas";
+import {
+  diasDeFeira,
+  emLinhas,
+  jaComecou,
+  periodoPorExtenso,
+  temaAtivo,
+} from "@/lib/temas";
+import { hojeEmIvoti } from "@/lib/planos";
 import { respostaDemo } from "@/lib/demo";
 import { podeConversar } from "@/lib/limite-chat";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -120,30 +127,7 @@ export async function POST(request: Request) {
   // A feira da semana entra como um bloco proprio, fora do cache: ela muda
   // e o catalogo nao, e misturar os dois jogaria fora o cache do catalogo
   // toda vez que uma feira comecasse ou terminasse.
-  const sobreAFeira = feira
-    ? [
-        "A FEIRA QUE ESTA ACONTECENDO AGORA",
-        "",
-        `Nome: ${feira.subtitulo ? feira.subtitulo + " " : ""}${feira.nome}`,
-        periodoPorExtenso(feira) ? `Quando: ${periodoPorExtenso(feira)}` : "",
-        feira.onde ? `Onde: ${feira.onde}` : "",
-        emLinhas(feira.programacao).length
-          ? "Programacao:\n" +
-            emLinhas(feira.programacao)
-              .map((l) => "- " + l)
-              .join("\n")
-          : "",
-        emLinhas(feira.expositores).length
-          ? "Expositores: " + emLinhas(feira.expositores).join(", ")
-          : "",
-        "",
-        "Quando a pergunta tiver a ver com a feira, responda com estes dados.",
-        "Se alguem perguntar o que fazer nesses dias, cite a feira primeiro.",
-        "Nao invente atracao, horario nem expositor que nao esteja escrito aqui.",
-      ]
-        .filter(Boolean)
-        .join("\n")
-    : null;
+  const sobreAFeira = feira ? blocoDaFeira(feira) : null;
 
   const stream = cliente.messages.stream({
     model: MODELO,
@@ -261,4 +245,74 @@ async function registrar(
   } catch (erro) {
     console.error("Nao consegui registrar a conversa:", erro);
   }
+}
+
+/* ------------------------------------------------------------------ */
+
+/** "2026-10-23" vira "23/10". */
+function emDiaEMes(data: string): string {
+  const [, mes, dia] = data.split("-");
+  return dia + "/" + mes;
+}
+
+/**
+ * O que o Guia sabe sobre a feira.
+ *
+ * O bloco antigo comecava com "A FEIRA QUE ESTA ACONTECENDO AGORA" e era
+ * mandado sempre que havia tema ativo. Mas tema ativo nao quer dizer
+ * feira aberta: ele liga sete dias antes e fica ligado nos dias de
+ * intervalo. Em 20/10/2026, uma terca sem feira, o Guia respondeu que a
+ * 19a Feira das Flores "esta acontecendo" e que abre as 9h — portao
+ * fechado. O bloco visual ja tinha sido corrigido; este nao.
+ *
+ * Agora o estado de HOJE vem escrito e separado dos dias da temporada,
+ * porque e a unica coisa que o Guia nao consegue deduzir sozinho de uma
+ * lista de datas sem errar de vez em quando.
+ */
+function blocoDaFeira(
+  feira: NonNullable<Awaited<ReturnType<typeof temaAtivo>>>,
+) {
+  const hoje = hojeEmIvoti();
+  const dias = diasDeFeira(feira);
+  const abertaHoje = dias.length === 0 || dias.includes(hoje);
+  const proximo = dias.find((d) => d > hoje);
+
+  const situacao = !jaComecou(feira, hoje)
+    ? "HOJE a feira AINDA NAO COMECOU. O primeiro dia e " +
+      emDiaEMes(feira.inicio!) +
+      "."
+    : abertaHoje
+      ? "HOJE a feira esta ABERTA."
+      : "HOJE a feira esta FECHADA." +
+        (proximo ? " Ela volta no dia " + emDiaEMes(proximo) + "." : "");
+
+  return [
+    "A FEIRA DA TEMPORADA EM IVOTI",
+    "",
+    "Nome: " + (feira.subtitulo ? feira.subtitulo + " " : "") + feira.nome,
+    periodoPorExtenso(feira) ? "Temporada: " + periodoPorExtenso(feira) : "",
+    feira.onde ? "Onde: " + feira.onde : "",
+    dias.length
+      ? "Dias em que ela ABRE: " + dias.map(emDiaEMes).join(", ")
+      : "",
+    situacao,
+    emLinhas(feira.programacao).length
+      ? "Programacao:\n" +
+        emLinhas(feira.programacao)
+          .map((l) => "- " + l)
+          .join("\n")
+      : "",
+    emLinhas(feira.expositores).length
+      ? "Na feira a pessoa encontra: " + emLinhas(feira.expositores).join(", ")
+      : "",
+    "",
+    "Quando a pergunta tiver a ver com a feira, responda com estes dados.",
+    "NUNCA diga que a feira esta acontecendo hoje se a linha HOJE acima",
+    "disser que ela esta fechada ou que ainda nao comecou. Nesse caso diga",
+    "quando ela abre e sugira outras coisas para hoje.",
+    "So cite o horario de 9h as 18h para um dia em que ela abre.",
+    "Nao invente atracao, horario nem expositor que nao esteja escrito aqui.",
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
