@@ -2,12 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   chamadaDoTema,
+  diaDestacado,
   emLinhas,
   periodoPorExtenso,
   variaveisDoTema,
   type Tema,
 } from "@/lib/temas";
-import { hojeEmIvoti } from "@/lib/planos";
 import { CardAzul, CardVidro, Legenda } from "./pecas";
 import { Petunia } from "./icones";
 
@@ -157,7 +157,7 @@ export function BlocoDaFeira({ tema }: { tema: Tema }) {
         <div className="mt-4">
           <RiscoDoTema />
           <Legenda cor="#FFFFFF">Programação</Legenda>
-          <Programacao linhas={programacao} />
+          <Programacao linhas={programacao} destaque={diaDestacado(tema)} />
         </div>
       )}
 
@@ -222,12 +222,6 @@ function porDia(linhas: string[]) {
   return { soltas, dias };
 }
 
-/** "13" e "10" de hoje viram "13/10", para achar o dia na programação. */
-function hojeEmDiaEMes(): string {
-  const [, mes, dia] = hojeEmIvoti().split("-");
-  return `${dia}/${mes}`;
-}
-
 /**
  * A programação, um dia por dobra.
  *
@@ -236,9 +230,10 @@ function hojeEmDiaEMes(): string {
  * da Início para baixo justamente nas duas semanas em que mais gente
  * nova chega ao site.
  *
- * Dobrado, cada dia é uma linha, e o de hoje nasce aberto: quem abre o
- * site durante a feira quer saber o que tem HOJE. Os outros ficam a um
- * toque.
+ * Dobrado, cada dia é uma linha, e um deles nasce aberto: o de hoje, se
+ * hoje tem feira, senão o do próximo dia que abre. Num dia de intervalo
+ * não adianta mostrar a sexta que já passou — quem olha quer saber o
+ * que vem.
  *
  * É `<details>` e não um botão com estado: abre e fecha sem programa
  * nenhum, funciona antes de o navegador carregar o site inteiro, e o
@@ -247,9 +242,15 @@ function hojeEmDiaEMes(): string {
  * Programação curta (um ou dois dias) não dobra nada — dobrar três
  * linhas seria esconder o que já cabia.
  */
-function Programacao({ linhas }: { linhas: string[] }) {
+function Programacao({
+  linhas,
+  destaque,
+}: {
+  linhas: string[];
+  /** O dia que nasce aberto, escrito "dd/mm" como aparece na lista. */
+  destaque: string | null;
+}) {
   const { soltas, dias } = porDia(linhas);
-  const hoje = hojeEmDiaEMes();
 
   const itens = dias.reduce((n, d) => n + d.itens.length, 0);
   if (dias.length < 3 || itens <= 6) {
@@ -264,9 +265,10 @@ function Programacao({ linhas }: { linhas: string[] }) {
     );
   }
 
-  // Fora dos dias de feira ninguém tem um "hoje" na lista: abre o
-  // primeiro, para a dobra não aparecer toda fechada e muda.
-  const algumEHoje = dias.some((d) => d.dia.includes(hoje));
+  // Se nada combinar — feira encerrada, ou programação num formato que
+  // o código não leu —, abre a primeira, para a dobra não aparecer toda
+  // fechada e muda.
+  const achou = destaque !== null && dias.some((d) => d.dia.includes(destaque));
 
   return (
     <div className="mt-2">
@@ -283,7 +285,7 @@ function Programacao({ linhas }: { linhas: string[] }) {
       {dias.map((d, i) => (
         <details
           key={d.dia}
-          open={algumEHoje ? d.dia.includes(hoje) : i === 0}
+          open={achou ? d.dia.includes(destaque!) : i === 0}
           className="border-t border-white/25 first:border-t-0"
         >
           <summary className="cursor-pointer list-none py-2.5 text-[14px] font-bold text-white marker:hidden">

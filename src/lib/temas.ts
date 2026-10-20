@@ -233,26 +233,80 @@ export function jaComecou(tema: Tema, hoje = hojeEmIvoti()): boolean {
 }
 
 /**
- * A chamada do bloco: "Acontecendo agora" ou quando começa.
+ * Os dias em que a feira ABRE, lidos da programação.
  *
- * Durante os dias de antecedência o site já está vestido de feira, e
- * dizer "acontecendo agora" ali seria mandar gente para um portão
- * fechado. Então a mesma peça conta a verdade do dia:
+ * Feira não é um bloco contínuo. A 19ª Feira das Flores acontece em 16,
+ * 17 e 18, e depois em 23, 24 e 25 — nos dias 19 a 22 o portão está
+ * fechado. O período do tema (`inicio` e `fim`) é a temporada inteira,
+ * porque tirar a roupa verde no meio faria o site parecer que a festa
+ * acabou. Mas o letreiro precisa saber a diferença, senão o site diz
+ * "acontecendo agora" numa segunda-feira e alguém atravessa a cidade
+ * para achar o Núcleo fechado.
  *
- *   amanhã          -> "Começa amanhã"
- *   de 2 a 6 dias   -> "Começa na sexta-feira"
- *   7 dias ou mais  -> "Começa dia 16 de outubro"
+ * Os dias saem do que já está cadastrado — o "Sex 16/10" no começo de
+ * cada linha da programação — em vez de uma coluna nova para alguém
+ * preencher duas vezes. O ano vem do período, e não do texto: "16/10"
+ * sozinho não diz o ano, e uma feira de fim de dezembro atravessa a
+ * virada.
  *
- * O dia da semana some a partir de uma semana porque "começa na sexta"
- * dito numa sexta-feira não diz se é hoje ou daqui a sete dias.
+ * Programação em outro formato devolve lista vazia, e aí o rótulo volta
+ * a se guiar só pelo período. Um formato que o código não entende não
+ * pode calar a feira.
  */
-export function chamadaDoTema(tema: Tema, hoje = hojeEmIvoti()): string {
-  if (jaComecou(tema, hoje)) return "Acontecendo agora";
+export function diasDeFeira(tema: Tema): string[] {
+  if (!tema.programacao || !tema.inicio || !tema.fim) return [];
 
-  const dias = diasEntre(hoje, tema.inicio!);
-  if (dias <= 1) return "Começa amanhã";
+  // "dd/mm" -> "AAAA-MM-DD", só para as datas dentro da temporada.
+  const doPeriodo = new Map<string, string>();
+  let d = tema.inicio;
+  for (let volta = 0; d <= tema.fim && volta < 400; volta++) {
+    const [, mes, dia] = d.split("-");
+    doPeriodo.set(`${dia}/${mes}`, d);
+    d = emDias(d, 1);
+  }
 
-  const quando = new Date(`${tema.inicio}T12:00:00-03:00`);
+  const achados = new Set<string>();
+  for (const linha of emLinhas(tema.programacao)) {
+    const corte = linha.indexOf(" · ");
+    if (corte < 0) continue;
+    // Procura no começo da linha uma das datas da temporada, em vez de
+    // extrair "dd/mm" e conferir depois: a lista só tem os dias que
+    // existem, então um número solto no texto não vira dia de feira.
+    const comeco = linha.slice(0, corte);
+    for (const [diaEMes, data] of doPeriodo) {
+      if (comeco.includes(diaEMes)) {
+        achados.add(data);
+        break;
+      }
+    }
+  }
+  return [...achados].sort();
+}
+
+/**
+ * Qual dia da programação nasce aberto: o de hoje, ou o próximo que vem.
+ *
+ * Devolve "dd/mm" porque é assim que o dia aparece escrito na lista.
+ * Num dia de intervalo não adianta abrir a dobra de sexta passada — o
+ * que a pessoa quer saber é o que tem no próximo dia de feira.
+ */
+export function diaDestacado(
+  tema: Tema,
+  hoje = hojeEmIvoti(),
+): string | null {
+  const dias = diasDeFeira(tema);
+  const escolhido = dias.includes(hoje) ? hoje : dias.find((d) => d >= hoje);
+  if (!escolhido) return null;
+  const [, mes, dia] = escolhido.split("-");
+  return `${dia}/${mes}`;
+}
+
+/** "amanhã", "na sexta-feira", "dia 23 de outubro". */
+function quandoPorExtenso(data: string, hoje: string): string {
+  const dias = diasEntre(hoje, data);
+  if (dias <= 1) return "amanhã";
+
+  const quando = new Date(`${data}T12:00:00-03:00`);
 
   if (dias <= 6) {
     const semana = new Intl.DateTimeFormat("pt-BR", {
@@ -260,16 +314,50 @@ export function chamadaDoTema(tema: Tema, hoje = hojeEmIvoti()): string {
       weekday: "long",
     }).format(quando);
     // Sábado e domingo pedem "no"; os dias terminados em -feira, "na".
-    const artigo = semana.endsWith("-feira") ? "na" : "no";
-    return `Começa ${artigo} ${semana}`;
+    return `${semana.endsWith("-feira") ? "na" : "no"} ${semana}`;
   }
 
-  const data = new Intl.DateTimeFormat("pt-BR", {
+  // O dia da semana some a partir de uma semana: "na sexta" dito numa
+  // sexta-feira não diz se é hoje ou daqui a sete dias.
+  const data_ = new Intl.DateTimeFormat("pt-BR", {
     timeZone: "America/Sao_Paulo",
     day: "numeric",
     month: "long",
   }).format(quando);
-  return `Começa dia ${data}`;
+  return `dia ${data_}`;
+}
+
+/**
+ * A chamada do bloco. Três estados, e nenhum deles mente:
+ *
+ *   antes de começar  -> "Começa amanhã" / "Começa na sexta-feira"
+ *   em dia de feira   -> "Acontecendo agora"
+ *   em dia de folga   -> "Volta na sexta-feira"
+ *
+ * O terceiro existe porque a temporada e os dias de feira não são a
+ * mesma coisa: a Feira das Flores vai de 16 a 25 de outubro, mas fecha
+ * de 19 a 22. Até 20/10/2026 o site dizia "acontecendo agora" nesses
+ * dias de portão fechado — o tipo de erro que custa uma viagem à toa
+ * para quem acreditou.
+ *
+ * Sem dias reconhecíveis na programação, o rótulo se guia só pelo
+ * período, que era o comportamento antigo.
+ */
+export function chamadaDoTema(tema: Tema, hoje = hojeEmIvoti()): string {
+  if (!jaComecou(tema, hoje))
+    return `Começa ${quandoPorExtenso(tema.inicio!, hoje)}`;
+
+  const dias = diasDeFeira(tema);
+  if (dias.length === 0 || dias.includes(hoje)) return "Acontecendo agora";
+
+  const volta = dias.find((d) => d > hoje);
+  if (volta) return `Volta ${quandoPorExtenso(volta, hoje)}`;
+
+  // Todos os dias já passaram, mas o período ainda não fechou. O site
+  // nunca chega aqui — temaAtivo não devolve feira com o fim vencido —,
+  // e mesmo assim não vale deixar "acontecendo agora" escrito como
+  // resposta para uma feira que acabou.
+  return "Encerrada";
 }
 
 /** "12 a 15 de outubro" — o período do selo, por extenso. */
