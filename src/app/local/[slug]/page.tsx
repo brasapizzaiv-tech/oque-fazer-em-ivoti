@@ -28,6 +28,8 @@ import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
 import { linkWhatsapp, usuarioInstagram } from "@/lib/texto";
 import { enderecoOficial } from "@/lib/site";
+import Ficha from "@/components/Ficha";
+import { fichaDoLugar } from "@/lib/ficha";
 
 export const revalidate = 600;
 
@@ -124,6 +126,7 @@ export default async function PaginaLocal({
 
   return (
     <div className="mx-auto lg:max-w-[1440px] lg:px-16 lg:pt-6 lg:pb-12">
+      <Ficha dados={fichaDoLugar(local)} />
       <div className="lg:grid lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-8">
           <ContarAcesso local={local.id} />
