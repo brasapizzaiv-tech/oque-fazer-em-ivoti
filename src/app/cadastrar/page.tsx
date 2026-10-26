@@ -9,8 +9,10 @@ import {
   Petunia,
 } from "@/components/vidro/icones";
 import FormularioCadastro from "./FormularioCadastro";
+import { enderecoOficial } from "@/lib/site";
 
 export const metadata: Metadata = {
+  alternates: enderecoOficial("/cadastrar"),
   title: "Cadastrar meu estabelecimento",
   description:
     "Coloque seu negócio no guia de Ivoti: é grátis, leva cinco minutos.",

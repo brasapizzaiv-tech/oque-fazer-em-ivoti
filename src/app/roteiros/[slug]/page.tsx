@@ -9,6 +9,7 @@ import { Legenda } from "@/components/vidro/pecas";
 import { FileiraDePetunias } from "@/components/vidro/blocos";
 import { roteiroCurado } from "@/lib/roteiros-curados";
 import { linkGoogleMaps, resumoDoPasseio } from "@/lib/roteiro";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -20,6 +21,7 @@ export async function generateMetadata({
   if (!roteiro) return { title: "Roteiro" };
 
   return {
+    alternates: enderecoOficial(`/roteiros/${roteiro.slug}`),
     title: roteiro.titulo,
     description:
       roteiro.descricao ??

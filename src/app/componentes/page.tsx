@@ -15,7 +15,11 @@ import {
   Petunia,
   Torii,
 } from "@/components/vidro/icones";
-import { BlocoDaFeira, RoupaDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
+import {
+  BlocoDaFeira,
+  RoupaDaFeira,
+  SeloDaFeira,
+} from "@/components/vidro/Feira";
 import type { Tema } from "@/lib/temas";
 import {
   Botao,

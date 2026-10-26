@@ -18,6 +18,7 @@ import {
 } from "@/lib/caminhos";
 import { imagemDoSite } from "@/lib/imagens";
 import { buscarLocais } from "@/lib/locais";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 300;
 
@@ -33,6 +34,7 @@ export async function generateMetadata({
   if (!caminho) return { title: "Caminho" };
 
   return {
+    alternates: enderecoOficial(`/caminhos/${caminho.slug}`),
     title: caminho.nome,
     description: `${extensaoPorExtenso(caminho.metros)} de estrada no interior de Ivoti, em circuito. O traçado no mapa e o que dá para ver pelo caminho.`,
   };

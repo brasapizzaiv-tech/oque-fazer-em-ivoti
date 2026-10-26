@@ -11,10 +11,12 @@ import { Chip } from "@/components/vidro/pecas";
 import Mapa from "@/components/Mapa";
 import { buscarLocais, listarCategorias } from "@/lib/locais";
 import { CAMINHOS, extensaoPorExtenso } from "@/lib/caminhos";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: enderecoOficial("/mapa"),
   title: "Mapa",
   description: "Todos os lugares de Ivoti no mapa, com rota e detalhes.",
 };

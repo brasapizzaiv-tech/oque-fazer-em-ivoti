@@ -13,10 +13,12 @@ import {
   tempoAPe,
   tempoDeCarro,
 } from "@/lib/caminhos";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 300;
 
 export const metadata: Metadata = {
+  alternates: enderecoOficial("/roteiros"),
   title: "Roteiros prontos",
   description:
     "Passeios montados em Ivoti: escolha um, abra a rota no mapa e saia.",

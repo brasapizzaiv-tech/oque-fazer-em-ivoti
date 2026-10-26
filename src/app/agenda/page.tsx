@@ -10,10 +10,12 @@ import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
 import { eventosVisiveis } from "@/lib/eventos";
 import { FUSO } from "@/lib/horarios";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 120;
 
 export const metadata: Metadata = {
+  alternates: enderecoOficial("/agenda"),
   title: "Agenda",
   description:
     "O que vai acontecer em Ivoti: shows, feiras, festas e encontros.",

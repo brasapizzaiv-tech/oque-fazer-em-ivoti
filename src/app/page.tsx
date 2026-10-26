@@ -31,8 +31,18 @@ import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { quandoVale } from "@/lib/promocoes";
 import { hojeEmIvoti } from "@/lib/planos";
 import { quandoPorExtenso } from "@/lib/horarios";
+import type { Metadata } from "next";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 60;
+
+// A capa e a unica pagina que nao tinha metadata proprio: ela herda
+// titulo e descricao do layout, e isso basta. O endereco oficial, nao —
+// sem ele o Google trata a capa do dominio e a do endereco da Vercel
+// como duas paginas iguais e nao sabe qual indexar.
+export const metadata: Metadata = {
+  alternates: enderecoOficial("/"),
+};
 
 /** A data de daqui a N dias, em AAAA-MM-DD, no fuso de Ivoti. */
 function daquiA(dias: number) {

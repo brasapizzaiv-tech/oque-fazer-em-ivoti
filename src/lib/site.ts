@@ -48,8 +48,10 @@ export const HOSTS_QUE_CONTAM = [
   "www.oguiaivoti.com.br",
   "oquefazeremivoti.com.br",
   "www.oquefazeremivoti.com.br",
-  "oque-fazer-em-ivoti.vercel.app",
 ];
+// O oque-fazer-em-ivoti.vercel.app saiu desta lista em 26/10/2026: ele
+// agora desvia para o dominio antes de a pagina carregar, entao nenhuma
+// visita chega a ser contada por la.
 
 /** Se a visita a este endereço entra na conta. */
 export function contaAcesso(host: string | null): boolean {
@@ -89,4 +91,23 @@ export function contaPagina(caminho: string | null | undefined): boolean {
   return !PAGINAS_QUE_NAO_CONTAM.some(
     (p) => caminho === p || caminho.startsWith(p + "/"),
   );
+}
+
+/**
+ * O endereço oficial de uma página, para o buscador.
+ *
+ * O site responde em mais de um endereço: o domínio próprio, o
+ * oque-fazer-em-ivoti.vercel.app que a Vercel dá a todo projeto, e as
+ * variações do Explorar com filtro na barra (?categoria=, ?promocao=).
+ * Para o Google, cada um desses é uma página diferente com o mesmo
+ * conteúdo — e em 23/10/2026 ele avisou por e-mail que deixou de indexar
+ * páginas por isso: "cópia sem página canônica selecionada pelo usuário".
+ *
+ * Esta marca é a resposta: ela diz, dentro da própria página, qual é o
+ * endereço de verdade. O caminho vai relativo de propósito; quem monta o
+ * endereço completo é o `metadataBase` do layout, que sai de SITE. Assim
+ * não existe a chance de alguém escrever o domínio errado à mão.
+ */
+export function enderecoOficial(caminho: string): { canonical: string } {
+  return { canonical: caminho };
 }

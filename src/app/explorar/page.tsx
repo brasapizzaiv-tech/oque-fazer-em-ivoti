@@ -16,10 +16,12 @@ import { hojeEmIvoti } from "@/lib/planos";
 import { quandoPorExtenso, situacao } from "@/lib/horarios";
 import { AvisoDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 60;
 
 export const metadata: Metadata = {
+  alternates: enderecoOficial("/explorar"),
   title: "Explorar",
   description:
     "Todos os lugares de Ivoti: filtre por tipo, etiqueta e horário.",

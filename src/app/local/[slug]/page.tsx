@@ -27,6 +27,7 @@ import { eventosVisiveis } from "@/lib/eventos";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
 import { linkWhatsapp, usuarioInstagram } from "@/lib/texto";
+import { enderecoOficial } from "@/lib/site";
 
 export const revalidate = 600;
 
@@ -38,6 +39,7 @@ export async function generateMetadata({
   if (!local) return { title: "Lugar não encontrado" };
 
   return {
+    alternates: enderecoOficial(`/local/${local.slug}`),
     title: local.nome,
     description: local.resumo ?? undefined,
     openGraph: {
