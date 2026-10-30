@@ -11,6 +11,8 @@ import { Legenda } from "@/components/vidro/pecas";
 import { eventosVisiveis } from "@/lib/eventos";
 import { FUSO } from "@/lib/horarios";
 import { enderecoOficial } from "@/lib/site";
+import Ficha from "@/components/Ficha";
+import { fichaDoEvento } from "@/lib/ficha";
 
 export const revalidate = 120;
 
@@ -54,6 +56,12 @@ export default async function Agenda() {
   return (
     <>
       <CabecalhoDeTela titulo="Agenda" foto={capa} />
+
+      {/* Uma ficha por evento: o buscador lê cada um como um evento
+          separado, com data e lugar, e não como texto de uma lista. */}
+      {eventos.map((e) => (
+        <Ficha key={e.id} dados={fichaDoEvento(e)} />
+      ))}
 
       <div className="mx-auto lg:max-w-[880px] lg:px-8 lg:pb-12">
         <div className="hidden px-4 pt-8 lg:block lg:px-0">

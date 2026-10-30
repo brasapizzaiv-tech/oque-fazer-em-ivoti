@@ -24,7 +24,21 @@ export type EventoNaTela = {
   local_texto: string | null;
   imagem_url: string | null;
   url: string | null;
-  local: { slug: string; nome: string; categoria_id: number | null } | null;
+  local: {
+    slug: string;
+    nome: string;
+    categoria_id: number | null;
+    // O endereço vem junto por causa da ficha do evento para o
+    // buscador: ele exige onde a coisa acontece, e sem isto a ficha
+    // sairia com o nome do lugar e nada mais.
+    endereco: string | null;
+    numero: string | null;
+    bairro: string | null;
+    cidade: string | null;
+    uf: string | null;
+    lat: number | null;
+    lng: number | null;
+  } | null;
 };
 
 export type FiltroEventos = {
@@ -72,7 +86,9 @@ export async function eventosVisiveis(
   if (ids.length > 0) {
     const { data: locais } = await sb
       .from("locais")
-      .select("id, slug, nome, categoria_id")
+      .select(
+        "id, slug, nome, categoria_id, endereco, numero, bairro, cidade, uf, lat, lng",
+      )
       .in("id", ids as string[]);
 
     for (const l of locais ?? []) {
@@ -80,6 +96,13 @@ export async function eventosVisiveis(
         slug: l.slug,
         nome: l.nome,
         categoria_id: l.categoria_id,
+        endereco: l.endereco,
+        numero: l.numero,
+        bairro: l.bairro,
+        cidade: l.cidade,
+        uf: l.uf,
+        lat: l.lat,
+        lng: l.lng,
       });
     }
   }

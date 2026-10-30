@@ -1,4 +1,5 @@
 import type { LocalCompleto } from "./tipos";
+import type { EventoNaTela } from "./eventos";
 import { SITE } from "./site";
 import { usuarioInstagram } from "./texto";
 
@@ -213,6 +214,77 @@ export function fichaDoLugar(local: LocalCompleto): object | null {
       longitude: local.lng,
     };
   }
+
+  return ficha;
+}
+
+/* ------------------------------------------------------------------ */
+/* A ficha de um evento                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * A ficha de um evento, pronta para virar JSON na página.
+ *
+ * O buscador exige três coisas: nome, quando começa e onde acontece.
+ * Sem qualquer uma delas a ficha é recusada inteira, então ela só sai
+ * quando as três existem.
+ *
+ * O que não é exigido também não é inventado. O preço, por exemplo: o
+ * cadastro de evento não tem campo de preço, e a Caminhada das Estações
+ * tem duas tabelas — grátis para quem mora em Ivoti, R$ 20 para quem
+ * vem de fora. Isso cabe na descrição, em português, e não numa linha
+ * de preço que teria de escolher uma das duas e mentir na outra.
+ */
+export function fichaDoEvento(evento: EventoNaTela): object | null {
+  const lugar = evento.local;
+  const onde = lugar?.nome ?? evento.local_texto;
+  if (!evento.titulo || !evento.inicio || !onde) return null;
+
+  const local: Record<string, unknown> = {
+    "@type": "Place",
+    name: onde,
+  };
+
+  const rua = [lugar?.endereco, lugar?.numero, lugar?.bairro]
+    .filter(Boolean)
+    .join(", ");
+
+  // Endereço sempre presente, mesmo magro: o buscador prefere recusar
+  // um "Place" sem endereço nenhum, e a cidade a gente sempre sabe.
+  local.address = {
+    "@type": "PostalAddress",
+    ...(rua ? { streetAddress: rua } : {}),
+    addressLocality: lugar?.cidade ?? "Ivoti",
+    addressRegion: lugar?.uf ?? "RS",
+    addressCountry: "BR",
+  };
+
+  if (lugar?.lat != null && lugar?.lng != null) {
+    local.geo = {
+      "@type": "GeoCoordinates",
+      latitude: lugar.lat,
+      longitude: lugar.lng,
+    };
+  }
+
+  // Para onde o buscador manda quem clicar. A página do lugar é melhor
+  // que a agenda: ela fala deste evento e de mais nada em volta.
+  const pagina = lugar?.slug ? `${SITE}/local/${lugar.slug}` : `${SITE}/agenda`;
+
+  const ficha: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: evento.titulo,
+    startDate: evento.inicio,
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: local,
+    url: evento.url || pagina,
+  };
+
+  if (evento.fim) ficha.endDate = evento.fim;
+  if (evento.descricao) ficha.description = evento.descricao;
+  if (evento.imagem_url) ficha.image = [evento.imagem_url];
 
   return ficha;
 }
