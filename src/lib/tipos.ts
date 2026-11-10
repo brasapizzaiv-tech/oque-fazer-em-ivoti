@@ -109,4 +109,6 @@ export type Evento = {
   status: "em_analise" | "publicado" | "rejeitado";
   /** A partir de quando aparece no site. Nulo = assim que aprovado. */
   publicar_em: string | null;
+  /** A data é certa, a hora não foi divulgada: a tela não fala de hora. */
+  sem_hora: boolean;
 };

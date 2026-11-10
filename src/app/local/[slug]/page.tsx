@@ -301,11 +301,15 @@ export default async function PaginaLocal({
                       })
                         .format(d)
                         .replace(".", "")}
-                      hora={new Intl.DateTimeFormat("pt-BR", {
-                        timeZone: "America/Sao_Paulo",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      }).format(d)}
+                      hora={
+                        e.sem_hora
+                          ? undefined
+                          : new Intl.DateTimeFormat("pt-BR", {
+                              timeZone: "America/Sao_Paulo",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }).format(d)
+                      }
                       onde={e.local_texto ?? undefined}
                       descricao={e.descricao}
                       foto={e.imagem_url}

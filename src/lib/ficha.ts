@@ -275,7 +275,14 @@ export function fichaDoEvento(evento: EventoNaTela): object | null {
     "@context": "https://schema.org",
     "@type": "Event",
     name: evento.titulo,
-    startDate: evento.inicio,
+    // Sem hora divulgada, a data vai sozinha: o vocabulário do
+    // buscador aceita "2027-03-19", e assim a ficha não promete um
+    // horário que ninguém anunciou.
+    startDate: evento.sem_hora
+      ? new Intl.DateTimeFormat("sv-SE", {
+          timeZone: "America/Sao_Paulo",
+        }).format(new Date(evento.inicio))
+      : evento.inicio,
     eventStatus: "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     location: local,

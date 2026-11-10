@@ -24,6 +24,8 @@ export type EventoNaTela = {
   local_texto: string | null;
   imagem_url: string | null;
   url: string | null;
+  /** A data é certa, a hora não foi divulgada. */
+  sem_hora: boolean;
   local: {
     slug: string;
     nome: string;
