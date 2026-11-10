@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { pedirAviso } from "@/lib/avisar";
 
 export default function AcoesAdmin({ id }: { id: string }) {
   const [motivo, setMotivo] = useState("");
@@ -20,6 +21,7 @@ export default function AcoesAdmin({ id }: { id: string }) {
         motivo_rejeicao: null,
       })
       .eq("id", id);
+    await pedirAviso(id);
     setIndo(false);
     router.refresh();
   }
@@ -31,6 +33,7 @@ export default function AcoesAdmin({ id }: { id: string }) {
       .from("locais")
       .update({ status: "rejeitado", motivo_rejeicao: motivo.trim() })
       .eq("id", id);
+    await pedirAviso(id);
     setIndo(false);
     setPedindoMotivo(false);
     router.refresh();

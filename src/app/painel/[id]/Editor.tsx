@@ -16,6 +16,7 @@ import EditorHorarios from "@/components/painel/EditorHorarios";
 import EditorItens from "@/components/painel/EditorItens";
 import EscolherPosicao from "@/components/painel/EscolherPosicao";
 import type { Categoria, LocalCompleto, Tag } from "@/lib/tipos";
+import { pedirAviso } from "@/lib/avisar";
 
 const ABAS = [
   { id: "sobre", nome: "Sobre" },
@@ -142,6 +143,7 @@ function BarraPublicacao({ local }: { local: LocalCompleto }) {
       .from("locais")
       .update({ status: "em_analise", motivo_rejeicao: null })
       .eq("id", local.id);
+    await pedirAviso(local.id);
     setIndo(false);
     router.refresh();
   }
