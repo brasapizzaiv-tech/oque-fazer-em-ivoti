@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Editor from "./Editor";
 import { listarCategorias, listarTags, localPorId } from "@/lib/locais";
 import { createClient } from "@/lib/supabase/server";
+import EntregarCadastro from "@/components/painel/EntregarCadastro";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +23,17 @@ export default async function EditarLocal({
     listarTags(supabase),
   ]);
 
+  const { data: perfil } = await supabase
+    .from("perfis")
+    .select("papel")
+    .eq("id", user?.id ?? "")
+    .maybeSingle();
+  const admin = perfil?.papel === "admin";
+
   // A RLS já barra quem não é dono, mas uma checagem explícita deixa a
   // mensagem melhor do que uma página vazia.
   if (!local || (local.dono_id !== user?.id && user)) {
-    const { data: perfil } = await supabase
-      .from("perfis")
-      .select("papel")
-      .eq("id", user?.id ?? "")
-      .maybeSingle();
-    if (perfil?.papel !== "admin") notFound();
+    if (!admin) notFound();
   }
   if (!local) notFound();
 
@@ -40,6 +43,7 @@ export default async function EditarLocal({
         ← Meus locais
       </Link>
       <Editor local={local} categorias={categorias} tags={tags} />
+      {admin && <EntregarCadastro local={local.id} nome={local.nome} />}
     </>
   );
 }
