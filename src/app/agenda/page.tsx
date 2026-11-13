@@ -19,9 +19,15 @@ export const revalidate = 120;
 
 export const metadata: Metadata = {
   alternates: enderecoOficial("/agenda"),
-  title: "Agenda",
+  // O título e a descrição usam as palavras que as pessoas digitam. No
+  // Search Console de 13/11/2026 a agenda era a segunda página que mais
+  // aparecia, para "eventos em ivoti hoje" e "o que fazer em ivoti hoje",
+  // perto da décima posição — com um título que dizia só "Agenda".
+  title: {
+    absolute: "Eventos em Ivoti: agenda de hoje e dos próximos dias",
+  },
   description:
-    "O que vai acontecer em Ivoti: shows, feiras, festas e encontros.",
+    "Eventos em Ivoti hoje e nos próximos dias: feiras, festas, shows e encontros, com a data e o lugar de cada um. A agenda do guia da cidade.",
 };
 
 /**
