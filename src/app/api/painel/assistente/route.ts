@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NOME_DO_SITE } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import { podeConversar } from "@/lib/limite-chat";
+import { conversaLimpa } from "@/lib/conversa";
 import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import { resumoDoLocal } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO, type TipoMetrica } from "@/lib/metricas";
@@ -55,9 +56,7 @@ export async function POST(request: Request) {
     return Response.json({ erro: "Pedido invalido." }, { status: 400 });
   }
 
-  const mensagens = (corpo.mensagens ?? [])
-    .filter((m) => m && typeof m.texto === "string" && m.texto.trim())
-    .slice(-12);
+  const mensagens = conversaLimpa(corpo.mensagens);
 
   if (mensagens.length === 0) {
     return Response.json({ erro: "Sem mensagem." }, { status: 400 });
@@ -84,12 +83,15 @@ export async function POST(request: Request) {
   const { data: local } = await supabase
     .from("locais")
     .select(
-      "id, nome, resumo, descricao, endereco, bairro, telefone, whatsapp, site, instagram, capa_url, status, plano, plano_ate, categoria:categorias(nome)",
+      "id, dono_id, nome, resumo, descricao, endereco, bairro, telefone, whatsapp, site, instagram, capa_url, status, plano, plano_ate, categoria:categorias(nome)",
     )
     .eq("id", corpo.local ?? "")
     .maybeSingle();
 
-  if (!local) {
+  // As regras do banco deixam qualquer um LER um local publicado, e o
+  // plano é do local. Sem conferir de quem ele é, uma conta sem plano
+  // usava o assistente apontando para o estabelecimento de outro.
+  if (!local || (!admin && local.dono_id !== user.id)) {
     return Response.json({ erro: "Não encontrei." }, { status: 404 });
   }
 

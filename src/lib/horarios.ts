@@ -221,15 +221,21 @@ export function deCampoDataHora(valor: string): string | null {
   return Number.isNaN(data.getTime()) ? null : data.toISOString();
 }
 
-/** "sáb, 20 de set, 21:00" — como o evento aparece escrito no site. */
-export function quandoPorExtenso(iso: string): string {
+/**
+ * "sáb, 20 de set, 21:00" — como o evento aparece escrito no site.
+ *
+ * Com `semHora`, sai só "sáb, 20 de set". Evento de data certa e hora não
+ * divulgada é gravado à meia-noite, e escrever "00:00" seria afirmar um
+ * horário que ninguém anunciou: o visitante (e o Guia) leriam "começa à
+ * meia-noite".
+ */
+export function quandoPorExtenso(iso: string, semHora = false): string {
   return new Intl.DateTimeFormat("pt-BR", {
     timeZone: FUSO,
     weekday: "short",
     day: "2-digit",
     month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
+    ...(semHora ? {} : { hour: "2-digit", minute: "2-digit" }),
   })
     .format(new Date(iso))
     .replaceAll(".", "");

@@ -17,10 +17,19 @@ import { createAdminClient } from "./supabase/admin";
 // serviria de nada.
 // ============================================================
 
-const POR_VISITANTE_POR_HORA = Number(
-  process.env.CHAT_LIMITE_POR_HORA ?? 20,
-);
-const DO_SITE_POR_DIA = Number(process.env.CHAT_LIMITE_POR_DIA ?? 500);
+/**
+ * O limite escrito na configuracao, ou o padrao.
+ *
+ * Um valor mal digitado ("vinte", "20/h") viraria NaN, e nenhum numero e
+ * maior que NaN: o chat ficaria sem limite nenhum, calado sobre isso.
+ */
+function limite(valor: string | undefined, padrao: number): number {
+  const numero = Number(valor);
+  return Number.isFinite(numero) && numero > 0 ? numero : padrao;
+}
+
+const POR_VISITANTE_POR_HORA = limite(process.env.CHAT_LIMITE_POR_HORA, 20);
+const DO_SITE_POR_DIA = limite(process.env.CHAT_LIMITE_POR_DIA, 500);
 
 export type Veredito =
   | { liberado: true }
@@ -75,13 +84,13 @@ export async function podeConversar(request: Request): Promise<Veredito> {
     const admin = createAdminClient();
     const { hora, dia } = janelas();
 
-    const [visitante, site] = await Promise.all([
-      admin.rpc("somar_uso_chat", {
-        p_chave: `ip:${identificar(request)}`,
-        p_janela: hora,
-      }),
-      admin.rpc("somar_uso_chat", { p_chave: "site", p_janela: dia }),
-    ]);
+    // Primeiro o visitante, e so depois o site. Somar os dois de uma vez
+    // fazia cada pedido RECUSADO gastar do teto da cidade: uma pessoa ja
+    // barrada, insistindo, calava o Guia para todo mundo ate a meia-noite.
+    const visitante = await admin.rpc("somar_uso_chat", {
+      p_chave: `ip:${identificar(request)}`,
+      p_janela: hora,
+    });
 
     if (typeof visitante.data === "number" && visitante.data > POR_VISITANTE_POR_HORA) {
       return {
@@ -90,6 +99,11 @@ export async function podeConversar(request: Request): Promise<Veredito> {
           "Você fez bastante pergunta nesta última hora! 😅 Descanse um pouco e volte daqui a pouco. Enquanto isso, dá para explorar o guia normalmente.",
       };
     }
+
+    const site = await admin.rpc("somar_uso_chat", {
+      p_chave: "site",
+      p_janela: dia,
+    });
 
     if (typeof site.data === "number" && site.data > DO_SITE_POR_DIA) {
       return {
@@ -103,5 +117,30 @@ export async function podeConversar(request: Request): Promise<Veredito> {
   } catch (erro) {
     console.error("Nao consegui conferir o limite do chat:", erro);
     return { liberado: true };
+  }
+}
+
+/**
+ * Conta mais um uso de qualquer coisa que precise de teto por hora, e diz
+ * se ainda cabe.
+ *
+ * Usa a mesma gaveta de contagem do chat. Como la, erro de contagem
+ * libera: um contador com problema nao pode travar o site.
+ */
+export async function dentroDoLimite(
+  chave: string,
+  maximoPorHora: number,
+): Promise<boolean> {
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return true;
+
+  try {
+    const { data } = await createAdminClient().rpc("somar_uso_chat", {
+      p_chave: chave,
+      p_janela: janelas().hora,
+    });
+    return typeof data !== "number" || data <= maximoPorHora;
+  } catch (erro) {
+    console.error(`Nao consegui conferir o limite de "${chave}":`, erro);
+    return true;
   }
 }

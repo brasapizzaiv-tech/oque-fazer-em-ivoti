@@ -11,6 +11,7 @@ import {
 import { hojeEmIvoti } from "@/lib/planos";
 import { respostaDemo } from "@/lib/demo";
 import { podeConversar } from "@/lib/limite-chat";
+import { conversaLimpa } from "@/lib/conversa";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -95,9 +96,7 @@ export async function POST(request: Request) {
     return Response.json({ erro: "Pedido invalido." }, { status: 400 });
   }
 
-  const mensagens = (corpo.mensagens ?? [])
-    .filter((m) => m && typeof m.texto === "string" && m.texto.trim())
-    .slice(-12);
+  const mensagens = conversaLimpa(corpo.mensagens);
 
   if (mensagens.length === 0) {
     return Response.json({ erro: "Sem mensagem." }, { status: 400 });

@@ -63,8 +63,13 @@ export default async function Inicio() {
   const principais = categorias.filter((c) => c.pai_id === null);
 
   // O celular mostra só o que é hoje; a tela grande tem espaço para a semana.
-  const limiteDeHoje = `${hojeEmIvoti()}T23:59:59-03:00`;
-  const deHoje = daSemana.filter((e) => e.inicio <= limiteDeHoje);
+  // Compara instantes, não textos: o banco devolve o início em UTC, e um
+  // show das 21h de Ivoti já vem escrito com a data de amanhã. Comparado
+  // letra a letra, ele ficava de fora do "hoje".
+  const fimDeHoje = new Date(`${hojeEmIvoti()}T23:59:59-03:00`).getTime();
+  const deHoje = daSemana.filter(
+    (e) => new Date(e.inicio).getTime() <= fimDeHoje,
+  );
 
   return (
     <>
@@ -257,7 +262,7 @@ export default async function Inicio() {
                   key={e.id}
                   href={`/agenda#${e.id}`}
                   foto={e.imagem_url}
-                  etiqueta={quandoPorExtenso(e.inicio)}
+                  etiqueta={quandoPorExtenso(e.inicio, e.sem_hora)}
                   titulo={e.titulo}
                   apoio={e.local?.nome ?? e.local_texto ?? undefined}
                   alto={180}
@@ -290,7 +295,7 @@ export default async function Inicio() {
                   key={e.id}
                   href={`/agenda#${e.id}`}
                   foto={e.imagem_url}
-                  etiqueta={quandoPorExtenso(e.inicio)}
+                  etiqueta={quandoPorExtenso(e.inicio, e.sem_hora)}
                   titulo={e.titulo}
                   apoio={e.local?.nome ?? e.local_texto ?? undefined}
                   alto={260}

@@ -302,7 +302,7 @@ export default async function Explorar({
                           {ev.titulo}
                         </p>
                         <p className="text-[12px] text-white/85">
-                          {quandoPorExtenso(ev.inicio)}
+                          {quandoPorExtenso(ev.inicio, ev.sem_hora)}
                         </p>
                       </li>
                     ))}

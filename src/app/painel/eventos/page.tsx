@@ -24,6 +24,7 @@ type Linha = {
   id: string;
   titulo: string;
   inicio: string;
+  sem_hora: boolean;
   status: string;
   local_texto: string | null;
   local: { nome: string } | null;
@@ -50,7 +51,9 @@ async function buscarEventos() {
   // Mesma regra dos locais: a administracao enxerga tudo, o dono so o dele.
   let consulta = supabase
     .from("eventos")
-    .select("id, titulo, inicio, status, local_texto, local:locais(nome)")
+    .select(
+      "id, titulo, inicio, sem_hora, status, local_texto, local:locais(nome)",
+    )
     .order("inicio", { ascending: false });
 
   if (!admin) consulta = consulta.eq("criado_por", user?.id ?? "");
@@ -152,7 +155,7 @@ function Lista({
                       className="text-[13px]"
                       style={{ color: "var(--color-v-texto-suave)" }}
                     >
-                      {quandoPorExtenso(e.inicio)}
+                      {quandoPorExtenso(e.inicio, e.sem_hora)}
                       {e.local?.nome
                         ? ` · ${e.local.nome}`
                         : e.local_texto

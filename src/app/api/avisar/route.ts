@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { mandarEmail, moldura, semHtml } from "@/lib/email";
 import { SITE } from "@/lib/site";
+import { dentroDoLimite } from "@/lib/limite-chat";
 
 export const runtime = "nodejs";
 
@@ -37,6 +38,14 @@ export async function POST(request: Request) {
       data: { user },
     } = await sb.auth.getUser();
     if (!user) return new Response(null, { status: 204 });
+
+    // Quatro avisos por hora, por pessoa e por cadastro, bastam para qualquer uso
+    // de verdade. Sem teto, repetir este pedido enchia a caixa da
+    // administração e gastava a cota de e-mails — a mesma que entrega o
+    // link de confirmar conta e o de trocar senha.
+    if (!(await dentroDoLimite(`aviso:${user.id}:${localId}`, 4))) {
+      return new Response(null, { status: 204 });
+    }
 
     const admin = createAdminClient();
 
@@ -130,7 +139,7 @@ async function avisarDono(admin: Admin, lugar: Lugar) {
         titulo: "Está no ar",
         texto: `<strong>${semHtml(lugar.nome)}</strong> já aparece no guia de Ivoti. Quem procurar por um lugar como o seu vai encontrar.`,
         botao: lugar.slug
-          ? { rotulo: "Ver no site", href: `${SITE}/local/${lugar.slug}` }
+          ? { rotulo: "Ver no site", href: `${SITE}/local/${encodeURIComponent(lugar.slug)}` }
           : undefined,
         rodape:
           "Tudo o que você alterar no painel daqui pra frente aparece no site em poucos minutos.",

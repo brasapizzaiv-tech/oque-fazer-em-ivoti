@@ -3,7 +3,6 @@ import { imagemDoSite } from "@/lib/imagens";
 import { CabecalhoDeTela, FileiraDePetunias } from "@/components/vidro/blocos";
 import Image from "next/image";
 import type { Metadata } from "next";
-import ContarAcesso from "@/components/ContarAcesso";
 import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
 import { listarRoteirosCurados } from "@/lib/roteiros-curados";
@@ -32,7 +31,6 @@ export default async function Roteiros() {
 
   return (
     <>
-      <ContarAcesso />
 
       <CabecalhoDeTela titulo="Roteiros prontos" foto={capa} />
 

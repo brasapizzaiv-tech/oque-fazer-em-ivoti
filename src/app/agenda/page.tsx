@@ -48,7 +48,9 @@ function porDia(eventos: Awaited<ReturnType<typeof eventosVisiveis>>) {
 
 export default async function Agenda() {
   const [eventos, capa] = await Promise.all([
-    eventosVisiveis({ limite: 40 }),
+    // Todos: a página diz quantos eventos há "pela frente", e com o teto
+    // de 40 ela escondia o fim do ano sem avisar.
+    eventosVisiveis({ limite: 500 }),
     imagemDoSite("capa-agenda"),
   ]);
   const dias = porDia(eventos);
@@ -128,8 +130,10 @@ export default async function Agenda() {
                         ...o,
                       }).format(d);
                     return (
+                      // O id é o destino dos cards da capa ("/agenda#id"): sem
+                      // ele o toque abria a agenda no topo, e não no evento.
+                      <div key={e.id} id={e.id} className="scroll-mt-24">
                       <LinhaEvento
-                        key={e.id}
                         titulo={e.titulo}
                         dia={parte({ day: "2-digit" })}
                         mes={parte({ month: "short" }).replace(".", "")}
@@ -142,6 +146,7 @@ export default async function Agenda() {
                         descricao={e.descricao}
                         foto={e.imagem_url}
                       />
+                      </div>
                     );
                   })}
                 </div>

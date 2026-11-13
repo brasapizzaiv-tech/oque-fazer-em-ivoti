@@ -3,7 +3,6 @@ import Link from "next/link";
 import { FileiraDePetunias } from "@/components/vidro/blocos";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import ContarAcesso from "@/components/ContarAcesso";
 import Mapa from "@/components/Mapa";
 import { CasaEnxaimel, Petunia } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
@@ -56,7 +55,6 @@ export default async function PaginaCaminho({
 
   return (
     <>
-      <ContarAcesso />
 
       <div className="mx-auto lg:max-w-[900px] lg:px-8 lg:pb-12">
         <header className="relative isolate px-4 pt-4 pb-4">

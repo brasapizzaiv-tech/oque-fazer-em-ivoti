@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import ContarAcesso from "@/components/ContarAcesso";
 import ListaDeParadas from "@/components/vidro/ListaDeParadas";
 import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
@@ -46,7 +45,6 @@ export default async function RoteiroPronto({
 
   return (
     <div className="mx-auto lg:max-w-[760px] lg:px-8 lg:pb-10">
-      <ContarAcesso />
 
       <header className="relative isolate px-4 pt-4 pb-4">
         <Image

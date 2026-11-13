@@ -75,8 +75,12 @@ export async function eventosVisiveis(
 
   if (ate) {
     // Até o fim daquele dia, em Ivoti.
-    const limiteData = new Date(`${ate}T23:59:59-03:00`).toISOString();
-    eventos = eventos.filter((e) => e.inicio <= limiteData);
+    // Instante contra instante. Comparar os dois como texto só dá certo
+    // enquanto o banco e o JavaScript escreverem a data do mesmo jeito.
+    const limiteData = new Date(`${ate}T23:59:59-03:00`).getTime();
+    eventos = eventos.filter(
+      (e) => new Date(e.inicio).getTime() <= limiteData,
+    );
   }
 
   if (eventos.length === 0) return [];

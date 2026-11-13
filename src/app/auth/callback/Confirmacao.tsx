@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { irParaRecarregando } from "@/lib/ir-para";
+import { caminhoInterno, irParaRecarregando } from "@/lib/ir-para";
 
 /**
  * Conclui a confirmacao de e-mail e joga a pessoa logada no painel.
@@ -29,9 +29,7 @@ export default function Confirmacao() {
   useEffect(() => {
     // So aceita caminho interno: um endereco completo aqui deixaria alguem
     // usar o nosso link pra jogar visitante em pagina de golpe.
-    const pedido = params.get("next") ?? "/painel";
-    const destino =
-      pedido.startsWith("/") && !pedido.startsWith("//") ? pedido : "/painel";
+    const destino = caminhoInterno(params.get("next"));
 
     const avisar = setTimeout(() => setDemorou(true), 6000);
 

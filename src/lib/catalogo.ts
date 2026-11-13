@@ -73,7 +73,9 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
  */
 async function agenda(): Promise<string> {
   // Mesma regra das telas: publicado, ja liberado, ainda nao passou.
-  const eventos = await eventosVisiveis({ limite: 40 }, createAdminClient());
+  // O teto existe para o texto não crescer sem fim, mas tem de caber um
+  // ano de calendário: com 40, o Guia não sabia do Natal.
+  const eventos = await eventosVisiveis({ limite: 120 }, createAdminClient());
 
   if (eventos.length === 0) {
     return "\n\n## AGENDA\nNenhum evento marcado no guia por enquanto. Nao invente eventos.";
@@ -84,7 +86,7 @@ async function agenda(): Promise<string> {
       ? `${e.local.nome} [[${e.local.slug}]]`
       : (e.local_texto ?? "local a confirmar");
     const detalhe = e.descricao ? ` — ${e.descricao.slice(0, 200)}` : "";
-    return `- ${e.titulo} · ${quandoPorExtenso(e.inicio)} · ${onde}${detalhe}`;
+    return `- ${e.titulo} · ${quandoPorExtenso(e.inicio, e.sem_hora)} · ${onde}${detalhe}`;
   });
 
   return `\n\n## AGENDA (eventos com data marcada)\n${linhas.join("\n")}`;

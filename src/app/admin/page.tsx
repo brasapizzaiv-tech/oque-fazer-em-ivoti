@@ -24,6 +24,7 @@ type EventoNaFila = {
   id: string;
   titulo: string;
   inicio: string;
+  sem_hora: boolean;
   descricao: string | null;
   local_texto: string | null;
   local: { nome: string } | null;
@@ -63,7 +64,9 @@ export default async function Admin() {
       .limit(30),
     supabase
       .from("eventos")
-      .select("id, titulo, inicio, descricao, local_texto, local:locais(nome)")
+      .select(
+        "id, titulo, inicio, sem_hora, descricao, local_texto, local:locais(nome)",
+      )
       .eq("status", "em_analise")
       .order("inicio", { ascending: true }),
   ]);
@@ -149,7 +152,7 @@ export default async function Admin() {
                   <div className="min-w-0">
                     <p className="font-semibold">{e.titulo}</p>
                     <p className="text-sm texto-suave">
-                      {quandoPorExtenso(e.inicio)}
+                      {quandoPorExtenso(e.inicio, e.sem_hora)}
                       {e.local?.nome
                         ? ` · ${e.local.nome}`
                         : e.local_texto

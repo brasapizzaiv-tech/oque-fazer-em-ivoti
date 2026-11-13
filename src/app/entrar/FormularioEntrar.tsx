@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
-import { irParaRecarregando } from "@/lib/ir-para";
+import { caminhoInterno, irParaRecarregando } from "@/lib/ir-para";
 
 export default function FormularioEntrar() {
   const [email, setEmail] = useState("");
@@ -45,8 +45,7 @@ export default function FormularioEntrar() {
       // O endereco de volta chega pela URL, entao so aceitamos caminhos deste
       // site: sem isso, um link preparado poderia mandar quem acabou de
       // entrar para fora, achando que ainda esta no guia.
-      const destino =
-        voltar.startsWith("/") && !voltar.startsWith("//") ? voltar : "/painel";
+      const destino = caminhoInterno(voltar);
 
       // Recarrega em vez de navegar por dentro: ver ir-para.ts. O botao
       // fica em "Entrando..." ate a tela nova chegar, de proposito.
