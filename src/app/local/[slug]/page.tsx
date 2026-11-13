@@ -30,6 +30,8 @@ import { linkWhatsapp, usuarioInstagram } from "@/lib/texto";
 import { enderecoOficial } from "@/lib/site";
 import Ficha from "@/components/Ficha";
 import { fichaDoEvento, fichaDoLugar } from "@/lib/ficha";
+import VideoDoLugar from "@/components/vidro/VideoDoLugar";
+import { videoParaMostrar } from "@/lib/video";
 
 export const revalidate = 600;
 
@@ -233,6 +235,13 @@ export default async function PaginaLocal({
               >
                 {local.descricao}
               </p>
+            </section>
+          )}
+
+          {videoParaMostrar(local.video_url) && (
+            <section className="px-4 pt-6">
+              <TituloSecao>Vídeo</TituloSecao>
+              <VideoDoLugar link={local.video_url} nome={local.nome} />
             </section>
           )}
 

@@ -72,6 +72,8 @@ export type Local = {
   site: string | null;
   instagram: string | null;
   facebook: string | null;
+  /** Link de um vídeo do YouTube ou do Instagram. */
+  video_url: string | null;
   faixa_preco: number | null;
   capa_url: string | null;
   plano: string;

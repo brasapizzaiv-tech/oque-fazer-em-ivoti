@@ -415,6 +415,7 @@ export const LOCAIS_DEMO: LocalCompleto[] = RASCUNHOS.map((r, i) => {
     site: null,
     instagram: r.instagram ?? null,
     facebook: null,
+    video_url: null,
     faixa_preco: r.preco ?? null,
     capa_url: null,
     plano: "gratuito",

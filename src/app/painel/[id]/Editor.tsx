@@ -17,6 +17,7 @@ import EditorItens from "@/components/painel/EditorItens";
 import EscolherPosicao from "@/components/painel/EscolherPosicao";
 import type { Categoria, LocalCompleto, Tag } from "@/lib/tipos";
 import { pedirAviso } from "@/lib/avisar";
+import { videoParaMostrar } from "@/lib/video";
 
 const ABAS = [
   { id: "sobre", nome: "Sobre" },
@@ -243,6 +244,7 @@ function Sobre({
     email: local.email ?? "",
     site: local.site ?? "",
     instagram: local.instagram ?? "",
+    video: local.video_url ?? "",
   });
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
@@ -273,6 +275,7 @@ function Sobre({
         email: dados.email.trim() || null,
         site: dados.site.trim() || null,
         instagram: dados.instagram.trim() || null,
+        video_url: dados.video.trim() || null,
       })
       .eq("id", local.id);
 
@@ -349,6 +352,25 @@ function Sobre({
             <option value="4">$$$$ — alto</option>
           </select>
         </label>
+      </Bloco>
+
+      <Bloco
+        titulo="Vídeo"
+        descricao="Um vídeo curto do lugar, tocando na sua página."
+      >
+        <Texto
+          rotulo="Link do vídeo"
+          placeholder="Cole o link de um Reel do Instagram ou de um vídeo do YouTube"
+          valor={dados.video}
+          onChange={mudar("video")}
+        />
+        {dados.video.trim() && !videoParaMostrar(dados.video) && (
+          <p className="mt-2 text-[13px] text-[color:var(--color-v-fechado-claro)]">
+            Não reconheci esse link. Precisa ser o endereço de um Reel do
+            Instagram ou de um vídeo do YouTube — copie pelo botão
+            &quot;Compartilhar&quot; do próprio vídeo.
+          </p>
+        )}
       </Bloco>
 
       <Bloco titulo="Contato" descricao="Como as pessoas falam com vocês.">
