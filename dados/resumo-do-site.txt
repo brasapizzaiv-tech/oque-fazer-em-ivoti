@@ -1,0 +1,68 @@
+O QUE FAZER EM IVOTI — O QUE O SITE TEM E FAZ
+
+O QUE É
+Um guia digital da cidade de Ivoti, feito para o visitante responder
+"o que eu faço hoje aqui?" pelo celular, sem baixar aplicativo.
+Endereço: oquefazeremivoti.com.br
+
+PARA O VISITANTE (tudo grátis, sem cadastro)
+- Início: o que está acontecendo hoje, os próximos eventos e as
+  promoções do dia
+- Explorar: todos os lugares, com busca e filtro por categoria,
+  por etiqueta e por "aberto agora"
+- Mapa: os lugares com pino no mapa e rota em um toque (Google Maps e Waze)
+- Agenda: o calendário de eventos da cidade, dia por dia
+  (já com os eventos oficiais de 2027)
+- Roteiros prontos e caminhos rurais desenhados no mapa, com distância
+- Página de cada lugar: fotos, horário de hoje, cardápio com preços,
+  WhatsApp, Instagram, endereço e rota
+- Feiras da cidade: quando chega o Kerb, a Feira do Mel ou a Feira das
+  Flores, o site inteiro muda de cor sozinho, mostra a programação por
+  dia e avisa "começa na sexta" ou "acontecendo agora"
+
+O GUIA (assistente de inteligência artificial)
+- O visitante conversa como se falasse com alguém da cidade
+- Indica onde comer, o que visitar e o que está aberto naquela hora
+- Monta um roteiro de passeio completo, com rota pronta no mapa
+- Conhece a agenda, as promoções e as feiras
+- Cada lugar indicado vira um link para a página dele
+
+PARA O COMERCIANTE (painel próprio, com login)
+- Cadastra e edita o próprio estabelecimento, sem depender de ninguém
+- Fotos, horários por dia da semana, cardápio com seções e preços
+- Publica eventos na agenda e promoções na capa do guia
+- Assistente de IA que escreve a descrição do negócio e sugere promoções
+- Recebe e-mail quando o cadastro entra no ar ou precisa de ajuste
+
+MÉTRICAS (o que o comerciante consegue provar)
+- Quantas pessoas abriram a página do estabelecimento
+- Quantas clicaram no WhatsApp
+- Quantas clicaram no telefone
+- Quantas pediram a rota ("como chegar")
+- Quantas abriram o cardápio
+- Quantas foram para o Instagram e para o site dele
+- Quantas vezes os eventos e as promoções dele foram vistos
+- Quantas vezes o Guia indicou o lugar dele
+- Tudo por período, com exportação em planilha
+- Os números contam só gente de verdade: robôs são filtrados
+
+CAMPANHAS COM INFLUENCIADOR
+- Cada campanha tem um link próprio
+- O site registra quem chegou por aquele link e o que fez nos 7 dias
+  seguintes
+- Relatório por estabelecimento: quantos abriram a página e quantos
+  clicaram em WhatsApp, rota, cardápio, Instagram e telefone
+- É a prova, em número, do que o vídeo trouxe
+
+PARA SER ENCONTRADO
+- Domínio próprio e site cadastrado no Google
+- Cada lugar e cada evento tem uma ficha que o Google lê: tipo de
+  estabelecimento, endereço, horário e localização
+- Imagem de compartilhamento pronta para WhatsApp e redes
+
+O QUE JÁ ESTÁ NO AR
+- 13 lugares publicados, entre comércios e pontos turísticos
+- 9 categorias principais e 45 subcategorias
+- 10 eventos oficiais de 2027, somando 53 dias de programação
+- 3 feiras com tema próprio programadas para o ano
+- 3 caminhos rurais mapeados
