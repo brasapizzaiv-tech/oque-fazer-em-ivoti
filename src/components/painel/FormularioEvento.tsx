@@ -4,12 +4,14 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { naoAbriu, prepararFoto } from "@/lib/preparar-foto";
 import { AreaTexto, Bloco, BotaoSalvar, Texto } from "./Campos";
 import { paraCampoDataHora, deCampoDataHora } from "@/lib/horarios";
 import type { Evento } from "@/lib/tipos";
 import { explicarErro } from "@/lib/erro-do-banco";
 
-const TAMANHO_MAXIMO = 8 * 1024 * 1024; // 8 MB
+// Teto do arquivo original; o que sobe é a versão reduzida.
+const TAMANHO_MAXIMO = 25 * 1024 * 1024;
 
 export type LocalDoDono = { id: string; nome: string };
 
@@ -53,7 +55,7 @@ export default function FormularioEvento({
     if (!arquivo) return;
 
     if (arquivo.size > TAMANHO_MAXIMO) {
-      setErro("A imagem passa de 8 MB. Diminua e tente de novo.");
+      setErro("A imagem é grande demais (passa de 25 MB).");
       return;
     }
 
@@ -61,12 +63,21 @@ export default function FormularioEvento({
     setSalvando(true);
 
     const supabase = createClient();
-    const extensao = arquivo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const caminho = `eventos/${crypto.randomUUID()}.${extensao}`;
+    const pronta = await prepararFoto(arquivo);
+    if (!pronta) {
+      setErro(naoAbriu(arquivo.name));
+      setSalvando(false);
+      return;
+    }
+    const caminho = `eventos/${crypto.randomUUID()}.${pronta.extensao}`;
 
     const { error } = await supabase.storage
       .from("locais")
-      .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
+      .upload(caminho, pronta.arquivo, {
+        cacheControl: "3600",
+        contentType: pronta.tipo,
+        upsert: false,
+      });
 
     if (error) {
       setErro(explicarErro(error, "Não consegui salvar o evento. Tente de novo."));

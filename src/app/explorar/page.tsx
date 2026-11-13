@@ -13,7 +13,7 @@ import Mapa from "@/components/Mapa";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { hojeEmIvoti } from "@/lib/planos";
-import { quandoPorExtenso, situacao } from "@/lib/horarios";
+import { quandoPorExtenso, seloDoLugar } from "@/lib/horarios";
 import { AvisoDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
 import { enderecoOficial } from "@/lib/site";
@@ -260,11 +260,7 @@ export default async function Explorar({
                     etiqueta={local.bairro ?? undefined}
                     titulo={local.nome}
                     apoio={local.categoria?.nome ?? undefined}
-                    status={
-                      situacao(local.horarios ?? []).aberto
-                        ? "aberto"
-                        : "fechado"
-                    }
+                    status={seloDoLugar(local.horarios ?? [])}
                     canto={
                       metros != null ? formatarDistancia(metros) : undefined
                     }

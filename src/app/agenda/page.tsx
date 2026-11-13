@@ -9,7 +9,7 @@ import {
 import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
 import { eventosVisiveis } from "@/lib/eventos";
-import { FUSO } from "@/lib/horarios";
+import { anoEmIvoti, FUSO } from "@/lib/horarios";
 import { enderecoOficial } from "@/lib/site";
 import Ficha from "@/components/Ficha";
 import { fichaDoEvento } from "@/lib/ficha";
@@ -33,10 +33,16 @@ export const metadata: Metadata = {
 function porDia(eventos: Awaited<ReturnType<typeof eventosVisiveis>>) {
   const grupos = new Map<string, typeof eventos>();
   for (const e of eventos) {
-    const dia = new Date(e.inicio).toLocaleDateString("pt-BR", {
+    const quando = new Date(e.inicio);
+    const dia = quando.toLocaleDateString("pt-BR", {
       weekday: "long",
       day: "2-digit",
       month: "long",
+      // O ano entra quando não é o corrente: o calendário já vai até o
+      // fim de 2027, e "03 de dezembro" lido em novembro parecia logo ali.
+      ...(anoEmIvoti(quando) === anoEmIvoti(new Date())
+        ? {}
+        : { year: "numeric" as const }),
       timeZone: FUSO,
     });
     const atual = grupos.get(dia) ?? [];

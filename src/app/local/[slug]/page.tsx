@@ -27,7 +27,7 @@ import { eventosVisiveis } from "@/lib/eventos";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkRota } from "@/lib/geo";
 import { linkWhatsapp, usuarioInstagram } from "@/lib/texto";
-import { enderecoOficial } from "@/lib/site";
+import { enderecoOficial, fotoParaCompartilhar } from "@/lib/site";
 import Ficha from "@/components/Ficha";
 import { fichaDoEvento, fichaDoLugar } from "@/lib/ficha";
 import VideoDoLugar from "@/components/vidro/VideoDoLugar";
@@ -42,14 +42,21 @@ export async function generateMetadata({
   const local = await localPorSlug(slug);
   if (!local) return { title: "Lugar não encontrado" };
 
+  const endereco = enderecoOficial(`/local/${local.slug}`);
+
   return {
-    alternates: enderecoOficial(`/local/${local.slug}`),
+    alternates: endereco,
     title: local.nome,
     description: local.resumo ?? undefined,
     openGraph: {
       title: local.nome,
       description: local.resumo ?? undefined,
-      images: local.capa_url ? [local.capa_url] : undefined,
+      url: endereco.canonical,
+      // Sempre uma imagem: definir "openGraph" aqui apaga a imagem padrão
+      // do site, e lugar sem foto era compartilhado no WhatsApp sem
+      // imagem nenhuma. Com foto, vai a versão reduzida — a original de
+      // um celular chega a 2 MB, e o WhatsApp desiste de imagem pesada.
+      images: [fotoParaCompartilhar(local.capa_url)],
     },
   };
 }
@@ -76,7 +83,11 @@ export default async function PaginaLocal({
     promocoesDoLocal(local.id),
   ]);
 
-  const { aberto, texto: textoDoHorario } = situacao(local.horarios ?? []);
+  const {
+    aberto,
+    semHorario,
+    texto: textoDoHorario,
+  } = situacao(local.horarios ?? []);
   const semana = porDia(local.horarios ?? []);
   const endereco = [local.endereco, local.numero, local.bairro]
     .filter(Boolean)
@@ -161,7 +172,11 @@ export default async function PaginaLocal({
 
           <div className="px-4 pt-4">
             <div className="flex flex-wrap items-center gap-2">
-              <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+              {/* Sem horário cadastrado não há selo: "Fechado" seria uma
+                  afirmação que o cadastro não sustenta. */}
+              {!semHorario && (
+                <SeloStatus tipo={aberto ? "aberto" : "fechado"} />
+              )}
               <span
                 className="text-[13px]"
                 style={{ color: "var(--color-v-texto-suave)" }}
@@ -385,7 +400,7 @@ export default async function PaginaLocal({
           )}
 
           <div className="px-4 pt-7 pb-8 lg:px-0">
-            <ConviteAoGuia nome={local.nome} />
+            <ConviteAoGuia temCardapio={local.itens.length > 0} />
           </div>
         </div>
 

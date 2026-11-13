@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 /**
  * A vitrine de componentes fica por cima da casca do site.
  *
@@ -12,6 +14,10 @@ export default function LayoutComponentes({
 }: {
   children: React.ReactNode;
 }) {
+  // Vitrine de trabalho: existe para quem desenvolve, e não para o
+  // visitante. No site no ar o endereço responde "não encontrado".
+  if (process.env.NODE_ENV === "production") notFound();
+
   return (
     <div
       className="fixed inset-0 z-[60] overflow-y-auto"

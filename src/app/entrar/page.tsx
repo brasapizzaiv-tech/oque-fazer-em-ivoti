@@ -6,6 +6,9 @@ import FormularioEntrar from "./FormularioEntrar";
 export const metadata: Metadata = {
   title: "Entrar",
   description: "Acesse o painel do seu estabelecimento.",
+  // Tela de senha não é resultado de busca: fica fora, como as outras
+  // telas de conta.
+  robots: { index: false, follow: false },
 };
 
 export default function Entrar() {

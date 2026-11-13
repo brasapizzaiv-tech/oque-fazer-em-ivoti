@@ -4,11 +4,13 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { naoAbriu, prepararFoto } from "@/lib/preparar-foto";
 import { Aviso, Caixa, Rotulo } from "@/components/painel/pecas";
 import type { ImagemCadastrada } from "@/lib/imagens";
 import { explicarErro } from "@/lib/erro-do-banco";
 
-const TAMANHO_MAXIMO = 6 * 1024 * 1024;
+// Teto do arquivo original; o que sobe é a versão reduzida.
+const TAMANHO_MAXIMO = 25 * 1024 * 1024;
 
 /**
  * Troca uma das imagens do site.
@@ -39,18 +41,27 @@ export default function TrocarImagem({ imagem }: { imagem: ImagemCadastrada }) {
 
     if (arquivo.size > TAMANHO_MAXIMO) {
       setErro(
-        "A imagem passa de 6 MB. Foto grande demais deixa o site lento no celular — diminua antes de enviar.",
+        "A imagem é grande demais (passa de 25 MB).",
       );
       return;
     }
 
     setIndo(true);
-    const extensao = arquivo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const caminho = `site/${imagem.chave}-${crypto.randomUUID()}.${extensao}`;
+    const pronta = await prepararFoto(arquivo, { manterPng: true });
+    if (!pronta) {
+      setIndo(false);
+      setErro(naoAbriu(arquivo.name));
+      return;
+    }
+    const caminho = `site/${imagem.chave}-${crypto.randomUUID()}.${pronta.extensao}`;
 
     const { error: erroEnvio } = await supabase.storage
       .from("locais")
-      .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
+      .upload(caminho, pronta.arquivo, {
+        cacheControl: "3600",
+        contentType: pronta.tipo,
+        upsert: false,
+      });
 
     if (erroEnvio) {
       setIndo(false);

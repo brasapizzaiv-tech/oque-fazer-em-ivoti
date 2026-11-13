@@ -111,3 +111,18 @@ export function contaPagina(caminho: string | null | undefined): boolean {
 export function enderecoOficial(caminho: string): { canonical: string } {
   return { canonical: caminho };
 }
+
+/**
+ * A imagem que acompanha o link quando alguém o manda no WhatsApp.
+ *
+ * Com foto, devolve a versão reduzida pelo próprio site (1200 de largura):
+ * a original de um celular chega a 2 MB, e os aplicativos de mensagem
+ * desistem de imagem pesada. Sem foto, a imagem padrão do guia — para o
+ * link nunca sair pelado.
+ *
+ * O endereço vai relativo; o `metadataBase` do layout completa o domínio.
+ */
+export function fotoParaCompartilhar(foto: string | null | undefined): string {
+  if (!foto) return "/opengraph-image.jpg";
+  return `/_next/image?url=${encodeURIComponent(foto)}&w=1200&q=75`;
+}

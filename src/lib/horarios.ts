@@ -75,7 +75,31 @@ export type SituacaoLocal = {
   texto: string;
   /** Minutos ate fechar (se aberto) ou ate abrir (se fechado hoje ainda). */
   minutosAte: number | null;
+  /**
+   * O cadastro nao tem horario nenhum. Nao e o mesmo que estar fechado:
+   * sem esta marca, o Nucleo de Casas Enxaimel e a igreja apareciam com o
+   * selo "Fechado" o dia inteiro, todo dia.
+   */
+  semHorario?: boolean;
 };
+
+/** A faixa que cobre o dia inteiro: praca, ponte, o que nao fecha. */
+function diaInteiro(h: Horario): boolean {
+  return paraMinutos(h.abre) === 0 && paraMinutos(h.fecha) >= 23 * 60 + 59;
+}
+
+/**
+ * O selo que o card do lugar mostra — ou nenhum, quando o cadastro nao
+ * informa horario e a unica resposta honesta e nao afirmar nada.
+ */
+export function seloDoLugar(
+  horarios: Horario[],
+  agora = agoraNaCidade(),
+): "aberto" | "fechado" | undefined {
+  const s = situacao(horarios, agora);
+  if (s.semHorario) return undefined;
+  return s.aberto ? "aberto" : "fechado";
+}
 
 /**
  * Diz se o local esta aberto agora, levando em conta faixas que viram a
@@ -87,7 +111,12 @@ export function situacao(
   agora = agoraNaCidade(),
 ): SituacaoLocal {
   if (!horarios || horarios.length === 0) {
-    return { aberto: false, texto: "Horário não informado", minutosAte: null };
+    return {
+      aberto: false,
+      texto: "Horário não informado",
+      minutosAte: null,
+      semHorario: true,
+    };
   }
 
   const { diaSemana, minutos } = agora;
@@ -97,6 +126,12 @@ export function situacao(
     const abre = paraMinutos(h.abre);
     const fecha = paraMinutos(h.fecha);
     const viraDia = fecha <= abre;
+
+    // Aberto o dia todo: sem isto a praca aparecia "Aberta ate as 23h59" e
+    // fechava por um minuto, todo dia, as 23:59.
+    if (h.dia_semana === diaSemana && diaInteiro(h)) {
+      return { aberto: true, texto: "Aberto 24 horas", minutosAte: null };
+    }
 
     // Faixa que comeca hoje.
     if (h.dia_semana === diaSemana) {
@@ -167,7 +202,9 @@ export function porDia(horarios: Horario[]) {
     const faixas = horarios
       .filter((h) => h.dia_semana === dia)
       .sort((a, b) => paraMinutos(a.abre) - paraMinutos(b.abre))
-      .map((h) => `${hhmm(h.abre)} às ${hhmm(h.fecha)}`);
+      .map((h) =>
+        diaInteiro(h) ? "24 horas" : `${hhmm(h.abre)} às ${hhmm(h.fecha)}`,
+      );
     return { dia, nome, faixas, fechado: faixas.length === 0 };
   });
 }
@@ -230,13 +267,28 @@ export function deCampoDataHora(valor: string): string | null {
  * meia-noite".
  */
 export function quandoPorExtenso(iso: string, semHora = false): string {
+  const quando = new Date(iso);
+
   return new Intl.DateTimeFormat("pt-BR", {
     timeZone: FUSO,
     weekday: "short",
     day: "2-digit",
     month: "short",
+    // O ano só aparece quando não é o corrente. Sem ele, um evento de
+    // dezembro de 2027 lido em novembro de 2026 parecia ser do mês que vem.
+    ...(anoEmIvoti(quando) === anoEmIvoti(new Date())
+      ? {}
+      : { year: "numeric" as const }),
     ...(semHora ? {} : { hour: "2-digit", minute: "2-digit" }),
   })
-    .format(new Date(iso))
+    .format(quando)
     .replaceAll(".", "");
+}
+
+/** O ano em que a data cai, no calendario de Ivoti. */
+export function anoEmIvoti(data: Date): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: FUSO,
+    year: "numeric",
+  }).format(data);
 }

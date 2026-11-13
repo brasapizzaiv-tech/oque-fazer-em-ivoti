@@ -192,8 +192,14 @@ export function BlocoRoteiro({ className = "" }: { className?: string }) {
   );
 }
 
-/** O convite ao Guia, na página do estabelecimento. */
-export function ConviteAoGuia({ nome }: { nome?: string }) {
+/**
+ * O convite ao Guia, na página do estabelecimento.
+ *
+ * A pergunta muda conforme o lugar tem cardápio ou não: "o que pedir" numa
+ * praça, numa ponte ou numa igreja não fazia sentido. E não leva o nome do
+ * lugar, porque "no Praça Neldo Holler" errava o gênero.
+ */
+export function ConviteAoGuia({ temCardapio }: { temCardapio?: boolean }) {
   return (
     <CardAzul className="p-5">
       <Legenda cor="#FFFFFF">Pergunte ao Guia</Legenda>
@@ -201,7 +207,7 @@ export function ConviteAoGuia({ nome }: { nome?: string }) {
         className="mt-1.5 text-[17px] leading-tight font-bold"
         style={{ fontFamily: "var(--fonte-titulo-nova)" }}
       >
-        {nome ? `O que pedir no ${nome}?` : "O que pedir aqui?"}
+        {temCardapio ? "O que pedir aqui?" : "O que mais tem por perto?"}
       </p>
       <p className="mt-1.5 text-[14px] text-white/85">
         Ou peça um roteiro pela cidade, começando por aqui.

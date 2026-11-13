@@ -4,13 +4,15 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { naoAbriu, prepararFoto } from "@/lib/preparar-foto";
 import { AreaTexto, Bloco, BotaoSalvar, Texto } from "./Campos";
 import { DIAS_CURTOS } from "@/lib/horarios";
 import { quandoVale, type Promocao } from "@/lib/promocoes";
 import type { LocalDoDono } from "./FormularioEvento";
 import { explicarErro } from "@/lib/erro-do-banco";
 
-const TAMANHO_MAXIMO = 8 * 1024 * 1024; // 8 MB
+// Teto do arquivo original; o que sobe é a versão reduzida.
+const TAMANHO_MAXIMO = 25 * 1024 * 1024;
 
 /** Cadastro e edição de promoção fixa. Sem "promocao" = criando uma nova. */
 export default function FormularioPromocao({
@@ -46,7 +48,7 @@ export default function FormularioPromocao({
     const arquivo = arquivos?.[0];
     if (!arquivo) return;
     if (arquivo.size > TAMANHO_MAXIMO) {
-      setErro("A imagem passa de 8 MB. Diminua e tente de novo.");
+      setErro("A imagem é grande demais (passa de 25 MB).");
       return;
     }
 
@@ -54,12 +56,21 @@ export default function FormularioPromocao({
     setSalvando(true);
 
     const supabase = createClient();
-    const extensao = arquivo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const caminho = `promocoes/${crypto.randomUUID()}.${extensao}`;
+    const pronta = await prepararFoto(arquivo);
+    if (!pronta) {
+      setErro(naoAbriu(arquivo.name));
+      setSalvando(false);
+      return;
+    }
+    const caminho = `promocoes/${crypto.randomUUID()}.${pronta.extensao}`;
 
     const { error } = await supabase.storage
       .from("locais")
-      .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
+      .upload(caminho, pronta.arquivo, {
+        cacheControl: "3600",
+        contentType: pronta.tipo,
+        upsert: false,
+      });
 
     if (error) {
       setErro(explicarErro(error, "Não consegui salvar a promoção. Tente de novo."));

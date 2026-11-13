@@ -44,7 +44,11 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
     .join(", ");
   if (endereco) linhas.push(`Endereco: ${endereco}`);
 
-  linhas.push(`Agora: ${s.aberto ? "ABERTO" : "FECHADO"} (${s.texto})`);
+  linhas.push(
+    s.semHorario
+      ? "Agora: horario nao informado. Nao afirme que esta aberto nem que esta fechado."
+      : `Agora: ${s.aberto ? "ABERTO" : "FECHADO"} (${s.texto})`,
+  );
   linhas.push(`Horarios: ${resumoSemana(local.horarios)}`);
 
   if (local.faixa_preco) linhas.push(`Preco: ${faixaPreco(local.faixa_preco)}`);

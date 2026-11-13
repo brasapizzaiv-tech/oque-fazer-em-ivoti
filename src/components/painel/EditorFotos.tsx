@@ -4,56 +4,12 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { naoAbriu, prepararFoto } from "@/lib/preparar-foto";
 import { Bloco } from "./Campos";
 import type { Foto } from "@/lib/tipos";
 
 /** Teto do arquivo original. O que sobe é a versão reduzida, bem menor. */
 const TAMANHO_MAXIMO = 25 * 1024 * 1024;
-
-/** Lado maior da foto que vai para o site. */
-const LADO_MAXIMO = 1920;
-
-/**
- * Reduz a foto e a converte para JPG, no próprio aparelho, antes de subir.
- *
- * Dois motivos. Foto de celular sai com 4 a 8 MB, e é esse arquivo que o
- * visitante baixaria na rua, no 4G. E o iPhone grava em HEIC, formato que
- * o Chrome e o Android não abrem: a foto subia, o comerciante a via no
- * iPhone dele, e para a maior parte dos visitantes era um quadro vazio.
- *
- * Devolve nulo quando o navegador não consegue abrir o arquivo (é o caso
- * do HEIC fora do Safari): melhor recusar com um recado claro do que
- * publicar uma foto que não aparece.
- */
-async function prepararFoto(arquivo: File): Promise<Blob | null> {
-  try {
-    const imagem = await createImageBitmap(arquivo, {
-      imageOrientation: "from-image",
-    });
-
-    const escala = Math.min(
-      1,
-      LADO_MAXIMO / Math.max(imagem.width, imagem.height),
-    );
-    const tela = document.createElement("canvas");
-    tela.width = Math.round(imagem.width * escala);
-    tela.height = Math.round(imagem.height * escala);
-
-    const pincel = tela.getContext("2d");
-    if (!pincel) return null;
-    // Fundo branco: PNG com transparência viraria preto no JPG.
-    pincel.fillStyle = "#FFFFFF";
-    pincel.fillRect(0, 0, tela.width, tela.height);
-    pincel.drawImage(imagem, 0, 0, tela.width, tela.height);
-    imagem.close();
-
-    return await new Promise((pronto) =>
-      tela.toBlob(pronto, "image/jpeg", 0.85),
-    );
-  } catch {
-    return null;
-  }
-}
 
 export default function EditorFotos({
   localId,
@@ -90,9 +46,7 @@ export default function EditorFotos({
 
       const reduzida = await prepararFoto(arquivo);
       if (!reduzida) {
-        recusadas.push(
-          `Não consegui abrir "${arquivo.name}". Se for foto de iPhone no formato HEIC, envie pelo próprio iPhone ou salve como JPG antes.`,
-        );
+        recusadas.push(naoAbriu(arquivo.name));
         continue;
       }
 
@@ -100,9 +54,9 @@ export default function EditorFotos({
 
       const { error: erroUpload } = await supabase.storage
         .from("locais")
-        .upload(caminho, reduzida, {
+        .upload(caminho, reduzida.arquivo, {
           cacheControl: "3600",
-          contentType: "image/jpeg",
+          contentType: reduzida.tipo,
           upsert: false,
         });
 

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { naoAbriu, prepararFoto } from "@/lib/preparar-foto";
 import {
   Aviso,
   CAMPO,
@@ -14,7 +15,8 @@ import {
 import type { Tema } from "@/lib/temas";
 import { explicarErro } from "@/lib/erro-do-banco";
 
-const TAMANHO_MAXIMO = 4 * 1024 * 1024;
+// Teto do arquivo original; o que sobe é a versão reduzida.
+const TAMANHO_MAXIMO = 25 * 1024 * 1024;
 
 /**
  * O editor de uma feira.
@@ -62,15 +64,24 @@ export default function EditorFeira({ tema }: { tema: Tema }) {
     qual: "logo" | "capa",
   ): Promise<string | null> {
     if (arquivo.size > TAMANHO_MAXIMO) {
-      setErro(`A imagem passa de 4 MB. Diminua e tente de novo.`);
+      setErro("A imagem é grande demais (passa de 25 MB).");
       return null;
     }
-    const extensao = arquivo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-    const caminho = `temas/${tema.slug}-${qual}-${crypto.randomUUID()}.${extensao}`;
+    // O logo da feira costuma ter fundo transparente: continua PNG.
+    const pronta = await prepararFoto(arquivo, { manterPng: true });
+    if (!pronta) {
+      setErro(naoAbriu(arquivo.name));
+      return null;
+    }
+    const caminho = `temas/${tema.slug}-${qual}-${crypto.randomUUID()}.${pronta.extensao}`;
 
     const { error } = await supabase.storage
       .from("locais")
-      .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
+      .upload(caminho, pronta.arquivo, {
+        cacheControl: "3600",
+        contentType: pronta.tipo,
+        upsert: false,
+      });
 
     if (error) {
       setErro(explicarErro(error, "Não consegui salvar. Tente de novo."));
