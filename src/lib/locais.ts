@@ -52,6 +52,93 @@ function afinar(
   });
 }
 
+/** Palavras que não ajudam a achar nada: saem da busca. */
+const PALAVRAS_VAZIAS = new Set([
+  "de", "do", "da", "dos", "das", "em", "no", "na", "nos", "nas",
+  "para", "pra", "com", "um", "uma", "e", "o", "a", "os", "as",
+]);
+
+/**
+ * As palavras que o visitante digitou, prontas para comparar: sem acento,
+ * em minúsculas e no singular ("pizzas" acha "pizza").
+ */
+function palavrasDaBusca(q: string): string[] {
+  const todas = normalizar(q)
+    .split(/[^a-z0-9]+/)
+    .filter((p) => p.length >= 2);
+  const uteis = todas.filter((p) => !PALAVRAS_VAZIAS.has(p));
+  return (uteis.length > 0 ? uteis : todas).map((p) =>
+    p.length > 3 && p.endsWith("s") ? p.slice(0, -1) : p,
+  );
+}
+
+/**
+ * O quanto um lugar responde à busca. Zero quer dizer "não é este".
+ *
+ * Todas as palavras precisam aparecer em algum canto do cadastro. Cada
+ * uma vale mais conforme onde foi achada: no nome pesa mais que na
+ * categoria, que pesa mais que no texto corrido.
+ *
+ * A busca é feita aqui, e não no banco, por três motivos que a auditoria
+ * de 13/11/2026 mediu: a do banco não achava palavra digitada sem acento
+ * ("nucleo", "portico", "sao pedro" davam zero), não olhava a categoria
+ * ("hamburgueria" e "museu" davam zero) nem o cardápio. Numa cidade do
+ * tamanho de Ivoti a lista inteira cabe na memória com folga.
+ */
+function pontosNaBusca(
+  local: LocalCompleto,
+  palavras: string[],
+  categoriaPai: string | undefined,
+): number {
+  const cantos: [number, string][] = [
+    [8, local.nome],
+    [5, `${local.categoria?.nome ?? ""} ${categoriaPai ?? ""}`],
+    [4, local.tags.map((t) => t.nome).join(" ")],
+    [3, local.resumo ?? ""],
+    [2, local.itens.map((i) => `${i.secao ?? ""} ${i.nome}`).join(" ")],
+    [1, `${local.descricao ?? ""} ${local.bairro ?? ""} ${local.endereco ?? ""}`],
+  ];
+  const prontos = cantos.map(([peso, texto]) => [peso, normalizar(texto)] as const);
+
+  let total = 0;
+  for (const palavra of palavras) {
+    const achou = prontos.find(([, texto]) => texto.includes(palavra));
+    if (!achou) return 0;
+    total += achou[0];
+  }
+  return total;
+}
+
+/** Fica só com o que responde à busca, do mais certeiro para o menos. */
+function filtrarPorTexto(
+  locais: LocalCompleto[],
+  q: string | undefined,
+  categorias: Categoria[],
+): LocalCompleto[] {
+  if (!q || !q.trim()) return locais;
+  const palavras = palavrasDaBusca(q);
+  if (palavras.length === 0) return locais;
+
+  const nomeDaCategoria = new Map(categorias.map((c) => [c.id, c.nome]));
+
+  return locais
+    .map((local) => ({
+      local,
+      pontos: pontosNaBusca(
+        local,
+        palavras,
+        local.categoria?.pai_id != null
+          ? nomeDaCategoria.get(local.categoria.pai_id)
+          : undefined,
+      ),
+    }))
+    .filter((x) => x.pontos > 0)
+    // A ordenação do JavaScript é estável: empate mantém a ordem que já
+    // veio (destaque primeiro, depois alfabética).
+    .sort((a, b) => b.pontos - a.pontos)
+    .map((x) => x.local);
+}
+
 /** Busca nos locais de demonstração, imitando o que o banco faria. */
 function buscarNaDemonstracao(filtros: FiltrosBusca): LocalCompleto[] {
   const { q, categoria, limite = 200 } = filtros;
@@ -68,18 +155,10 @@ function buscarNaDemonstracao(filtros: FiltrosBusca): LocalCompleto[] {
     }
   }
 
-  if (q && q.trim()) {
-    const alvo = normalizar(q);
-    locais = locais.filter((l) =>
-      normalizar(
-        [l.nome, l.resumo, l.descricao, l.bairro, l.categoria?.nome]
-          .filter(Boolean)
-          .join(" "),
-      ).includes(alvo),
-    );
-  }
-
-  return afinar(locais, filtros).slice(0, limite);
+  return filtrarPorTexto(afinar(locais, filtros), q, CATEGORIAS_DEMO).slice(
+    0,
+    limite,
+  );
 }
 
 /** Arruma a linha crua do banco no formato que o site usa. */
@@ -148,14 +227,18 @@ export async function buscarLocais(
   const sb = supabase ?? (await createClient());
   const { q, categoria, limite = 200 } = filtros;
 
+  // Traz todos os publicados e só corta no fim, depois de filtrar e
+  // ordenar. Cortar aqui deixaria de fora lugares que o filtro escolheria.
   let consulta = sb
     .from("locais")
     .select(CAMPOS)
     .eq("status", "publicado")
-    .limit(limite);
+    .limit(1000);
+
+  const categorias =
+    categoria || (q && q.trim()) ? await listarCategorias(sb) : [];
 
   if (categoria) {
-    const categorias = await listarCategorias(sb);
     const alvo = categorias.find((c) => c.slug === categoria);
     if (alvo) {
       const filhas = categorias
@@ -165,24 +248,20 @@ export async function buscarLocais(
     }
   }
 
-  if (q && q.trim()) {
-    // websearch_to_tsquery entende "pizza -doce" e frases entre aspas.
-    consulta = consulta.textSearch("busca", q.trim(), {
-      type: "websearch",
-      config: "portuguese",
-    });
-  }
-
   const { data, error } = await consulta;
   if (error) {
     console.error("Erro ao buscar locais:", error.message);
     return [];
   }
 
-  return afinar(
-    (data ?? []).map((l) => montar(l as LinhaBruta)),
-    filtros,
-  );
+  return filtrarPorTexto(
+    afinar(
+      (data ?? []).map((l) => montar(l as LinhaBruta)),
+      filtros,
+    ),
+    q,
+    categorias,
+  ).slice(0, limite);
 }
 
 export async function localPorSlug(
