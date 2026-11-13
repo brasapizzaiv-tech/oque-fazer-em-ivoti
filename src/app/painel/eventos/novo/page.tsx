@@ -1,11 +1,12 @@
 import Link from "next/link";
 import FormularioEvento from "@/components/painel/FormularioEvento";
+import Bloqueado from "@/components/painel/Bloqueado";
 import { locaisParaEvento } from "../locais-do-dono";
 
 export const dynamic = "force-dynamic";
 
 export default async function NovoEvento() {
-  const { locais, admin } = await locaisParaEvento();
+  const { locais, admin, bloqueado } = await locaisParaEvento("eventos");
 
   return (
     <>
@@ -24,7 +25,11 @@ export default async function NovoEvento() {
         </h1>
       </div>
 
-      <FormularioEvento locais={locais} ehAdmin={admin} />
+      {bloqueado ? (
+        <Bloqueado modulo="eventos" />
+      ) : (
+        <FormularioEvento locais={locais} ehAdmin={admin} />
+      )}
     </>
   );
 }

@@ -7,7 +7,7 @@ import {
   resumoDoLocal,
 } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO } from "@/lib/metricas";
-import { planoAtivo, podeUsar } from "@/lib/planos";
+import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import {
   BarrasRanqueadas,
   GraficoDias,
@@ -68,14 +68,14 @@ export default async function Metricas({
 
   const local = locais.find((l) => l.id === escolhido) ?? locais[0];
   const plano = planoAtivo(local.plano, local.plano_ate);
-  // A administracao enxerga as metricas de qualquer local, premium ou nao:
+  // A administracao enxerga as metricas de qualquer local, com plano ou nao:
   // e voce quem precisa saber como o guia inteiro esta indo para decidir o
   // que melhorar e o que oferecer a quem. O bloqueio continua valendo para o
-  // comerciante: no login dele, so o premium abre os numeros.
+  // comerciante: no login dele, so o plano Movimento ou acima abre os numeros.
   const liberado = admin || podeUsar("metricas", plano);
   const vendoComoAdmin = admin && !podeUsar("metricas", plano);
 
-  // No gratuito nem se pede o resumo: a regra do banco nao devolveria as
+  // Sem o plano nem se pede o resumo: a regra do banco nao devolveria as
   // linhas, e pedir o que vai voltar vazio so ensina a tela a conviver
   // com buraco. O total de acessos, que e de graca, vem pela funcao que
   // devolve so ele.
@@ -127,9 +127,9 @@ export default async function Metricas({
 
       {vendoComoAdmin && (
         <p className="mt-4 aviso-painel px-3 py-2 text-[14px]">
-          Você está vendo como administração. {local.nome} está no plano
-          gratuito — no painel do próprio estabelecimento, estes números
-          aparecem bloqueados.
+          Você está vendo como administração. {local.nome} não tem o{" "}
+          {planoDoModulo("metricas")} — no painel do próprio estabelecimento,
+          estes números aparecem bloqueados.
         </p>
       )}
 

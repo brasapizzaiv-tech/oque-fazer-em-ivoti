@@ -2,7 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NOME_DO_SITE } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import { podeConversar } from "@/lib/limite-chat";
-import { planoAtivo, podeUsar } from "@/lib/planos";
+import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import { resumoDoLocal } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO, type TipoMetrica } from "@/lib/metricas";
 import { resumoSemana } from "@/lib/horarios";
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
   const plano = planoAtivo(local.plano, local.plano_ate);
   if (!admin && !podeUsar("guia_painel", plano)) {
     return Response.json(
-      { erro: "O assistente faz parte do plano premium." },
+      { erro: `O assistente faz parte do ${planoDoModulo("guia_painel")}.` },
       { status: 403 },
     );
   }

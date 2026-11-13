@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { planoAtivo, podeUsar } from "@/lib/planos";
+import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import Bloqueado from "@/components/painel/Bloqueado";
 import EscolherLocal from "@/components/painel/EscolherLocal";
 import ChatDoPainel from "@/components/painel/ChatDoPainel";
@@ -50,7 +50,7 @@ export default async function Assistente({
   const plano = planoAtivo(local.plano, local.plano_ate);
 
   // Mesma regra das métricas: a administração enxerga tudo, e o comerciante
-  // só com o premium.
+  // só com o plano que libera o assistente.
   const liberado = admin || podeUsar("guia_painel", plano);
   const vendoComoAdmin = admin && !podeUsar("guia_painel", plano);
 
@@ -80,9 +80,9 @@ export default async function Assistente({
 
       {vendoComoAdmin && (
         <p className="mt-4 aviso-painel px-3 py-2 text-[14px]">
-          Você está vendo como administração. {local.nome} está no plano
-          gratuito — no painel do próprio estabelecimento, o assistente aparece
-          bloqueado.
+          Você está vendo como administração. {local.nome} não tem o{" "}
+          {planoDoModulo("guia_painel")} — no painel do próprio estabelecimento,
+          o assistente aparece bloqueado.
         </p>
       )}
 

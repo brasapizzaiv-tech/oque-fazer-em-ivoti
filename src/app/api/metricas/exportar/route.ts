@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NOME_DO_TIPO, type TipoMetrica } from "@/lib/metricas";
 import { diasAtras } from "@/lib/metricas-resumo";
-import { planoAtivo, podeUsar } from "@/lib/planos";
+import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import { enderecoCurto } from "@/lib/roteiro";
 
 export const runtime = "nodejs";
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
   const plano = planoAtivo(local.plano, local.plano_ate);
   if (!admin && !podeUsar("metricas", plano)) {
     return Response.json(
-      { erro: "A exportação faz parte do plano premium." },
+      { erro: `A exportação faz parte do ${planoDoModulo("metricas")}.` },
       { status: 403 },
     );
   }
@@ -76,7 +76,10 @@ export async function GET(request: Request) {
 
   if (error) {
     console.error("Nao consegui exportar as metricas:", error.message);
-    return Response.json({ erro: "Não consegui gerar agora." }, { status: 500 });
+    return Response.json(
+      { erro: "Não consegui gerar agora." },
+      { status: 500 },
+    );
   }
 
   const csv = montarCsv(

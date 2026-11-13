@@ -101,7 +101,7 @@ export default async function Agenda() {
               style={{ color: "var(--color-v-texto-suave)" }}
             >
               Ainda não há nada marcado. Se você tem um estabelecimento, pode
-              cadastrar seu evento — é grátis.
+              divulgar seus eventos aqui.
             </p>
             <Link
               href="/painel"

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import FormularioPromocao from "@/components/painel/FormularioPromocao";
+import Bloqueado from "@/components/painel/Bloqueado";
 import { locaisParaEvento } from "../../eventos/locais-do-dono";
 
 export const dynamic = "force-dynamic";
 
 export default async function NovaPromocao() {
-  const { locais } = await locaisParaEvento();
+  const { locais, bloqueado } = await locaisParaEvento("promocoes");
 
   return (
     <>
@@ -24,7 +25,9 @@ export default async function NovaPromocao() {
         </h1>
       </div>
 
-      {locais.length === 0 ? (
+      {bloqueado ? (
+        <Bloqueado modulo="promocoes" />
+      ) : locais.length === 0 ? (
         <p className="caixa-painel border-dashed p-8 text-center text-sm texto-suave">
           Cadastre primeiro o seu estabelecimento — a promoção fica ligada a
           ele.

@@ -2,7 +2,12 @@ import Link from "next/link";
 import { SubTitulo, TituloPainel } from "@/components/painel/pecas";
 import ControlePlano from "./ControlePlano";
 import { createClient } from "@/lib/supabase/server";
-import { planoAtivo } from "@/lib/planos";
+import {
+  ORDEM_DOS_PLANOS,
+  PLANOS,
+  planoAtivo,
+  precoPorExtenso,
+} from "@/lib/planos";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +19,7 @@ type Linha = {
   plano: string;
   plano_ate: string | null;
   plano_desde: string | null;
+  dono_id: string | null;
   categoria: { nome: string } | null;
 };
 
@@ -23,44 +29,82 @@ export default async function Planos() {
   const { data } = await supabase
     .from("locais")
     .select(
-      "id, slug, nome, bairro, plano, plano_ate, plano_desde, categoria:categorias(nome)",
+      "id, slug, nome, bairro, plano, plano_ate, plano_desde, dono_id, categoria:categorias(nome)",
     )
     .eq("status", "publicado")
     .order("nome");
 
   const locais = (data ?? []) as unknown as Linha[];
+  const ativoDe = (l: Linha) => planoAtivo(l.plano, l.plano_ate);
 
-  const premium = locais.filter(
-    (l) => planoAtivo(l.plano, l.plano_ate) === "premium",
-  );
-  const gratuitos = locais.filter(
-    (l) => planoAtivo(l.plano, l.plano_ate) === "gratuito",
-  );
+  const semPlano = locais.filter((l) => ativoDe(l) === "gratuito");
+  // Lugar sem dono é ponto da cidade: praça, ponte, memorial. Não é
+  // cliente em potencial, então não entra na conta de quem falta cobrar.
+  const comerciosSemPlano = semPlano.filter((l) => l.dono_id !== null);
+  const pontosDaCidade = semPlano.filter((l) => l.dono_id === null);
+
+  const mensal = locais.reduce((soma, l) => {
+    const p = ativoDe(l);
+    return p === "gratuito" ? soma : soma + PLANOS[p].centavos;
+  }, 0);
 
   return (
     <div>
       <TituloPainel>Planos</TituloPainel>
       <p className="mt-1 text-[14px] texto-suave">
-        Você combina o pagamento fora do site e marca aqui até quando vale.
-        Quando a data passa, o plano volta para gratuito sozinho — nada é
-        apagado, só fica bloqueado.
+        Você combina o pagamento fora do site e marca aqui qual plano vale e até
+        quando. Quando a data passa, os recursos do plano se fecham sozinhos —
+        nada é apagado.
       </p>
 
-      <div className="mt-6 flex gap-3 text-sm">
+      <div className="mt-6 flex flex-wrap gap-3 text-sm">
         <span className="aviso-painel px-4 py-2.5">
-          <strong className="text-lg">{premium.length}</strong> premium
+          <strong className="text-lg">{precoPorExtenso(mensal)}</strong> por mês
+          em planos ativos
         </span>
-        <span className="border-2 border-[color:var(--color-v-texto)]/25 bg-[color:var(--color-v-fundo)] px-4 py-2.5">
-          <strong className="text-lg">{gratuitos.length}</strong> gratuitos
+        {ORDEM_DOS_PLANOS.map((p) => (
+          <span key={p} className="caixa-painel px-4 py-2.5">
+            <strong className="text-lg">
+              {locais.filter((l) => ativoDe(l) === p).length}
+            </strong>{" "}
+            {PLANOS[p].nome}
+          </span>
+        ))}
+        <span className="caixa-painel px-4 py-2.5">
+          <strong className="text-lg">{comerciosSemPlano.length}</strong> sem
+          plano
         </span>
       </div>
 
-      {premium.length > 0 && <Grupo titulo="Premium" locais={premium} />}
+      {[...ORDEM_DOS_PLANOS].reverse().map((p) => {
+        const doPlano = locais.filter((l) => ativoDe(l) === p);
+        return doPlano.length > 0 ? (
+          <Grupo
+            key={p}
+            titulo={`${PLANOS[p].nome} · ${precoPorExtenso(PLANOS[p].centavos)}`}
+            locais={doPlano}
+          />
+        ) : null;
+      })}
+
       <Grupo
-        titulo="Gratuitos"
-        locais={gratuitos}
-        vazio="Nenhum estabelecimento no plano gratuito."
+        titulo="Comércios sem plano"
+        locais={comerciosSemPlano}
+        vazio="Nenhum comércio publicado sem plano."
       />
+
+      {pontosDaCidade.length > 0 && (
+        <section className="mt-8">
+          <SubTitulo>Pontos da cidade</SubTitulo>
+          <p className="mt-1 text-sm texto-suave">
+            Praças, monumentos e atrativos públicos. Ficam no guia de graça: são
+            o motivo de o visitante abrir o site.
+          </p>
+          <p className="mt-2 text-sm">
+            {pontosDaCidade.map((l) => l.nome).join(" · ")}
+          </p>
+        </section>
+      )}
     </div>
   );
 }

@@ -17,5 +17,14 @@ export const NOME_DO_SITE = "O que fazer em Ivoti";
 /** A linha que acompanha o nome no logo. */
 export const ASSINATURA = "A cidade das flores";
 
+/**
+ * O WhatsApp para onde vai quem quer saber dos planos.
+ *
+ * Aparece no bloqueio dos módulos do painel e na página de planos. Mora
+ * aqui para as duas telas nunca mandarem o comerciante para números
+ * diferentes.
+ */
+export const WHATSAPP_DO_GUIA = "5551998323298";
+
 /** Como o assistente se chama. */
 export const NOME_DO_ASSISTENTE = "O Guia";

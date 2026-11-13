@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { planoAtivo, diasParaVencer } from "@/lib/planos";
+import { planoAtivo, diasParaVencer, nomeDoPlano } from "@/lib/planos";
 import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
@@ -17,12 +17,13 @@ export const dynamic = "force-dynamic";
 /**
  * O selo do plano ao lado do nome.
  *
- * Só aparece no premium: um selo "Gratuito" em toda linha viraria ruído, e
- * quem está no gratuito já descobre o que existe pelos módulos bloqueados.
+ * Só aparece em quem tem plano pago, com o nome do plano: um selo "Sem
+ * plano" em toda linha viraria ruído, e os pontos da cidade nunca terão um.
  * Avisa quando falta pouco para vencer, que é quando ainda dá para renovar.
  */
 function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
-  if (planoAtivo(plano, ate) !== "premium") return null;
+  const ativo = planoAtivo(plano, ate);
+  if (ativo === "gratuito") return null;
 
   const dias = diasParaVencer(ate);
   const acabando = dias !== null && dias <= 7;
@@ -38,7 +39,7 @@ function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
       }}
       title={ate ? `Vale até ${ate}` : "Sem data de vencimento"}
     >
-      Premium
+      {nomeDoPlano(ativo)}
       {acabando &&
         (dias === 0
           ? " · vence hoje"
@@ -102,7 +103,7 @@ export default async function Painel() {
             acao={<Botao href="/painel/novo">Começar</Botao>}
           >
             Cadastre seu estabelecimento, atrativo ou ponto turístico. Leva
-            poucos minutos e é de graça.
+            poucos minutos.
           </Nenhum>
         </div>
       ) : (

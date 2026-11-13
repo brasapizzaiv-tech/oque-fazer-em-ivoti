@@ -24,7 +24,7 @@ export default async function EditarPromocao({
 
   if (!promocao) notFound();
 
-  const { locais } = await locaisParaEvento();
+  const { locais } = await locaisParaEvento("promocoes", true);
 
   return (
     <>

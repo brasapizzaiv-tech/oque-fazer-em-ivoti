@@ -24,7 +24,7 @@ export default async function EditarEvento({
 
   if (!evento) notFound();
 
-  const { locais, admin } = await locaisParaEvento();
+  const { locais, admin } = await locaisParaEvento("eventos", true);
 
   return (
     <>

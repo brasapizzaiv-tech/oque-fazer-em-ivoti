@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { FileiraDePetunias } from "@/components/vidro/blocos";
 import CabecalhoSimples from "@/components/vidro/CabecalhoSimples";
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
   alternates: enderecoOficial("/cadastrar"),
   title: "Cadastrar meu estabelecimento",
   description:
-    "Coloque seu negócio no guia de Ivoti: é grátis, leva cinco minutos.",
+    "Coloque seu negócio no guia de Ivoti: o cadastro leva cinco minutos.",
 };
 
 const VANTAGENS = [
@@ -74,8 +75,16 @@ export default function Cadastrar() {
             className="mt-3 max-w-[46ch] text-[15px]"
             style={{ color: "var(--color-v-texto-suave)" }}
           >
-            É de graça. Você cria a conta, preenche o perfil do jeito que
-            quiser, e a gente publica.
+            Você cria a conta, preenche o perfil do jeito que quiser, e a gente
+            publica.{" "}
+            <Link
+              href="/planos"
+              className="font-semibold underline"
+              style={{ color: "var(--color-v-azul)" }}
+            >
+              Conheça os planos
+            </Link>
+            .
           </p>
 
           <ul className="mt-8 space-y-5">

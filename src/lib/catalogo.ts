@@ -9,7 +9,7 @@ import {
   DIAS,
 } from "./horarios";
 import { faixaPreco } from "./texto";
-import { planoAtivo } from "./planos";
+import { planoAtivo, podeUsar } from "./planos";
 import { quandoVale } from "./promocoes";
 import type { LocalCompleto } from "./tipos";
 
@@ -26,7 +26,10 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
   const s = situacao(local.horarios, agora);
   const linhas: string[] = [];
 
-  const parceiro = planoAtivo(local.plano, local.plano_ate) === "premium";
+  const parceiro = podeUsar(
+    "prioridade_guia",
+    planoAtivo(local.plano, local.plano_ate),
+  );
 
   linhas.push(`### ${local.nome} [[${local.slug}]]`);
   // A marca que o Guia usa para desempatar entre dois lugares que servem
@@ -93,7 +96,9 @@ async function agenda(): Promise<string> {
  * Usa a mesma funcao do banco que o site usa, entao chat e tela nunca
  * discordam sobre o que esta valendo.
  */
-async function promocoesDeHoje(nomePorId: Map<string, string>): Promise<string> {
+async function promocoesDeHoje(
+  nomePorId: Map<string, string>,
+): Promise<string> {
   const { data } = await createAdminClient().rpc("promocoes_de_hoje", {
     p_local: null,
   });
@@ -131,8 +136,12 @@ export async function catalogo(): Promise<Catalogo> {
   // aqui ela reforca o desempate que as instrucoes ja pedem — sem tirar
   // ninguem do catalogo.
   const locais = [...todos].sort((a, b) => {
-    const pa = planoAtivo(a.plano, a.plano_ate) === "premium" ? 0 : 1;
-    const pb = planoAtivo(b.plano, b.plano_ate) === "premium" ? 0 : 1;
+    const pa = podeUsar("prioridade_guia", planoAtivo(a.plano, a.plano_ate))
+      ? 0
+      : 1;
+    const pb = podeUsar("prioridade_guia", planoAtivo(b.plano, b.plano_ate))
+      ? 0
+      : 1;
     return pa - pb;
   });
   const nomePorId = new Map(locais.map((l) => [l.id, l.nome]));

@@ -3,13 +3,22 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { hojeEmIvoti, planoAtivo, diasParaVencer } from "@/lib/planos";
+import {
+  ORDEM_DOS_PLANOS,
+  PLANOS,
+  diasParaVencer,
+  hojeEmIvoti,
+  planoAtivo,
+  precoPorExtenso,
+  type PlanoPago,
+} from "@/lib/planos";
 
 /**
- * Liga e desliga o premium de um estabelecimento.
+ * Liga, troca e encerra o plano de um estabelecimento.
  *
  * Não cobra nada nem fala com banco nenhum: você combina o pagamento fora e
- * marca aqui até quando vale. Quando a data passa, o site rebaixa sozinho.
+ * marca aqui qual plano vale e até quando. Quando a data passa, o site
+ * fecha os recursos do plano sozinho.
  */
 export default function ControlePlano({
   local,
@@ -26,8 +35,13 @@ export default function ControlePlano({
 }) {
   const ativo = planoAtivo(plano, planoAte);
   const dias = diasParaVencer(planoAte);
+  // Plano pago gravado, mas com a data vencida.
+  const vencido = ativo === "gratuito" && plano !== "gratuito";
 
   const [abrindo, setAbrindo] = useState(false);
+  const [escolhido, setEscolhido] = useState<PlanoPago>(
+    ativo === "gratuito" ? "presenca" : ativo,
+  );
   const [ate, setAte] = useState(planoAte ?? emUmMes());
   const [observacao, setObservacao] = useState("");
   const [indo, setIndo] = useState(false);
@@ -44,11 +58,14 @@ export default function ControlePlano({
       data: { user },
     } = await supabase.auth.getUser();
 
-    const desde = planoDesde ?? hojeEmIvoti();
+    // Renovar o mesmo plano mantém a data em que o cliente entrou; trocar
+    // de plano começa a contar de hoje.
+    const desde =
+      escolhido === ativo && planoDesde ? planoDesde : hojeEmIvoti();
 
     const { error } = await supabase
       .from("locais")
-      .update({ plano: "premium", plano_desde: desde, plano_ate: ate })
+      .update({ plano: escolhido, plano_desde: desde, plano_ate: ate })
       .eq("id", local);
 
     if (error) {
@@ -57,9 +74,14 @@ export default function ControlePlano({
       return;
     }
 
+    // Fecha o período que estava aberto antes de abrir o novo: assim o
+    // histórico mostra "Presença até ontem, Movimento a partir de hoje",
+    // e não dois planos valendo ao mesmo tempo.
+    if (escolhido !== ativo) await fecharPeriodoAberto(supabase);
+
     await supabase.from("planos_historico").insert({
       local_id: local,
-      plano: "premium",
+      plano: escolhido,
       inicio: desde,
       fim: ate,
       quem: user?.id ?? null,
@@ -81,25 +103,30 @@ export default function ControlePlano({
       .update({ plano: "gratuito", plano_ate: null, plano_desde: null })
       .eq("id", local);
 
-    // Fecha o período aberto no histórico em vez de apagá-lo: o registro de
-    // que este comércio já foi cliente é justamente o que interessa depois.
-    await supabase
-      .from("planos_historico")
-      .update({ fim: hojeEmIvoti() })
-      .eq("local_id", local)
-      .eq("plano", "premium")
-      .gte("fim", hojeEmIvoti());
+    await fecharPeriodoAberto(supabase);
 
     setIndo(false);
     router.refresh();
   }
 
+  // Fecha em vez de apagar: o registro de que este comércio já foi cliente
+  // é justamente o que interessa depois.
+  async function fecharPeriodoAberto(
+    supabase: ReturnType<typeof createClient>,
+  ) {
+    await supabase
+      .from("planos_historico")
+      .update({ fim: hojeEmIvoti() })
+      .eq("local_id", local)
+      .gte("fim", hojeEmIvoti());
+  }
+
   return (
     <div className="mt-3 border-t border-[color:var(--color-v-texto)]/20 pt-3">
-      {ativo === "premium" ? (
+      {ativo !== "gratuito" ? (
         <div className="flex flex-wrap items-center gap-3">
           <span className="rounded-full bg-[color:var(--color-v-petunia)] px-3 py-1 text-[11px] font-bold text-[#FFFFFF]">
-            ⭐ Premium
+            {PLANOS[ativo].nome} · {precoPorExtenso(PLANOS[ativo].centavos)}
           </span>
           <span className="text-sm texto-suave">
             {planoAte
@@ -116,7 +143,7 @@ export default function ControlePlano({
               onClick={() => setAbrindo(true)}
               className="botao-vazado px-3.5 py-2 text-[14px]"
             >
-              Renovar
+              Renovar ou trocar
             </button>
             <button
               type="button"
@@ -130,8 +157,8 @@ export default function ControlePlano({
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-3">
-          <span className="pilula px-3 py-1 text-[11px]">Gratuito</span>
-          {plano === "premium" && (
+          <span className="pilula px-3 py-1 text-[11px]">Sem plano</span>
+          {vencido && (
             <span className="text-sm text-[color:var(--color-v-fechado-claro)]">
               venceu em {porExtenso(planoAte)}
             </span>
@@ -141,7 +168,7 @@ export default function ControlePlano({
             onClick={() => setAbrindo(true)}
             className="botao-cheio ml-auto px-4 py-2 text-[14px]"
           >
-            Ativar Premium
+            Ativar um plano
           </button>
         </div>
       )}
@@ -149,8 +176,24 @@ export default function ControlePlano({
       {abrindo && (
         <div className="aviso-painel mt-3 p-4">
           <p className="text-sm font-medium">
-            Premium para <strong>{nome}</strong>
+            Plano para <strong>{nome}</strong>
           </p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {ORDEM_DOS_PLANOS.map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setEscolhido(p)}
+                aria-pressed={escolhido === p}
+                className={`px-3.5 py-2 text-[14px] ${
+                  escolhido === p ? "botao-cheio" : "botao-vazado"
+                }`}
+              >
+                {PLANOS[p].nome} · {precoPorExtenso(PLANOS[p].centavos)}
+              </button>
+            ))}
+          </div>
 
           <div className="mt-3 flex flex-wrap items-end gap-3">
             <label className="block">

@@ -1,10 +1,8 @@
-import { NOME_DO_SITE } from "@/lib/marca";
-import { MODULOS, type Modulo } from "@/lib/planos";
-
-const WHATSAPP_DO_GUIA = "5551998323298";
+import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
+import { MODULOS, PLANOS, type Modulo } from "@/lib/planos";
 
 /**
- * O véu que cobre um módulo premium para quem está no plano gratuito.
+ * O véu que cobre um módulo para quem está num plano abaixo do dele.
  *
  * Mostra o conteúdo real por baixo, desfocado. Ver o que se está perdendo
  * vende muito melhor que uma tela vazia dizendo "indisponível" — o comerciante
@@ -25,10 +23,11 @@ export default function Bloqueado({
   /** A prévia real, que aparece borrada atrás do aviso. */
   children?: React.ReactNode;
 }) {
-  const { nome: titulo, convite } = MODULOS[modulo];
+  const { nome: titulo, convite, exige } = MODULOS[modulo];
+  const plano = PLANOS[exige].nome;
 
   const mensagem = encodeURIComponent(
-    `Olá! Quero saber sobre o plano Premium do ${NOME_DO_SITE}${nome ? ` para o ${nome}` : ""}.`,
+    `Olá! Quero saber sobre o plano ${plano} do ${NOME_DO_SITE}${nome ? ` para o ${nome}` : ""}.`,
   );
 
   return (
@@ -55,7 +54,9 @@ export default function Bloqueado({
           <span className="grid h-11 w-11 place-items-center rounded-full bg-[color:var(--color-v-fundo)] text-xl mx-auto">
             🔒
           </span>
-          <p className="mt-3 font-semibold">{titulo} é do plano Premium</p>
+          <p className="mt-3 font-semibold">
+            {titulo} é do plano {plano}
+          </p>
           <p className="mt-1.5 text-sm texto-suave">{convite}</p>
           <a
             href={`https://wa.me/${WHATSAPP_DO_GUIA}?text=${mensagem}`}
