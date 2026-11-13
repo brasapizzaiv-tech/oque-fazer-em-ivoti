@@ -56,6 +56,12 @@ export const viewport: Viewport = {
   themeColor: "#FAF7F1",
 };
 
+// As telas sem dado próprio (Guia, planos, cadastro, entrar, senha) são
+// montadas uma vez e guardadas. Sem prazo, elas ficavam com a roupa da
+// feira do dia da última publicação do site: o tema não entrava nem saía
+// nelas sozinho. Com cinco minutos, acompanham o resto.
+export const revalidate = 300;
+
 export default async function RootLayout({ children }: LayoutProps<"/">) {
   // A feira que estiver valendo hoje. Fora de feira volta nada, e o site
   // continua no desenho de sempre.

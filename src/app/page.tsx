@@ -26,7 +26,7 @@ import {
 import { BlocoDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
 import { imagemDoSite } from "@/lib/imagens";
-import { categoriasComLugar, listarCategorias } from "@/lib/locais";
+import { categoriasComLugar } from "@/lib/locais";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { quandoVale } from "@/lib/promocoes";
@@ -53,15 +53,13 @@ function daquiA(dias: number) {
 }
 
 export default async function Inicio() {
-  const [categorias, daSemana, promocoes, feira, capa] = await Promise.all([
-    listarCategorias(),
+  const [principais, daSemana, promocoes, feira, capa] = await Promise.all([
+    categoriasComLugar(),
     eventosVisiveis({ ate: daquiA(7), limite: 8 }),
     promocoesDeHoje(4),
     temaAtivo(),
     imagemDoSite("capa-inicio"),
   ]);
-
-  const principais = await categoriasComLugar(categorias);
 
   // O celular mostra só o que é hoje; a tela grande tem espaço para a semana.
   // Compara instantes, não textos: o banco devolve o início em UTC, e um

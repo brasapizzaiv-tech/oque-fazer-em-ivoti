@@ -10,7 +10,6 @@ import { CasaEnxaimel } from "@/components/vidro/icones";
 import {
   buscarLocais,
   categoriasComLugar,
-  listarCategorias,
   listarTags,
 } from "@/lib/locais";
 import { distancia, formatarDistancia } from "@/lib/geo";
@@ -63,9 +62,16 @@ export default async function Explorar({
   const soComPromocao = texto(params.promocao) === "1";
   const soComEvento = texto(params.evento) === "1";
 
-  const [categorias, todasTags, todos, eventosDeHoje, promocoes, feira, capa] =
-    await Promise.all([
-      listarCategorias(),
+  const [
+    principais,
+    todasTags,
+    todos,
+    eventosDeHoje,
+    promocoes,
+    feira,
+    capa,
+  ] = await Promise.all([
+      categoriasComLugar(),
       listarTags(),
       buscarLocais({ q, categoria, tags, abertoAgora: aberto }),
       eventosVisiveis({ ate: hojeEmIvoti(), limite: 200 }),
@@ -93,8 +99,6 @@ export default async function Explorar({
     if (soComEvento && !comEvento.has(l.id)) return false;
     return true;
   });
-
-  const principais = await categoriasComLugar(categorias);
 
   /** Monta o endereço mantendo o que já estava filtrado. */
   function url(mudanca: Record<string, string | string[] | undefined>) {

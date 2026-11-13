@@ -201,20 +201,24 @@ export async function listarCategorias(
  * publicado.
  */
 export async function categoriasComLugar(
-  categorias: Categoria[],
   supabase?: SupabaseClient,
 ): Promise<Categoria[]> {
   let usadas: (number | null)[];
+  let categorias: Categoria[];
 
   if (!SUPABASE_CONFIGURADO) {
+    categorias = CATEGORIAS_DEMO;
     usadas = LOCAIS_DEMO.map((l) => l.categoria_id);
   } else {
     const sb = supabase ?? (await createClient());
-    const { data, error } = await sb
-      .from("locais")
-      .select("categoria_id")
-      .eq("status", "publicado")
-      .limit(1000);
+    // As duas consultas saem juntas, e a página chama esta função ao lado
+    // das outras buscas dela: os atalhos não podem custar uma espera a
+    // mais na abertura da capa.
+    const [todas, { data, error }] = await Promise.all([
+      listarCategorias(sb),
+      sb.from("locais").select("categoria_id").eq("status", "publicado").limit(1000),
+    ]);
+    categorias = todas;
     // Na dúvida, mostra todas: atalho que leva a uma lista vazia é ruim,
     // mas capa sem atalho nenhum é pior.
     if (error) return categorias.filter((c) => c.pai_id === null);
