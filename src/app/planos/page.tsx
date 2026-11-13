@@ -3,6 +3,7 @@ import CabecalhoSimples from "@/components/vidro/CabecalhoSimples";
 import { Botao, CardAzul, CardVidro, Legenda } from "@/components/vidro/pecas";
 import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
+  COTA_DE_CAMPANHA_CENTAVOS,
   ORDEM_DOS_PLANOS,
   PLANOS,
   precoPorExtenso,
@@ -214,7 +215,10 @@ export default function Planos() {
               className="mt-4 text-[13px]"
               style={{ color: "var(--color-v-texto-suave)" }}
             >
-              A cota é paga por campanha, à parte da mensalidade.
+              <strong style={{ color: "var(--color-v-texto)" }}>
+                {precoPorExtenso(COTA_DE_CAMPANHA_CENTAVOS)} por cota
+              </strong>
+              , paga por campanha, à parte da mensalidade.
             </p>
           </CardVidro>
 

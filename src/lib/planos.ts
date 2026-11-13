@@ -59,6 +59,15 @@ export const PLANOS: Record<
   },
 };
 
+/**
+ * A cota de uma campanha com influenciador, em centavos.
+ *
+ * Cada vídeo visita quatro estabelecimentos, e cada um paga uma cota — à
+ * parte da mensalidade. Quatro cotas de R$ 500 cobrem um influenciador de
+ * R$ 2.000, que é a faixa dos mais engajados da região.
+ */
+export const COTA_DE_CAMPANHA_CENTAVOS = 50000;
+
 export const ORDEM_DOS_PLANOS: PlanoPago[] = [
   "presenca",
   "movimento",
