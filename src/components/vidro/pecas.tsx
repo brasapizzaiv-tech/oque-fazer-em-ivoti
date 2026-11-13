@@ -195,7 +195,9 @@ export function Chip({
   flor?: boolean;
 }) {
   const classe =
-    "inline-flex h-[37px] shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium whitespace-nowrap transition";
+    // 44px de altura: é o mínimo para o dedo acertar sem esbarrar no
+    // vizinho. Eram 37.
+    "inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-4 text-[13px] font-medium whitespace-nowrap transition";
 
   const estilo: CSSProperties = ativo
     ? { backgroundColor: "var(--color-v-torii)", color: "#FFFFFF" }

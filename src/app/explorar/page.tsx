@@ -7,7 +7,12 @@ import PertoDeMim from "@/components/vidro/PertoDeMim";
 import { CabecalhoDeTela, Fileira, Vazio } from "@/components/vidro/blocos";
 import { CardAzul, Chip, Legenda } from "@/components/vidro/pecas";
 import { CasaEnxaimel } from "@/components/vidro/icones";
-import { buscarLocais, listarCategorias, listarTags } from "@/lib/locais";
+import {
+  buscarLocais,
+  categoriasComLugar,
+  listarCategorias,
+  listarTags,
+} from "@/lib/locais";
 import { distancia, formatarDistancia } from "@/lib/geo";
 import Mapa from "@/components/Mapa";
 import { eventosVisiveis } from "@/lib/eventos";
@@ -89,7 +94,7 @@ export default async function Explorar({
     return true;
   });
 
-  const principais = categorias.filter((c) => c.pai_id === null);
+  const principais = await categoriasComLugar(categorias);
 
   /** Monta o endereço mantendo o que já estava filtrado. */
   function url(mudanca: Record<string, string | string[] | undefined>) {

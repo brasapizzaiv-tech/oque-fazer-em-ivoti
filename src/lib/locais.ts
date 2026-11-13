@@ -190,6 +190,49 @@ export async function listarCategorias(
   return (data ?? []) as Categoria[];
 }
 
+/**
+ * As categorias principais que têm ao menos um lugar no ar, nela ou numa
+ * das filhas.
+ *
+ * É o que os atalhos da capa e do Explorar mostram. Com a lista inteira,
+ * seis dos nove atalhos levavam a "Nada encontrado": o guia oferecia
+ * hospedagem, vida noturna e compras sem ter um lugar sequer para mostrar.
+ * A categoria volta a aparecer sozinha quando o primeiro lugar dela for
+ * publicado.
+ */
+export async function categoriasComLugar(
+  categorias: Categoria[],
+  supabase?: SupabaseClient,
+): Promise<Categoria[]> {
+  let usadas: (number | null)[];
+
+  if (!SUPABASE_CONFIGURADO) {
+    usadas = LOCAIS_DEMO.map((l) => l.categoria_id);
+  } else {
+    const sb = supabase ?? (await createClient());
+    const { data, error } = await sb
+      .from("locais")
+      .select("categoria_id")
+      .eq("status", "publicado")
+      .limit(1000);
+    // Na dúvida, mostra todas: atalho que leva a uma lista vazia é ruim,
+    // mas capa sem atalho nenhum é pior.
+    if (error) return categorias.filter((c) => c.pai_id === null);
+    usadas = (data ?? []).map((l) => l.categoria_id as number | null);
+  }
+
+  const comLugar = new Set<number>();
+  const paiDe = new Map(categorias.map((c) => [c.id, c.pai_id]));
+  for (const id of usadas) {
+    if (id == null) continue;
+    comLugar.add(id);
+    const pai = paiDe.get(id);
+    if (pai != null) comLugar.add(pai);
+  }
+
+  return categorias.filter((c) => c.pai_id === null && comLugar.has(c.id));
+}
+
 export async function listarTags(supabase?: SupabaseClient): Promise<Tag[]> {
   if (!SUPABASE_CONFIGURADO) return TAGS_DEMO;
   const sb = supabase ?? (await createClient());

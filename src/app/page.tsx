@@ -26,7 +26,7 @@ import {
 import { BlocoDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
 import { imagemDoSite } from "@/lib/imagens";
-import { listarCategorias } from "@/lib/locais";
+import { categoriasComLugar, listarCategorias } from "@/lib/locais";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { quandoVale } from "@/lib/promocoes";
@@ -61,7 +61,7 @@ export default async function Inicio() {
     imagemDoSite("capa-inicio"),
   ]);
 
-  const principais = categorias.filter((c) => c.pai_id === null);
+  const principais = await categoriasComLugar(categorias);
 
   // O celular mostra só o que é hoje; a tela grande tem espaço para a semana.
   // Compara instantes, não textos: o banco devolve o início em UTC, e um
@@ -365,6 +365,24 @@ export default async function Inicio() {
             é a flor símbolo do município.
           </SobreIvoti>
         </div>
+
+        {/* A porta do comerciante, só no celular. No computador ela está
+            na barra de cima; no celular não existia em lugar nenhum, e o
+            dono de um negócio que abria o guia no telefone não tinha como
+            chegar ao cadastro. */}
+        <p
+          className="mt-6 text-center text-[13px] lg:hidden"
+          style={{ color: "var(--color-v-texto-suave)" }}
+        >
+          Tem um negócio em Ivoti?{" "}
+          <Link
+            href="/painel"
+            className="inline-flex h-11 items-center font-bold underline"
+            style={{ color: "var(--color-v-azul)" }}
+          >
+            Sou comerciante
+          </Link>
+        </p>
       </section>
     </>
   );
