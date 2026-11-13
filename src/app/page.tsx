@@ -27,6 +27,7 @@ import { BlocoDaFeira, SeloDaFeira } from "@/components/vidro/Feira";
 import { temaAtivo } from "@/lib/temas";
 import { imagemDoSite } from "@/lib/imagens";
 import { categoriasComLugar } from "@/lib/locais";
+import { ROTAS_REGIONAIS } from "@/lib/rotas-regionais";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { quandoVale } from "@/lib/promocoes";
@@ -362,6 +363,50 @@ export default async function Inicio() {
             Ivoti é o maior produtor de flores do Rio Grande do Sul, e a petúnia
             é a flor símbolo do município.
           </SobreIvoti>
+        </div>
+
+        {/* As duas rotas de que a cidade faz parte. Quem visita Ivoti
+            quase sempre está percorrendo a região, e o site oficial de
+            cada rota é onde estão as cidades vizinhas. */}
+        <Legenda className="mt-8 block" cor="var(--color-v-petunia)">
+          Ivoti faz parte de
+        </Legenda>
+        <div className="mt-3 space-y-3 lg:grid lg:grid-cols-2 lg:gap-4 lg:space-y-0">
+          {ROTAS_REGIONAIS.map((rota) => (
+            <a
+              key={rota.nome}
+              href={rota.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="vidro block p-5"
+            >
+              <p
+                className="text-[19px] leading-tight font-bold"
+                style={{
+                  color: "var(--color-v-texto)",
+                  fontFamily: "var(--fonte-titulo-nova)",
+                }}
+              >
+                {rota.nome}
+              </p>
+              <p
+                className="mt-1.5 text-[14px]"
+                style={{ color: "var(--color-v-texto-suave)" }}
+              >
+                {rota.texto}
+              </p>
+              <span
+                className="mt-3 inline-flex min-h-11 items-center text-[14px] font-bold underline"
+                style={{ color: "var(--color-v-azul)" }}
+              >
+                {rota.rotulo}
+                <span aria-hidden className="ml-1">
+                  ↗
+                </span>
+                <span className="sr-only"> (abre em outra aba)</span>
+              </span>
+            </a>
+          ))}
         </div>
 
         {/* A porta do comerciante, só no celular. No computador ela está

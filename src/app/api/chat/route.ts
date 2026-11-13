@@ -12,6 +12,7 @@ import { hojeEmIvoti } from "@/lib/planos";
 import { respostaDemo } from "@/lib/demo";
 import { podeConversar } from "@/lib/limite-chat";
 import { conversaLimpa } from "@/lib/conversa";
+import { ROTAS_PARA_O_GUIA } from "@/lib/rotas-regionais";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
@@ -83,7 +84,9 @@ Regras do roteiro:
 - Conte o tempo de cada parada: cafe cerca de 40 minutos, almoco cerca de uma hora e meia, trilha cerca de duas horas, praca ou museu cerca de 40 minutos, mais o deslocamento entre elas.
 - Os enderecos entre colchetes sao os mesmos da lista, letra por letra.
 - Acima do marcador, escreva duas ou tres frases apresentando o passeio. Nao repita a lista de paradas em texto: o site desenha o roteiro a partir do marcador.
-- Use o marcador de roteiro OU os marcadores de lugar, nunca os dois na mesma resposta.`;
+- Use o marcador de roteiro OU os marcadores de lugar, nunca os dois na mesma resposta.
+
+${ROTAS_PARA_O_GUIA}`;
 
 export async function POST(request: Request) {
   let corpo: {
