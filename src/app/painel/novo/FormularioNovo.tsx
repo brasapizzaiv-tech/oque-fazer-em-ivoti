@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { paraSlug } from "@/lib/texto";
+import { explicarErro } from "@/lib/erro-do-banco";
 import type { Categoria } from "@/lib/tipos";
 
 export default function FormularioNovo({
@@ -37,32 +38,37 @@ export default function FormularioNovo({
 
     // O endereço do local no site vem do nome. Se já existir alguém com o
     // mesmo nome, acrescenta um número no fim.
+    //
+    // Quem decide se o endereço está livre é a própria gravação, e não uma
+    // consulta antes dela: a consulta só enxerga os lugares que esta conta
+    // pode ver. Um nome igual ao de um rascunho de outra pessoa passava
+    // como livre, a gravação era recusada, e o comerciante lia um erro em
+    // inglês sem nunca conseguir cadastrar.
     const base = paraSlug(nome) || "local";
-    let slug = base;
-    for (let tentativa = 2; tentativa <= 30; tentativa++) {
-      const { data: existe } = await supabase
+    let data: { id: string } | null = null;
+    let error: { code?: string; message?: string } | null = null;
+
+    for (let tentativa = 1; tentativa <= 30; tentativa++) {
+      const resposta = await supabase
         .from("locais")
+        .insert({
+          nome: nome.trim(),
+          slug: tentativa === 1 ? base : `${base}-${tentativa}`,
+          categoria_id: categoriaId ? Number(categoriaId) : null,
+          dono_id: user.id,
+          status: "rascunho",
+        })
         .select("id")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (!existe) break;
-      slug = `${base}-${tentativa}`;
+        .single();
+
+      data = resposta.data;
+      error = resposta.error;
+      // 23505 é "já existe um com esse endereço": tenta o próximo número.
+      if (error?.code !== "23505") break;
     }
 
-    const { data, error } = await supabase
-      .from("locais")
-      .insert({
-        nome: nome.trim(),
-        slug,
-        categoria_id: categoriaId ? Number(categoriaId) : null,
-        dono_id: user.id,
-        status: "rascunho",
-      })
-      .select("id")
-      .single();
-
     if (error || !data) {
-      setErro(error?.message ?? "Não consegui criar agora.");
+      setErro(explicarErro(error, "Não consegui criar agora. Tente de novo."));
       setIndo(false);
       return;
     }

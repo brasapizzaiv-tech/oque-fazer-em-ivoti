@@ -8,6 +8,7 @@ import { AreaTexto, Bloco, BotaoSalvar, Texto } from "./Campos";
 import { DIAS_CURTOS } from "@/lib/horarios";
 import { quandoVale, type Promocao } from "@/lib/promocoes";
 import type { LocalDoDono } from "./FormularioEvento";
+import { explicarErro } from "@/lib/erro-do-banco";
 
 const TAMANHO_MAXIMO = 8 * 1024 * 1024; // 8 MB
 
@@ -61,7 +62,7 @@ export default function FormularioPromocao({
       .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
 
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui salvar a promoção. Tente de novo."));
       setSalvando(false);
       return;
     }
@@ -103,7 +104,7 @@ export default function FormularioPromocao({
       : await supabase.from("promocoes").insert(campos);
 
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui salvar a promoção. Tente de novo."));
       setSalvando(false);
       return;
     }

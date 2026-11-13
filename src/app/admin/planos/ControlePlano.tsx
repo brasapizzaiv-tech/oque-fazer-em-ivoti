@@ -12,6 +12,7 @@ import {
   precoPorExtenso,
   type PlanoPago,
 } from "@/lib/planos";
+import { explicarErro } from "@/lib/erro-do-banco";
 
 /**
  * Liga, troca e encerra o plano de um estabelecimento.
@@ -69,7 +70,7 @@ export default function ControlePlano({
       .eq("id", local);
 
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui gravar o plano. Tente de novo."));
       setIndo(false);
       return;
     }

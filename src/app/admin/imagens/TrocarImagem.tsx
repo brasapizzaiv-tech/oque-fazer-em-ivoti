@@ -6,6 +6,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Aviso, Caixa, Rotulo } from "@/components/painel/pecas";
 import type { ImagemCadastrada } from "@/lib/imagens";
+import { explicarErro } from "@/lib/erro-do-banco";
 
 const TAMANHO_MAXIMO = 6 * 1024 * 1024;
 
@@ -53,7 +54,7 @@ export default function TrocarImagem({ imagem }: { imagem: ImagemCadastrada }) {
 
     if (erroEnvio) {
       setIndo(false);
-      setErro(erroEnvio.message);
+      setErro(explicarErro(erroEnvio, "Não consegui trocar a imagem. Tente de novo."));
       return;
     }
 
@@ -67,7 +68,7 @@ export default function TrocarImagem({ imagem }: { imagem: ImagemCadastrada }) {
 
     setIndo(false);
     if (erroBanco) {
-      setErro(erroBanco.message);
+      setErro(explicarErro(erroBanco, "Não consegui trocar a imagem. Tente de novo."));
       return;
     }
     setUrl(novaUrl);
@@ -83,7 +84,7 @@ export default function TrocarImagem({ imagem }: { imagem: ImagemCadastrada }) {
       .eq("chave", imagem.chave);
     setIndo(false);
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui trocar a imagem. Tente de novo."));
       return;
     }
     setUrl(null);

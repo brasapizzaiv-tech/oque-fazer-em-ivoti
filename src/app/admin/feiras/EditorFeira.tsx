@@ -12,6 +12,7 @@ import {
   Rotulo,
 } from "@/components/painel/pecas";
 import type { Tema } from "@/lib/temas";
+import { explicarErro } from "@/lib/erro-do-banco";
 
 const TAMANHO_MAXIMO = 4 * 1024 * 1024;
 
@@ -72,7 +73,7 @@ export default function EditorFeira({ tema }: { tema: Tema }) {
       .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
 
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui salvar. Tente de novo."));
       return null;
     }
     return supabase.storage.from("locais").getPublicUrl(caminho).data.publicUrl;
@@ -120,7 +121,7 @@ export default function EditorFeira({ tema }: { tema: Tema }) {
 
     setSalvando(false);
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui salvar. Tente de novo."));
       return;
     }
     if (tambemPublicar !== undefined) setPublicado(tambemPublicar);

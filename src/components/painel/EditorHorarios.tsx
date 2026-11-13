@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { trocarLinhas } from "@/lib/trocar-linhas";
 import { DIAS, hhmm } from "@/lib/horarios";
 import { Bloco, BotaoSalvar } from "./Campos";
 import type { Horario } from "@/lib/tipos";
@@ -63,22 +64,22 @@ export default function EditorHorarios({
         })),
     );
 
-    const supabase = createClient();
     // Substitui tudo: é mais simples (e mais previsível) do que casar linha
     // a linha o que mudou.
-    const { error: erroApagar } = await supabase
-      .from("locais_horarios")
-      .delete()
-      .eq("local_id", localId);
-
-    if (!erroApagar && linhas.length > 0) {
-      const { error } = await supabase.from("locais_horarios").insert(linhas);
-      if (error) setErro(error.message);
-    } else if (erroApagar) {
-      setErro(erroApagar.message);
-    }
+    const falha = await trocarLinhas(
+      createClient(),
+      "locais_horarios",
+      localId,
+      linhas,
+    );
 
     setSalvando(false);
+
+    if (falha) {
+      setErro(falha);
+      return;
+    }
+
     setSalvo(true);
     // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
     // "Ainda precisa de: os horários" continuava na tela depois de salvar os

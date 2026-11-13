@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { trocarLinhas } from "@/lib/trocar-linhas";
+import { precoDigitado } from "@/lib/dinheiro";
 import { Bloco, BotaoSalvar } from "./Campos";
 import type { Item } from "@/lib/tipos";
 
@@ -50,34 +52,39 @@ export default function EditorItens({
     setSalvando(true);
 
     const validas = linhas.filter((l) => l.nome.trim());
-    const supabase = createClient();
 
-    const { error: erroApagar } = await supabase
-      .from("locais_itens")
-      .delete()
-      .eq("local_id", localId);
-
-    if (erroApagar) {
-      setErro(erroApagar.message);
+    // Preço que não dá para entender para tudo aqui, antes de gravar: a
+    // conta antiga transformava "R$ 45,90" em "sem preço" sem dizer nada.
+    const semPreco = validas.find((l) => precoDigitado(l.preco) === undefined);
+    if (semPreco) {
+      setErro(
+        `Não entendi o preço de "${semPreco.nome.trim()}". Escreva só o número, como 45,90.`,
+      );
       setSalvando(false);
       return;
     }
 
-    if (validas.length > 0) {
-      const { error } = await supabase.from("locais_itens").insert(
-        validas.map((l, ordem) => ({
-          local_id: localId,
-          secao: l.secao.trim() || null,
-          nome: l.nome.trim(),
-          descricao: l.descricao.trim() || null,
-          preco: l.preco ? Number(l.preco.replace(",", ".")) : null,
-          ordem,
-        })),
-      );
-      if (error) setErro(error.message);
-    }
+    const falha = await trocarLinhas(
+      createClient(),
+      "locais_itens",
+      localId,
+      validas.map((l, ordem) => ({
+        local_id: localId,
+        secao: l.secao.trim() || null,
+        nome: l.nome.trim(),
+        descricao: l.descricao.trim() || null,
+        preco: precoDigitado(l.preco) ?? null,
+        ordem,
+      })),
+    );
 
     setSalvando(false);
+
+    if (falha) {
+      setErro(falha);
+      return;
+    }
+
     setSalvo(true);
     // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
     // "Ainda precisa de: os horários" continuava na tela depois de salvar os

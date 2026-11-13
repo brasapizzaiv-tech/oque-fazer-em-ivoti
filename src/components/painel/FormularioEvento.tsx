@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { AreaTexto, Bloco, BotaoSalvar, Texto } from "./Campos";
 import { paraCampoDataHora, deCampoDataHora } from "@/lib/horarios";
 import type { Evento } from "@/lib/tipos";
+import { explicarErro } from "@/lib/erro-do-banco";
 
 const TAMANHO_MAXIMO = 8 * 1024 * 1024; // 8 MB
 
@@ -68,7 +69,7 @@ export default function FormularioEvento({
       .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
 
     if (error) {
-      setErro(error.message);
+      setErro(explicarErro(error, "Não consegui salvar o evento. Tente de novo."));
       setSalvando(false);
       return;
     }
@@ -121,7 +122,7 @@ export default function FormularioEvento({
         .update(campos)
         .eq("id", evento.id);
       if (error) {
-        setErro(error.message);
+        setErro(explicarErro(error, "Não consegui salvar o evento. Tente de novo."));
         setSalvando(false);
         return;
       }
@@ -133,7 +134,7 @@ export default function FormularioEvento({
         status: ehAdmin ? "publicado" : "em_analise",
       });
       if (error) {
-        setErro(error.message);
+        setErro(explicarErro(error, "Não consegui salvar o evento. Tente de novo."));
         setSalvando(false);
         return;
       }

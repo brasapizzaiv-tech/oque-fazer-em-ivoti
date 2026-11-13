@@ -18,6 +18,7 @@ import EscolherPosicao from "@/components/painel/EscolherPosicao";
 import type { Categoria, LocalCompleto, Tag } from "@/lib/tipos";
 import { pedirAviso } from "@/lib/avisar";
 import { videoParaMostrar } from "@/lib/video";
+import { explicarErro, SESSAO_TERMINOU } from "@/lib/erro-do-banco";
 
 const ABAS = [
   { id: "sobre", nome: "Sobre" },
@@ -39,6 +40,15 @@ export default function Editor({
   tags: Tag[];
 }) {
   const [aba, setAba] = useState<Aba>("sobre");
+  // As abas que a pessoa já abriu continuam montadas, só escondidas. Antes
+  // cada aba era desmontada ao sair: quem escrevia a descrição, ia conferir
+  // os horários e voltava encontrava o texto antigo, sem aviso nenhum.
+  const [abertas, setAbertas] = useState<Aba[]>(["sobre"]);
+
+  function abrir(qual: Aba) {
+    setAba(qual);
+    setAbertas((a) => (a.includes(qual) ? a : [...a, qual]));
+  }
 
   return (
     <div className="mt-3">
@@ -81,7 +91,7 @@ export default function Editor({
           <button
             key={a.id}
             type="button"
-            onClick={() => setAba(a.id)}
+            onClick={() => abrir(a.id)}
             aria-current={aba === a.id ? "true" : undefined}
             className="-mb-[2px] px-3 py-2.5 text-[14px] font-semibold whitespace-nowrap transition sm:px-4"
             style={{
@@ -97,26 +107,36 @@ export default function Editor({
         ))}
       </nav>
 
-      <div className="mt-5 space-y-5">
-        {aba === "sobre" && (
-          <>
+      <div className="mt-5">
+        {abertas.includes("sobre") && (
+          <div hidden={aba !== "sobre"} className="space-y-5">
             <Sobre local={local} categorias={categorias} />
             <Etiquetas local={local} tags={tags} />
-          </>
+          </div>
         )}
-        {aba === "endereco" && <Endereco local={local} />}
-        {aba === "horarios" && (
-          <EditorHorarios localId={local.id} horarios={local.horarios} />
+        {abertas.includes("endereco") && (
+          <div hidden={aba !== "endereco"}>
+            <Endereco local={local} />
+          </div>
         )}
-        {aba === "fotos" && (
-          <EditorFotos
-            localId={local.id}
-            fotos={local.fotos}
-            capa={local.capa_url}
-          />
+        {abertas.includes("horarios") && (
+          <div hidden={aba !== "horarios"}>
+            <EditorHorarios localId={local.id} horarios={local.horarios} />
+          </div>
         )}
-        {aba === "itens" && (
-          <EditorItens localId={local.id} itens={local.itens} />
+        {abertas.includes("fotos") && (
+          <div hidden={aba !== "fotos"}>
+            <EditorFotos
+              localId={local.id}
+              fotos={local.fotos}
+              capa={local.capa_url}
+            />
+          </div>
+        )}
+        {abertas.includes("itens") && (
+          <div hidden={aba !== "itens"}>
+            <EditorItens localId={local.id} itens={local.itens} />
+          </div>
         )}
       </div>
     </div>
@@ -260,9 +280,18 @@ function Sobre({
   async function salvar(evento: React.FormEvent) {
     evento.preventDefault();
     setErro(null);
+
+    if (!dados.nome.trim()) {
+      setErro("O nome não pode ficar vazio.");
+      return;
+    }
+
     setSalvando(true);
 
-    const { error } = await createClient()
+    // O "select" no fim devolve as linhas que mudaram. Com a sessão
+    // vencida o banco não dá erro: só não muda nada. Sem conferir, a tela
+    // dizia "Salvo" para um texto que nunca foi gravado.
+    const { data, error } = await createClient()
       .from("locais")
       .update({
         nome: dados.nome.trim(),
@@ -277,10 +306,14 @@ function Sobre({
         instagram: dados.instagram.trim() || null,
         video_url: dados.video.trim() || null,
       })
-      .eq("id", local.id);
+      .eq("id", local.id)
+      .select("id");
 
-    if (error) setErro(error.message);
-    else {
+    if (error) {
+      setErro(explicarErro(error, "Não consegui salvar. Tente de novo."));
+    } else if (!data || data.length === 0) {
+      setErro(SESSAO_TERMINOU);
+    } else {
       setSalvo(true);
       // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
       // "Ainda precisa de: os horários" continuava na tela depois de salvar os
@@ -429,21 +462,50 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
   );
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
+  const [erro, setErro] = useState<string | null>(null);
   const router = useRouter();
 
   async function salvar(evento: React.FormEvent) {
     evento.preventDefault();
+    setErro(null);
     setSalvando(true);
 
     const supabase = createClient();
-    await supabase.from("locais_tags").delete().eq("local_id", local.id);
+
+    // Primeiro grava as marcadas, depois tira as desmarcadas. Na ordem
+    // contrária (apagar tudo e inserir de novo), uma falha no meio deixava
+    // o lugar sem etiqueta nenhuma — e a tela dizendo "Salvo".
+    let falha: { code?: string; message?: string } | null = null;
+
     if (marcadas.length > 0) {
-      await supabase
+      const { error } = await supabase.from("locais_tags").upsert(
+        marcadas.map((tag_id) => ({ local_id: local.id, tag_id })),
+        { onConflict: "local_id,tag_id", ignoreDuplicates: true },
+      );
+      falha = error;
+    }
+
+    if (!falha) {
+      let tirar = supabase
         .from("locais_tags")
-        .insert(marcadas.map((tag_id) => ({ local_id: local.id, tag_id })));
+        .delete()
+        .eq("local_id", local.id);
+      if (marcadas.length > 0) {
+        tirar = tirar.not("tag_id", "in", `(${marcadas.join(",")})`);
+      }
+      const { error } = await tirar;
+      falha = error;
     }
 
     setSalvando(false);
+
+    if (falha) {
+      setErro(
+        explicarErro(falha, "Não consegui salvar as etiquetas. Tente de novo."),
+      );
+      return;
+    }
+
     setSalvo(true);
     // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
     // "Ainda precisa de: os horários" continuava na tela depois de salvar os
@@ -485,6 +547,15 @@ function Etiquetas({ local, tags }: { local: LocalCompleto; tags: Tag[] }) {
           })}
         </div>
 
+        {erro && (
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]"
+          >
+            {erro}
+          </p>
+        )}
+
         <BotaoSalvar salvando={salvando} salvo={salvo}>
           Salvar etiquetas
         </BotaoSalvar>
@@ -522,7 +593,10 @@ function Endereco({ local }: { local: LocalCompleto }) {
     setErro(null);
     setSalvando(true);
 
-    const { error } = await createClient()
+    // O "select" no fim devolve as linhas que mudaram. Com a sessão
+    // vencida o banco não dá erro: só não muda nada. Sem conferir, a tela
+    // dizia "Salvo" para um texto que nunca foi gravado.
+    const { data, error } = await createClient()
       .from("locais")
       .update({
         endereco: dados.endereco.trim() || null,
@@ -532,10 +606,14 @@ function Endereco({ local }: { local: LocalCompleto }) {
         lat: dados.lat,
         lng: dados.lng,
       })
-      .eq("id", local.id);
+      .eq("id", local.id)
+      .select("id");
 
-    if (error) setErro(error.message);
-    else {
+    if (error) {
+      setErro(explicarErro(error, "Não consegui salvar. Tente de novo."));
+    } else if (!data || data.length === 0) {
+      setErro(SESSAO_TERMINOU);
+    } else {
       setSalvo(true);
       // Pede ao painel que recalcule o que ainda falta. Sem isto o aviso
       // "Ainda precisa de: os horários" continuava na tela depois de salvar os

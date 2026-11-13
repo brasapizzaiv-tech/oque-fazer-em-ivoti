@@ -7,7 +7,53 @@ import { createClient } from "@/lib/supabase/client";
 import { Bloco } from "./Campos";
 import type { Foto } from "@/lib/tipos";
 
-const TAMANHO_MAXIMO = 8 * 1024 * 1024; // 8 MB
+/** Teto do arquivo original. O que sobe é a versão reduzida, bem menor. */
+const TAMANHO_MAXIMO = 25 * 1024 * 1024;
+
+/** Lado maior da foto que vai para o site. */
+const LADO_MAXIMO = 1920;
+
+/**
+ * Reduz a foto e a converte para JPG, no próprio aparelho, antes de subir.
+ *
+ * Dois motivos. Foto de celular sai com 4 a 8 MB, e é esse arquivo que o
+ * visitante baixaria na rua, no 4G. E o iPhone grava em HEIC, formato que
+ * o Chrome e o Android não abrem: a foto subia, o comerciante a via no
+ * iPhone dele, e para a maior parte dos visitantes era um quadro vazio.
+ *
+ * Devolve nulo quando o navegador não consegue abrir o arquivo (é o caso
+ * do HEIC fora do Safari): melhor recusar com um recado claro do que
+ * publicar uma foto que não aparece.
+ */
+async function prepararFoto(arquivo: File): Promise<Blob | null> {
+  try {
+    const imagem = await createImageBitmap(arquivo, {
+      imageOrientation: "from-image",
+    });
+
+    const escala = Math.min(
+      1,
+      LADO_MAXIMO / Math.max(imagem.width, imagem.height),
+    );
+    const tela = document.createElement("canvas");
+    tela.width = Math.round(imagem.width * escala);
+    tela.height = Math.round(imagem.height * escala);
+
+    const pincel = tela.getContext("2d");
+    if (!pincel) return null;
+    // Fundo branco: PNG com transparência viraria preto no JPG.
+    pincel.fillStyle = "#FFFFFF";
+    pincel.fillRect(0, 0, tela.width, tela.height);
+    pincel.drawImage(imagem, 0, 0, tela.width, tela.height);
+    imagem.close();
+
+    return await new Promise((pronto) =>
+      tela.toBlob(pronto, "image/jpeg", 0.85),
+    );
+  } catch {
+    return null;
+  }
+}
 
 export default function EditorFotos({
   localId,
@@ -22,6 +68,9 @@ export default function EditorFotos({
   const [capaAtual, setCapaAtual] = useState(capa);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
+  /** A foto que está pedindo "apagar mesmo?". */
+  const [confirmando, setConfirmando] = useState<string | null>(null);
+  const [apagando, setApagando] = useState<string | null>(null);
   const router = useRouter();
 
   async function enviar(arquivos: FileList | null) {
@@ -31,24 +80,35 @@ export default function EditorFotos({
 
     const supabase = createClient();
     const novas: Foto[] = [];
+    const recusadas: string[] = [];
 
     for (const arquivo of Array.from(arquivos)) {
       if (arquivo.size > TAMANHO_MAXIMO) {
-        setErro(
-          `"${arquivo.name}" passa de 8 MB. Diminua a foto e tente de novo.`,
+        recusadas.push(`"${arquivo.name}" é grande demais (passa de 25 MB).`);
+        continue;
+      }
+
+      const reduzida = await prepararFoto(arquivo);
+      if (!reduzida) {
+        recusadas.push(
+          `Não consegui abrir "${arquivo.name}". Se for foto de iPhone no formato HEIC, envie pelo próprio iPhone ou salve como JPG antes.`,
         );
         continue;
       }
 
-      const extensao = arquivo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const caminho = `${localId}/${crypto.randomUUID()}.${extensao}`;
+      const caminho = `${localId}/${crypto.randomUUID()}.jpg`;
 
       const { error: erroUpload } = await supabase.storage
         .from("locais")
-        .upload(caminho, arquivo, { cacheControl: "3600", upsert: false });
+        .upload(caminho, reduzida, {
+          cacheControl: "3600",
+          contentType: "image/jpeg",
+          upsert: false,
+        });
 
       if (erroUpload) {
-        setErro(erroUpload.message);
+        console.error("Foto não subiu:", erroUpload);
+        recusadas.push(`Não consegui enviar "${arquivo.name}". Tente de novo.`);
         continue;
       }
 
@@ -66,8 +126,16 @@ export default function EditorFotos({
         .select("id, url, legenda, ordem")
         .single();
 
-      if (error) setErro(error.message);
-      else if (data) novas.push(data as Foto);
+      if (error || !data) {
+        console.error("Foto subiu mas não foi registrada:", error);
+        // O arquivo ficaria órfão no depósito: sem a linha, ninguém o vê
+        // nem consegue apagar pela tela.
+        await supabase.storage.from("locais").remove([caminho]);
+        recusadas.push(`Não consegui salvar "${arquivo.name}". Tente de novo.`);
+        continue;
+      }
+
+      novas.push(data as Foto);
     }
 
     // Primeira foto do local vira a capa automaticamente.
@@ -75,6 +143,7 @@ export default function EditorFotos({
       await definirCapa(novas[0].url);
     }
 
+    if (recusadas.length > 0) setErro(recusadas.join(" "));
     setLista((atual) => [...atual, ...novas]);
     setEnviando(false);
     router.refresh();
@@ -86,13 +155,32 @@ export default function EditorFotos({
       .from("locais")
       .update({ capa_url: url })
       .eq("id", localId);
-    if (error) setErro(error.message);
-    else setCapaAtual(url);
+    if (error) {
+      console.error("Capa não trocou:", error);
+      setErro("Não consegui trocar a capa. Tente de novo.");
+    } else {
+      setCapaAtual(url);
+      router.refresh();
+    }
   }
 
   async function apagar(foto: Foto) {
+    setErro(null);
+    setApagando(foto.id);
     const supabase = createClient();
-    await supabase.from("locais_fotos").delete().eq("id", foto.id);
+
+    const { error } = await supabase
+      .from("locais_fotos")
+      .delete()
+      .eq("id", foto.id);
+
+    if (error) {
+      console.error("Foto não foi apagada:", error);
+      setErro("Não consegui apagar a foto. Tente de novo.");
+      setApagando(null);
+      setConfirmando(null);
+      return;
+    }
 
     // Remove o arquivo do Storage também (o caminho é o que vem depois de
     // /locais/ na URL pública).
@@ -109,6 +197,8 @@ export default function EditorFotos({
     }
 
     setLista((atual) => atual.filter((f) => f.id !== foto.id));
+    setApagando(null);
+    setConfirmando(null);
     router.refresh();
   }
 
@@ -122,6 +212,7 @@ export default function EditorFotos({
           type="file"
           accept="image/*"
           multiple
+          disabled={enviando}
           className="hidden"
           onChange={(e) => {
             void enviar(e.target.files);
@@ -132,56 +223,101 @@ export default function EditorFotos({
         <p className="mt-1 text-sm font-medium">
           {enviando ? "Enviando..." : "Escolher fotos"}
         </p>
-        <p className="text-xs texto-suave">JPG ou PNG, até 8 MB cada</p>
+        <p className="text-xs texto-suave">
+          Pode mandar a foto do celular como está: ela é reduzida sozinha.
+        </p>
       </label>
 
       {erro && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">
+        <p
+          role="alert"
+          className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]"
+        >
           {erro}
         </p>
       )}
 
       {lista.length > 0 && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-          {lista.map((foto) => (
-            <div
-              key={foto.id}
-              className="group relative aspect-[4/3] overflow-hidden border-2 border-[color:var(--color-v-texto)]/30"
-            >
-              <Image
-                src={foto.url}
-                alt={foto.legenda ?? ""}
-                fill
-                sizes="200px"
-                className="object-cover"
-              />
+          {lista.map((foto) => {
+            const ehCapa = capaAtual === foto.url;
+            const perguntando = confirmando === foto.id;
 
-              {capaAtual === foto.url && (
-                <span className="absolute top-2 left-2 botao-cheio px-2 py-0.5 text-[11px]">
-                  Capa
-                </span>
-              )}
+            return (
+              <div
+                key={foto.id}
+                className="overflow-hidden border-2 border-[color:var(--color-v-texto)]/30"
+              >
+                <div className="relative aspect-[4/3]">
+                  <Image
+                    src={foto.url}
+                    alt={foto.legenda ?? ""}
+                    fill
+                    sizes="200px"
+                    className="object-cover"
+                  />
 
-              <div className="absolute inset-x-0 bottom-0 flex gap-1 bg-linear-to-t from-[color:var(--color-v-texto)]/80 to-transparent p-2 opacity-0 transition group-hover:opacity-100">
-                {capaAtual !== foto.url && (
-                  <button
-                    type="button"
-                    onClick={() => void definirCapa(foto.url)}
-                    className="rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold"
-                  >
-                    Usar de capa
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => void apagar(foto)}
-                  className="ml-auto rounded-md bg-white/90 px-2 py-1 text-[11px] font-semibold text-[color:var(--color-v-fechado-claro)]"
-                >
-                  Apagar
-                </button>
+                  {ehCapa && (
+                    <span className="absolute top-2 left-2 botao-cheio px-2 py-0.5 text-[11px]">
+                      Capa
+                    </span>
+                  )}
+                </div>
+
+                {/* Os botões ficam sempre à vista, embaixo da foto. Antes
+                    só apareciam com o mouse por cima: no celular não há
+                    mouse, e eles ficavam invisíveis mas tocáveis — um
+                    toque no canto da foto a apagava, sem pergunta. */}
+                <div className="flex min-h-11 flex-wrap items-center gap-1 p-1.5">
+                  {perguntando ? (
+                    <>
+                      <span className="px-1 text-[12px] font-semibold">
+                        Apagar?
+                      </span>
+                      <button
+                        type="button"
+                        disabled={apagando === foto.id}
+                        onClick={() => void apagar(foto)}
+                        className="ml-auto min-h-9 rounded-md px-2.5 text-[12px] font-semibold text-white disabled:opacity-50"
+                        style={{
+                          backgroundColor: "var(--color-v-fechado-claro)",
+                        }}
+                      >
+                        {apagando === foto.id ? "Apagando..." : "Apagar"}
+                      </button>
+                      <button
+                        type="button"
+                        disabled={apagando === foto.id}
+                        onClick={() => setConfirmando(null)}
+                        className="min-h-9 rounded-md border border-[color:var(--color-v-texto)]/30 px-2.5 text-[12px] font-semibold"
+                      >
+                        Voltar
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {!ehCapa && (
+                        <button
+                          type="button"
+                          onClick={() => void definirCapa(foto.url)}
+                          className="min-h-9 rounded-md border border-[color:var(--color-v-texto)]/30 px-2.5 text-[12px] font-semibold"
+                        >
+                          Usar de capa
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setConfirmando(foto.id)}
+                        className="ml-auto min-h-9 rounded-md px-2.5 text-[12px] font-semibold text-[color:var(--color-v-fechado-claro)]"
+                      >
+                        Apagar
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </Bloco>
