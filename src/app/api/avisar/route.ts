@@ -29,8 +29,11 @@ export async function POST(request: Request) {
   if (!SUPABASE_CONFIGURADO) return new Response(null, { status: 204 });
 
   try {
-    const { local: localId } = (await request.json()) as { local?: string };
-    if (!localId) return new Response(null, { status: 204 });
+    const { local: localId, evento: eventoId } = (await request.json()) as {
+      local?: string;
+      evento?: string;
+    };
+    if (!localId && !eventoId) return new Response(null, { status: 204 });
 
     // Quem esta pedindo. Sem sessao, nao se avisa ninguem.
     const sb = await createClient();
@@ -38,6 +41,11 @@ export async function POST(request: Request) {
       data: { user },
     } = await sb.auth.getUser();
     if (!user) return new Response(null, { status: 204 });
+
+    if (!localId) {
+      await avisarSobreEvento(user.id, eventoId!);
+      return new Response(null, { status: 204 });
+    }
 
     // Quatro avisos por hora, por pessoa e por cadastro, bastam para qualquer uso
     // de verdade. Sem teto, repetir este pedido enchia a caixa da
@@ -84,6 +92,74 @@ export async function POST(request: Request) {
   return new Response(null, { status: 204 });
 }
 
+/**
+ * O aviso de um evento. Mesma regra dos lugares: a situacao e lida do
+ * banco, e cada lado so avisa o que lhe cabe.
+ */
+async function avisarSobreEvento(quem: string, eventoId: string) {
+  if (!(await dentroDoLimite(`aviso:${quem}:${eventoId}`, 4))) return;
+
+  const admin = createAdminClient();
+
+  const { data: evento } = await admin
+    .from("eventos")
+    .select("id, titulo, status, criado_por")
+    .eq("id", eventoId)
+    .maybeSingle();
+  if (!evento) return;
+
+  const { data: perfil } = await admin
+    .from("perfis")
+    .select("papel")
+    .eq("id", quem)
+    .maybeSingle();
+  const ehAdmin = perfil?.papel === "admin";
+  const titulo = semHtml(evento.titulo);
+
+  if (evento.status === "em_analise") {
+    // So quem cadastrou avisa que cadastrou.
+    if (evento.criado_por !== quem) return;
+    await paraAAdministracao(admin, {
+      assunto: `Evento esperando análise: ${evento.titulo}`,
+      titulo: "Chegou um evento",
+      texto: `<strong>${titulo}</strong> foi cadastrado e está esperando sua decisão: publicar na agenda ou devolver.`,
+    });
+    return;
+  }
+
+  // So a administracao avisa que publicou ou devolveu.
+  if (!ehAdmin) return;
+  const para = await emailDe(admin, evento.criado_por);
+  if (!para) return;
+
+  if (evento.status === "publicado") {
+    await mandarEmail({
+      para,
+      assunto: `${evento.titulo} está na agenda`,
+      html: moldura({
+        titulo: "Está na agenda",
+        texto: `<strong>${titulo}</strong> já aparece na agenda do guia de Ivoti.`,
+        botao: { rotulo: "Ver a agenda", href: `${SITE}/agenda` },
+      }),
+    });
+    return;
+  }
+
+  if (evento.status === "rejeitado") {
+    await mandarEmail({
+      para,
+      assunto: `${evento.titulo} precisa de um ajuste`,
+      html: moldura({
+        titulo: "Falta um ajuste",
+        texto: `Olhamos o evento <strong>${titulo}</strong> e ele precisa de uma correção antes de entrar na agenda.`,
+        botao: { rotulo: "Abrir meus eventos", href: `${SITE}/painel/eventos` },
+        rodape:
+          "Abra o evento, corrija e salve: ele volta sozinho para a análise.",
+      }),
+    });
+  }
+}
+
 type Lugar = {
   nome: string;
   slug: string | null;
@@ -106,6 +182,18 @@ async function emailDe(
 
 /** "Chegou um cadastro para analisar." */
 async function avisarAdministracao(admin: Admin, lugar: Lugar) {
+  await paraAAdministracao(admin, {
+    assunto: `${lugar.nome} está esperando análise`,
+    titulo: "Chegou um cadastro",
+    texto: `<strong>${semHtml(lugar.nome)}</strong> foi enviado para análise e está esperando sua decisão: publicar ou pedir ajuste.`,
+  });
+}
+
+/** Manda o mesmo recado para cada conta da administracao. */
+async function paraAAdministracao(
+  admin: Admin,
+  recado: { assunto: string; titulo: string; texto: string },
+) {
   const { data: admins } = await admin
     .from("perfis")
     .select("id")
@@ -116,10 +204,10 @@ async function avisarAdministracao(admin: Admin, lugar: Lugar) {
     if (!para) continue;
     await mandarEmail({
       para,
-      assunto: `${lugar.nome} está esperando análise`,
+      assunto: recado.assunto,
       html: moldura({
-        titulo: "Chegou um cadastro",
-        texto: `<strong>${semHtml(lugar.nome)}</strong> foi enviado para análise e está esperando sua decisão: publicar ou pedir ajuste.`,
+        titulo: recado.titulo,
+        texto: recado.texto,
         botao: { rotulo: "Abrir a administração", href: `${SITE}/admin` },
       }),
     });

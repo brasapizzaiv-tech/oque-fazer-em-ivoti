@@ -9,6 +9,7 @@ import { AreaTexto, Bloco, BotaoSalvar, Texto } from "./Campos";
 import { paraCampoDataHora, deCampoDataHora } from "@/lib/horarios";
 import type { Evento } from "@/lib/tipos";
 import { explicarErro } from "@/lib/erro-do-banco";
+import { pedirAvisoDoEvento } from "@/lib/avisar";
 
 // Teto do arquivo original; o que sobe é a versão reduzida.
 const TAMANHO_MAXIMO = 25 * 1024 * 1024;
@@ -38,6 +39,10 @@ export default function FormularioEvento({
     paraCampoDataHora(evento?.inicio ?? null),
   );
   const [fim, setFim] = useState(paraCampoDataHora(evento?.fim ?? null));
+  // Data certa, hora ainda não divulgada. Sem esta opção o formulário
+  // exigia uma hora, e quem só sabia o dia acabava gravando meia-noite —
+  // que o site então anunciava como horário de verdade.
+  const [semHora, setSemHora] = useState(evento?.sem_hora ?? false);
   const [descricao, setDescricao] = useState(evento?.descricao ?? "");
   const [url, setUrl] = useState(evento?.url ?? "");
   const [imagem, setImagem] = useState(evento?.imagem_url ?? "");
@@ -95,14 +100,27 @@ export default function FormularioEvento({
 
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
+    // Segundo toque enquanto o primeiro ainda está gravando: sem esta
+    // linha o evento era criado duas vezes.
+    if (salvando) return;
     setErro(null);
 
     if (!titulo.trim()) return setErro("Falta o nome do evento.");
 
-    const comeco = deCampoDataHora(inicio);
-    if (!comeco) return setErro("Falta a data e a hora de início.");
+    // Sem hora, o evento é gravado à meia-noite do dia e marcado como tal;
+    // o fim, se houver, vale até o último minuto do último dia.
+    const comeco = deCampoDataHora(
+      semHora && inicio ? `${inicio.slice(0, 10)}T00:00` : inicio,
+    );
+    if (!comeco) {
+      return setErro(
+        semHora ? "Falta a data do evento." : "Falta a data e a hora de início.",
+      );
+    }
 
-    const termino = deCampoDataHora(fim);
+    const termino = deCampoDataHora(
+      semHora && fim ? `${fim.slice(0, 10)}T23:59` : fim,
+    );
     if (termino && termino <= comeco) {
       return setErro("O fim não pode ser antes do início.");
     }
@@ -121,13 +139,18 @@ export default function FormularioEvento({
       local_texto: localId ? null : localTexto.trim() || null,
       inicio: comeco,
       fim: termino,
+      sem_hora: semHora,
       descricao: descricao.trim() || null,
       url: url.trim() || null,
       imagem_url: imagem || null,
       publicar_em: deCampoDataHora(publicarEm),
     };
 
+    // O evento que a administração deve ficar sabendo que existe.
+    let paraAvisar: string | null = null;
+
     if (evento) {
+      paraAvisar = evento.id;
       const { error } = await supabase
         .from("eventos")
         .update(campos)
@@ -138,18 +161,28 @@ export default function FormularioEvento({
         return;
       }
     } else {
-      const { error } = await supabase.from("eventos").insert({
-        ...campos,
-        criado_por: user?.id ?? null,
-        // O admin publica direto; os demais entram na fila de aprovacao.
-        status: ehAdmin ? "publicado" : "em_analise",
-      });
+      const { data: criado, error } = await supabase
+        .from("eventos")
+        .insert({
+          ...campos,
+          criado_por: user?.id ?? null,
+          // O admin publica direto; os demais entram na fila de aprovacao.
+          // (Quem garante isso e o banco; aqui e so para a tela ja saber.)
+          status: ehAdmin ? "publicado" : "em_analise",
+        })
+        .select("id")
+        .single();
+      paraAvisar = criado?.id ?? null;
       if (error) {
         setErro(explicarErro(error, "Não consegui salvar o evento. Tente de novo."));
         setSalvando(false);
         return;
       }
     }
+
+    // A rota decide se há o que avisar: só manda e-mail quando o evento
+    // está de fato esperando análise.
+    if (!ehAdmin && paraAvisar) void pedirAvisoDoEvento(paraAvisar);
 
     setSalvando(false);
     setSalvo(true);
@@ -198,18 +231,28 @@ export default function FormularioEvento({
         titulo="Quando"
         descricao="Horário de Ivoti. O fim é opcional — preencha se o evento tem hora para acabar."
       >
+        <label className="flex min-h-11 items-center gap-2.5 text-sm">
+          <input
+            type="checkbox"
+            checked={semHora}
+            onChange={(e) => setSemHora(e.target.checked)}
+            className="h-5 w-5"
+          />
+          A hora ainda não foi divulgada (mostrar só o dia)
+        </label>
+
         <div className="grid gap-4 sm:grid-cols-2">
           <Texto
-            rotulo="Começa"
-            tipo="datetime-local"
-            valor={inicio}
-            onChange={setInicio}
+            rotulo={semHora ? "Dia" : "Começa"}
+            tipo={semHora ? "date" : "datetime-local"}
+            valor={semHora ? inicio.slice(0, 10) : inicio}
+            onChange={(v) => setInicio(semHora && v ? `${v}T00:00` : v)}
           />
           <Texto
-            rotulo="Termina (opcional)"
-            tipo="datetime-local"
-            valor={fim}
-            onChange={setFim}
+            rotulo={semHora ? "Último dia (opcional)" : "Termina (opcional)"}
+            tipo={semHora ? "date" : "datetime-local"}
+            valor={semHora ? fim.slice(0, 10) : fim}
+            onChange={(v) => setFim(semHora && v ? `${v}T23:59` : v)}
           />
         </div>
       </Bloco>
@@ -246,7 +289,7 @@ export default function FormularioEvento({
         <div>
           <span className="text-sm font-medium">Imagem (opcional)</span>
           <p className="text-xs texto-suave">
-            O cartaz do evento, se tiver. Até 8 MB.
+            O cartaz do evento, se tiver.
           </p>
           {imagem && (
             <div className="relative mt-2 h-36 w-full max-w-sm overflow-hidden rounded-xl">

@@ -5,6 +5,7 @@ import { listarCampanhas, relatoriosDasCampanhas } from "@/lib/campanhas";
 import { CLIQUES_DE_CONTATO, NOME_DO_TIPO } from "@/lib/metricas";
 import { SITE } from "@/lib/site";
 import CopiarLink from "./CopiarLink";
+import CotasDaCampanha from "./CotasDaCampanha";
 import NovaCampanha from "./NovaCampanha";
 
 export const dynamic = "force-dynamic";
@@ -83,6 +84,12 @@ export default async function Campanhas() {
                 </div>
 
                 <CopiarLink link={`${SITE}/?de=${c.slug}`} />
+
+                <CotasDaCampanha
+                  campanha={c.id}
+                  atuais={c.locais}
+                  comercios={comercios}
+                />
 
                 <div className="mt-4 flex flex-wrap gap-3 text-sm">
                   <span className="aviso-painel px-4 py-2.5">

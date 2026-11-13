@@ -43,7 +43,14 @@ export default function ControlePlano({
   const [escolhido, setEscolhido] = useState<PlanoPago>(
     ativo === "gratuito" ? "presenca" : ativo,
   );
-  const [ate, setAte] = useState(planoAte ?? emUmMes());
+  // Data vencida não serve de ponto de partida: reativar um plano que
+  // venceu abria com a data antiga, e confirmar sem mexer gravava um plano
+  // que já nascia vencido.
+  const [ate, setAte] = useState(
+    planoAte && planoAte >= hojeEmIvoti() ? planoAte : emUmMes(),
+  );
+  /** O "Encerrar" pede um segundo toque antes de valer. */
+  const [encerrando, setEncerrando] = useState(false);
   const [observacao, setObservacao] = useState("");
   const [indo, setIndo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -51,6 +58,9 @@ export default function ControlePlano({
 
   async function ligar() {
     if (!ate) return setErro("Escolha até quando o plano vale.");
+    if (ate < hojeEmIvoti()) {
+      return setErro("Essa data já passou. Escolha uma data de hoje em diante.");
+    }
     setErro(null);
     setIndo(true);
 
@@ -80,14 +90,37 @@ export default function ControlePlano({
     // e não dois planos valendo ao mesmo tempo.
     if (escolhido !== ativo) await fecharPeriodoAberto(supabase);
 
-    await supabase.from("planos_historico").insert({
-      local_id: local,
-      plano: escolhido,
-      inicio: desde,
-      fim: ate,
-      quem: user?.id ?? null,
-      observacao: observacao.trim() || null,
-    });
+    // Renovar o mesmo plano estica o período que já está aberto, em vez
+    // de abrir outro: senão cada renovação virava uma linha nova e o
+    // histórico mostrava o mesmo plano valendo duas vezes.
+    let esticou = false;
+    if (escolhido === ativo) {
+      const { data: abertos } = await supabase
+        .from("planos_historico")
+        .update({ fim: ate })
+        .eq("local_id", local)
+        .eq("plano", escolhido)
+        .gte("fim", hojeEmIvoti())
+        .select("id");
+      esticou = (abertos ?? []).length > 0;
+    }
+
+    if (!esticou) {
+      const { error: erroHistorico } = await supabase
+        .from("planos_historico")
+        .insert({
+          local_id: local,
+          plano: escolhido,
+          inicio: desde,
+          fim: ate,
+          quem: user?.id ?? null,
+          observacao: observacao.trim() || null,
+        });
+      if (erroHistorico) {
+        // O plano em si já está valendo; só o registro ficou para trás.
+        console.error("Histórico do plano não foi gravado:", erroHistorico);
+      }
+    }
 
     setIndo(false);
     setAbrindo(false);
@@ -96,17 +129,28 @@ export default function ControlePlano({
   }
 
   async function desligar() {
+    setErro(null);
     setIndo(true);
     const supabase = createClient();
 
-    await supabase
+    const { error } = await supabase
       .from("locais")
       .update({ plano: "gratuito", plano_ate: null, plano_desde: null })
       .eq("id", local);
 
+    if (error) {
+      setErro(
+        explicarErro(error, "Não consegui encerrar o plano. Tente de novo."),
+      );
+      setIndo(false);
+      setEncerrando(false);
+      return;
+    }
+
     await fecharPeriodoAberto(supabase);
 
     setIndo(false);
+    setEncerrando(false);
     router.refresh();
   }
 
@@ -138,23 +182,56 @@ export default function ControlePlano({
                   : `vence em ${dias} dias (${porExtenso(planoAte)})`
               : "sem data de vencimento"}
           </span>
-          <div className="ml-auto flex gap-2">
-            <button
-              type="button"
-              onClick={() => setAbrindo(true)}
-              className="botao-vazado px-3.5 py-2 text-[14px]"
+          {encerrando ? (
+            // Encerrar tira do comerciante, na hora, tudo o que o plano dá.
+            // Um toque só, sem pergunta, era fácil demais de errar.
+            <div className="ml-auto flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium">
+                Encerrar o plano de {nome}?
+              </span>
+              <button
+                type="button"
+                onClick={desligar}
+                disabled={indo}
+                className="botao-cheio px-3.5 py-2 text-[14px] disabled:opacity-50"
+              >
+                {indo ? "Encerrando..." : "Encerrar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEncerrando(false)}
+                disabled={indo}
+                className="botao-vazado px-3.5 py-2 text-[14px]"
+              >
+                Voltar
+              </button>
+            </div>
+          ) : (
+            <div className="ml-auto flex gap-2">
+              <button
+                type="button"
+                onClick={() => setAbrindo(true)}
+                className="botao-vazado px-3.5 py-2 text-[14px]"
+              >
+                Renovar ou trocar
+              </button>
+              <button
+                type="button"
+                onClick={() => setEncerrando(true)}
+                className="botao-vazado px-3.5 py-2 text-[14px] text-[color:var(--color-v-fechado-claro)]"
+              >
+                Encerrar
+              </button>
+            </div>
+          )}
+          {erro && !abrindo && (
+            <p
+              role="alert"
+              className="w-full text-sm text-[color:var(--color-v-fechado-claro)]"
             >
-              Renovar ou trocar
-            </button>
-            <button
-              type="button"
-              onClick={desligar}
-              disabled={indo}
-              className="botao-vazado px-3.5 py-2 text-[14px] text-[color:var(--color-v-fechado-claro)] disabled:opacity-50"
-            >
-              Encerrar
-            </button>
-          </div>
+              {erro}
+            </p>
+          )}
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-3">
@@ -261,9 +338,17 @@ export default function ControlePlano({
 
 /** Data de hoje mais N meses, em AAAA-MM-DD. */
 function emUmMes(meses = 1): string {
-  const d = new Date(`${hojeEmIvoti()}T12:00:00-03:00`);
-  d.setMonth(d.getMonth() + meses);
-  return d.toISOString().slice(0, 10);
+  const [ano, mes, dia] = hojeEmIvoti().split("-").map(Number);
+
+  // O mês de destino, e o último dia que ele tem. Somar direto no
+  // calendário fazia 31 de janeiro mais um mês cair em 3 de março.
+  const alvo = new Date(Date.UTC(ano, mes - 1 + meses, 1));
+  const ultimoDia = new Date(
+    Date.UTC(alvo.getUTCFullYear(), alvo.getUTCMonth() + 1, 0),
+  ).getUTCDate();
+  alvo.setUTCDate(Math.min(dia, ultimoDia));
+
+  return alvo.toISOString().slice(0, 10);
 }
 
 function porExtenso(data: string | null): string {

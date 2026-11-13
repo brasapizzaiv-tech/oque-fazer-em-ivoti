@@ -10,11 +10,26 @@
  * e isso que importa para quem apertou o botao.
  */
 export async function pedirAviso(local: string): Promise<void> {
+  await pedir({ local });
+}
+
+/**
+ * O mesmo, para um evento: avisa a administracao que chegou um para
+ * conferir, e avisa quem cadastrou quando ele e publicado ou devolvido.
+ *
+ * Antes so os lugares avisavam. A tela do evento prometia "uma conferida
+ * rapida", mas ninguem ficava sabendo que havia o que conferir.
+ */
+export async function pedirAvisoDoEvento(evento: string): Promise<void> {
+  await pedir({ evento });
+}
+
+async function pedir(corpo: { local?: string; evento?: string }) {
   try {
     await fetch("/api/avisar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ local }),
+      body: JSON.stringify(corpo),
       keepalive: true,
     });
   } catch {
