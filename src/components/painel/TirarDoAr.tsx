@@ -26,27 +26,48 @@ export default function TirarDoAr({
   const [confirmando, setConfirmando] = useState(false);
   const [indo, setIndo] = useState(false);
   const [erro, setErro] = useState(false);
+  /** O banco não deixou devolver: foi a administração que tirou do ar. */
+  const [barrado, setBarrado] = useState(false);
   const router = useRouter();
 
   async function mudar(para: "publicado" | "inativo") {
     setIndo(true);
     setErro(false);
 
-    const { error } = await createClient()
+    // Pede de volta como ficou: a regra do banco não dá erro quando
+    // recusa a mudança, só mantém o status anterior. Sem conferir, o botão
+    // "Voltar ao ar" de um lugar tirado pela administração parecia não
+    // fazer nada.
+    const { data, error } = await createClient()
       .from("locais")
       .update({ status: para })
-      .eq("id", id);
+      .eq("id", id)
+      .select("status");
 
     setIndo(false);
     setConfirmando(false);
 
-    if (error) {
-      console.error("Nao consegui mudar o status:", error.message);
+    if (error || !data || data.length === 0) {
+      console.error("Nao consegui mudar o status:", error?.message);
       setErro(true);
       return;
     }
 
+    if (data[0].status !== para) {
+      setBarrado(true);
+      return;
+    }
+
     router.refresh();
+  }
+
+  if (barrado) {
+    return (
+      <span className="max-w-[26ch] shrink-0 text-xs texto-suave">
+        Este lugar foi tirado do ar pela administração. Fale com a gente para
+        voltar.
+      </span>
+    );
   }
 
   if (erro) {
