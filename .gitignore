@@ -10,3 +10,7 @@ npm-debug.log*
 .vercel
 next-env.d.ts
 tsconfig.tsbuildinfo
+
+# Relatorios da auditoria ficam so neste computador: o repositorio e
+# publico, e achado de seguranca nao se publica antes de corrigir.
+docs/auditoria/
