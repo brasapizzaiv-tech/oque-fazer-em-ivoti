@@ -8,6 +8,11 @@
 // ]
 // "capa" e o indice da foto que vira a imagem principal do local (padrao 0).
 //
+// Por padrao as fotos da lista SUBSTITUEM as que o local ja tem. Com
+// "acrescentar": true elas entram depois das atuais, e a capa so muda se o
+// local ainda nao tiver uma ou se "capa" vier escrito na lista:
+//   { "slug": "...", "arquivos": [...], "acrescentar": true }
+//
 // As fotos sao reduzidas antes de subir: foto de camera vem com 6000px e uns
 // 5 MB, o que deixaria a pagina pesada no celular de quem esta na rua.
 import { readFileSync } from "node:fs";
@@ -83,11 +88,11 @@ const supabase = createClient(ENDERECO, CHAVE, {
 const lista = JSON.parse(readFileSync(process.argv[2], "utf8"));
 
 for (const item of lista) {
-  const { slug, arquivos, capa = 0 } = item;
+  const { slug, arquivos, capa, acrescentar = false } = item;
 
   const { data: local, error: erroLocal } = await supabase
     .from("locais")
-    .select("id, nome")
+    .select("id, nome, capa_url")
     .eq("slug", slug)
     .maybeSingle();
 
@@ -98,9 +103,29 @@ for (const item of lista) {
 
   console.log(`\n${local.nome}`);
 
-  // Troca as fotos anteriores deste local em vez de acumular duplicata a cada
-  // vez que o script roda.
-  await supabase.from("locais_fotos").delete().eq("local_id", local.id);
+  // De onde continuam o numero do arquivo e a ordem na galeria. Comeca do
+  // zero quando as fotos novas substituem as antigas.
+  let ultimoNumero = 0;
+  let proximaOrdem = 0;
+
+  if (acrescentar) {
+    const { data: atuais } = await supabase
+      .from("locais_fotos")
+      .select("url, ordem")
+      .eq("local_id", local.id);
+
+    for (const { url, ordem } of atuais ?? []) {
+      // O numero sai do nome do arquivo, e nao da contagem: se uma foto do
+      // meio foi apagada, contar faria a nova gravar por cima da ultima.
+      const numero = Number(url.match(/-(\d+)\.jpg$/)?.[1] ?? 0);
+      ultimoNumero = Math.max(ultimoNumero, numero);
+      proximaOrdem = Math.max(proximaOrdem, ordem + 1);
+    }
+  } else {
+    // Troca as fotos anteriores deste local em vez de acumular duplicata a
+    // cada vez que o script roda.
+    await supabase.from("locais_fotos").delete().eq("local_id", local.id);
+  }
 
   const urls = [];
 
@@ -113,7 +138,7 @@ for (const item of lista) {
       .jpeg({ quality: QUALIDADE, mozjpeg: true })
       .toBuffer();
 
-    const destino = `pontos/${slug}-${i + 1}.jpg`;
+    const destino = `pontos/${slug}-${ultimoNumero + i + 1}.jpg`;
 
     const { error: erroUpload } = await supabase.storage
       .from(BUCKET)
@@ -134,22 +159,30 @@ for (const item of lista) {
 
   if (urls.length === 0) continue;
 
-  const linhas = urls.map((url, ordem) => ({
+  const linhas = urls.map((url, i) => ({
     local_id: local.id,
     url,
-    ordem,
+    ordem: proximaOrdem + i,
   }));
 
   const { error: erroFotos } = await supabase.from("locais_fotos").insert(linhas);
   if (erroFotos) console.error(`  ! erro ao gravar as fotos: ${erroFotos.message}`);
 
-  const { error: erroCapa } = await supabase
-    .from("locais")
-    .update({ capa_url: urls[capa] ?? urls[0] })
-    .eq("id", local.id);
-  if (erroCapa) console.error(`  ! erro ao gravar a capa: ${erroCapa.message}`);
+  // Acrescentando, a capa que ja esta no ar fica — a nao ser que a lista
+  // diga com todas as letras qual das novas deve assumir.
+  const mantemCapa = acrescentar && capa === undefined && local.capa_url;
 
-  console.log(`  -> ${urls.length} foto(s), capa definida`);
+  if (!mantemCapa) {
+    const { error: erroCapa } = await supabase
+      .from("locais")
+      .update({ capa_url: urls[capa ?? 0] ?? urls[0] })
+      .eq("id", local.id);
+    if (erroCapa) console.error(`  ! erro ao gravar a capa: ${erroCapa.message}`);
+  }
+
+  console.log(
+    `  -> ${urls.length} foto(s), ${mantemCapa ? "capa mantida" : "capa definida"}`,
+  );
 }
 
 console.log("\nPronto. ✅");
