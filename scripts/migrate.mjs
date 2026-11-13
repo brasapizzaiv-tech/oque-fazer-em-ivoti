@@ -23,6 +23,9 @@ const client = new pg.Client({
   ssl: { rejectUnauthorized: false },
 });
 
+const SO_O_SERVIDOR = ["somar_metrica", "somar_uso_chat"];
+const SO_CONTA_LOGADA = ["entregar_local"];
+
 async function main() {
   await client.connect();
   console.log("✓ Conectado ao banco");
@@ -80,6 +83,31 @@ async function main() {
     grant execute on all functions in schema public to anon, authenticated, service_role;
   `);
   console.log("✓ Permissões dos papéis da API garantidas (anon, authenticated, service_role)");
+
+  // O "grant execute on all functions" acima é largo de propósito, e por
+  // isso desfazia em silêncio qualquer revoke escrito numa migration (foi
+  // assim que entregar_local voltou a aceitar visitante). As funções que
+  // NÃO são para todo mundo ficam listadas aqui e são fechadas de novo no
+  // fim de toda rodada. Função nova que só o servidor deve chamar: entra
+  // na lista.
+  for (const [nomes, papeis] of [
+    // Só o servidor do site chama (com a chave secreta): contadores.
+    [SO_O_SERVIDOR, "public, anon, authenticated"],
+    // Só conta logada chama; por dentro elas conferem se é a administração.
+    [SO_CONTA_LOGADA, "public, anon"],
+  ]) {
+    const { rows } = await client.query(
+      `select p.oid::regprocedure::text as funcao
+         from pg_proc p
+         join pg_namespace n on n.oid = p.pronamespace
+        where n.nspname = 'public' and p.proname = any($1)`,
+      [nomes],
+    );
+    for (const { funcao } of rows) {
+      await client.query(`revoke execute on function ${funcao} from ${papeis}`);
+    }
+  }
+  console.log("✓ Funções internas fechadas para quem não deve chamá-las");
 
   console.log(
     count === 0
