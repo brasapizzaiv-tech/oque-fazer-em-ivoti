@@ -23,6 +23,10 @@ export const TIPOS = [
   "indicacao",
   "site_pagina",
   "site_origem",
+  // O que veio de uma campanha com influenciador. O navegador nunca manda
+  // este tipo: e o servidor que o grava, ao lado da contagem normal,
+  // quando a visita chegou por um link de campanha cadastrado.
+  "campanha",
 ] as const;
 
 export type TipoMetrica = (typeof TIPOS)[number];
@@ -51,6 +55,7 @@ export const NOME_DO_TIPO: Record<TipoMetrica, string> = {
   indicacao: "Indicações do Guia",
   site_pagina: "Páginas do site",
   site_origem: "Origem dos acessos",
+  campanha: "Campanhas",
 };
 
 export function ehTipoValido(valor: string): valor is TipoMetrica {
@@ -66,7 +71,11 @@ export function ehTipoValido(valor: string): valor is TipoMetrica {
  */
 export async function somar(
   tipo: TipoMetrica,
-  onde: { local?: string | null; alvo?: string | null; chave?: string | null } = {},
+  onde: {
+    local?: string | null;
+    alvo?: string | null;
+    chave?: string | null;
+  } = {},
 ): Promise<void> {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
 
@@ -91,7 +100,10 @@ export async function somar(
  * evita registrar o caminho completo, que as vezes carrega o que a pessoa
  * pesquisou.
  */
-export function origemDoAcesso(referer: string | null, proprioHost: string): string {
+export function origemDoAcesso(
+  referer: string | null,
+  proprioHost: string,
+): string {
   if (!referer) return "direto";
   try {
     const host = new URL(referer).hostname.replace(/^www\./, "");

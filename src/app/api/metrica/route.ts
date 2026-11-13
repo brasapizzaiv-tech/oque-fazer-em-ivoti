@@ -1,6 +1,7 @@
 import { ehTipoValido, somar, origemDoAcesso } from "@/lib/metricas";
 import { ehRobo } from "@/lib/robo";
 import { contaAcesso, contaPagina } from "@/lib/site";
+import { idDaCampanha } from "@/lib/campanhas";
 
 export const runtime = "nodejs";
 
@@ -38,11 +39,17 @@ export async function POST(request: Request) {
       alvo?: string;
       chave?: string;
       de?: string;
+      campanha?: string;
     };
 
     if (!corpo.tipo || !ehTipoValido(corpo.tipo)) {
       return new Response(null, { status: 204 });
     }
+
+    // "campanha" e tipo que so o servidor grava. Se o navegador pudesse
+    // manda-lo direto, qualquer um inflaria o relatorio de uma campanha —
+    // que e o numero usado para vender a proxima cota.
+    if (corpo.tipo === "campanha") return new Response(null, { status: 204 });
 
     // 3. Painel, administracao e telas de conta nao sao visita ao guia.
     //    O navegador ja nao manda, mas a regra mora aqui tambem: endereco
@@ -70,6 +77,7 @@ export async function POST(request: Request) {
       await somar("site_origem", {
         chave: origemDoAcesso(corpo.de ?? null, host).slice(0, 80),
       });
+      await contarNaCampanha(corpo.campanha, "site_origem", null);
       return new Response(null, { status: 204 });
     }
 
@@ -79,6 +87,7 @@ export async function POST(request: Request) {
       // O caminho da pagina e o unico texto livre aceito, e cortado curto.
       chave: corpo.chave ? corpo.chave.slice(0, 120) : null,
     });
+    await contarNaCampanha(corpo.campanha, corpo.tipo, corpo.local ?? null);
   } catch (erro) {
     console.error("Metrica recusada:", erro);
   }
@@ -94,4 +103,25 @@ function caminhoDoReferer(referer: string | null): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Soma a mesma acao na conta da campanha de onde a visita veio.
+ *
+ * E uma segunda linha, ao lado da contagem normal — nunca no lugar dela:
+ * os numeros do comerciante e do site continuam inteiros, e a campanha
+ * ganha a sua propria conta, com a campanha no alvo, a acao na chave e o
+ * estabelecimento no local.
+ *
+ * So conta campanha cadastrada. O que vem depois do "?de=" e escrito por
+ * quem quiser; sem conferir, a tabela encheria de campanha inventada.
+ */
+async function contarNaCampanha(
+  slug: string | undefined,
+  acao: string,
+  local: string | null,
+) {
+  const campanha = await idDaCampanha(slug);
+  if (!campanha) return;
+  await somar("campanha", { alvo: campanha, chave: acao, local });
 }

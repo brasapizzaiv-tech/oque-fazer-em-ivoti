@@ -1,3 +1,5 @@
+import { campanhaDaVisita } from "./campanha-link";
+
 /**
  * Manda contar alguma coisa, do lado do navegador.
  *
@@ -12,7 +14,14 @@ export function contar(
 ): void {
   if (typeof window === "undefined") return;
 
-  const corpo = JSON.stringify({ tipo, ...onde });
+  // Se a visita chegou por um link de campanha, tudo o que ela conta vai
+  // marcado. Quem decide se a campanha existe e o servidor.
+  const campanha = campanhaDaVisita();
+  const corpo = JSON.stringify({
+    tipo,
+    ...onde,
+    ...(campanha ? { campanha } : {}),
+  });
 
   try {
     if (navigator.sendBeacon) {

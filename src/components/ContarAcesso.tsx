@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { contar } from "@/lib/contar";
 import { contaPagina } from "@/lib/site";
+import { guardarCampanha } from "@/lib/campanha-link";
 
 /**
  * Conta o acesso a uma pagina. Nao desenha nada.
@@ -18,6 +19,15 @@ import { contaPagina } from "@/lib/site";
 export default function ContarAcesso({ local }: { local?: string }) {
   const caminho = usePathname();
   const jaContou = useRef<string>("");
+
+  // O link de campanha: oquefazeremivoti.com.br/?de=juliana-nov. Guarda
+  // assim que a pagina abre, antes de qualquer contagem ou clique, para
+  // nada do que a visita fizer escapar da conta. Le direto da barra de
+  // endereco, e nao do roteador, porque so interessa a chegada.
+  useEffect(() => {
+    const de = new URLSearchParams(window.location.search).get("de");
+    if (de) guardarCampanha(de.trim().toLowerCase());
+  }, []);
 
   useEffect(() => {
     // Em navegacao interna o componente do layout nao remonta; a chave abaixo
