@@ -299,15 +299,15 @@ export function Botao({
 /**
  * A marca: o símbolo à esquerda, o nome e a assinatura ao lado.
  *
- * O símbolo é um caminho que passa pelas três heranças da cidade — a
- * petúnia, a casa enxaimel e o torii — e termina num pino de mapa. Diz
- * num desenho o que o site faz: um roteiro por Ivoti. Antes o logo
- * levava o torii de um lado e a casa do outro; o símbolo junta os dois e
- * a flor, então eles saíram para não dizer a mesma coisa duas vezes.
+ * O símbolo é uma estrada que sai da petúnia, passa pela casa enxaimel e
+ * chega ao torii — as três heranças da cidade num caminho só. Diz num
+ * desenho o que o site faz: um roteiro por Ivoti. Antes o logo levava o
+ * torii de um lado e a casa do outro; o símbolo junta os dois e a flor,
+ * então eles saíram para não dizer a mesma coisa duas vezes.
  *
- * É um arquivo de imagem, e não um desenho escrito aqui dentro, porque
- * usa degradês e sombras com nome: repetido duas vezes na mesma página,
- * um desenho embutido brigaria consigo mesmo pelos nomes.
+ * É uma imagem modelada, com volume e sombra, e por isso entra como
+ * arquivo (public/marca/simbolo.png, fundo transparente) e não como
+ * desenho escrito aqui dentro.
  *
  * Sobre foto ou barra escura ele ganha uma base clara. O caminho do
  * símbolo é azul-marinho, e sobre o marrom da barra do painel sumiria —
@@ -339,13 +339,12 @@ export function Logo({
         {/* Encolhe abaixo de 360px em vez de empurrar o nome para a
             segunda linha: num iPhone SE o botão do Guia divide a barra. */}
         <Image
-          src="/marca/logo-simbolo.svg"
+          src="/marca/simbolo.png"
           alt=""
-          width={200}
-          height={216}
-          unoptimized
+          width={181}
+          height={192}
           priority
-          className="h-[34px] w-auto min-[360px]:h-[40px]"
+          className="h-[36px] w-auto min-[360px]:h-[44px]"
         />
       </span>
 
