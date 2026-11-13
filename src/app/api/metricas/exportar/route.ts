@@ -71,6 +71,9 @@ export async function GET(request: Request) {
     .from("metricas_dia")
     .select("dia, tipo, contagem")
     .eq("local_id", localId)
+    // As linhas de campanha são a conta da administração, e repetem o que
+    // já está nas demais: na planilha do comerciante elas somariam dobrado.
+    .neq("tipo", "campanha")
     .gte("dia", desde)
     .order("dia");
 
@@ -105,7 +108,18 @@ function montarCsv(
 ): string {
   const cabecalho = ["Dia", "O que foi medido", "Quantidade"];
 
-  const corpo = linhas.map((l) => [
+  // Uma linha por dia e por tipo. No banco, "eventos vistos" tem uma
+  // linha para cada evento; na planilha isso aparecia como o mesmo título
+  // repetido várias vezes no mesmo dia.
+  const somadas = new Map<string, { dia: string; tipo: string; contagem: number }>();
+  for (const l of linhas) {
+    const chave = `${l.dia}|${l.tipo}`;
+    const atual = somadas.get(chave);
+    if (atual) atual.contagem += l.contagem;
+    else somadas.set(chave, { ...l });
+  }
+
+  const corpo = [...somadas.values()].map((l) => [
     // Data no formato brasileiro: a planilha e lida por gente, nao por
     // programa.
     l.dia.split("-").reverse().join("/"),

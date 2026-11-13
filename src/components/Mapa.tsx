@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import LinkDeContato from "@/components/LinkDeContato";
 import { useEffect, useMemo, useState } from "react";
 import {
   APIProvider,
@@ -266,18 +267,14 @@ function Conteudo({
               >
                 Ver
               </Link>
-              <a
+              <LinkDeContato
                 href={linkRota(aberto)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 rounded-[9px] px-2 py-1.5 text-center text-xs font-bold"
-                style={{
-                  border: "1.5px solid var(--color-v-azul)",
-                  color: "var(--color-v-azul)",
-                }}
+                tipo="clique_rota"
+                local={aberto.id}
+                className="flex-1 rounded-[9px] border-[1.5px] border-[color:var(--color-v-azul)] px-2 py-1.5 text-center text-xs font-bold text-[color:var(--color-v-azul)]"
               >
                 Rota
-              </a>
+              </LinkDeContato>
             </div>
           </div>
         </InfoWindow>

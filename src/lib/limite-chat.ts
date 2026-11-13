@@ -36,7 +36,7 @@ export type Veredito =
   | { liberado: false; motivo: string };
 
 /** Resumo embaralhado do endereco de rede — nao da pra voltar ao original. */
-function identificar(request: Request): string {
+export function identificar(request: Request): string {
   const cabecalho =
     request.headers.get("x-forwarded-for") ??
     request.headers.get("x-real-ip") ??

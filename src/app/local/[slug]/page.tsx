@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ContarAcesso from "@/components/ContarAcesso";
+import ContarAoVer from "@/components/ContarAoVer";
+import LinkDeContato from "@/components/LinkDeContato";
 import type { PromocaoNaTela } from "@/lib/promocoes";
 import Favoritar from "@/components/vidro/Favoritar";
 import Galeria from "@/components/vidro/Galeria";
@@ -228,12 +230,18 @@ export default async function PaginaLocal({
               <TituloSecao selo="promocao">Promoções de hoje</TituloSecao>
               <div className="mt-3 space-y-3">
                 {promocoes.map((p) => (
-                  <CardPromocao
+                  <ContarAoVer
                     key={p.id}
-                    href="#"
-                    titulo={p.titulo}
-                    quando={quandoVale(p)}
-                  />
+                    tipo="promocao_vista"
+                    local={local.id}
+                    alvo={p.id}
+                  >
+                    <CardPromocao
+                      href="#"
+                      titulo={p.titulo}
+                      quando={quandoVale(p)}
+                    />
+                  </ContarAoVer>
                 ))}
               </div>
             </section>
@@ -312,8 +320,13 @@ export default async function PaginaLocal({
                 {eventos.map((e) => {
                   const d = new Date(e.inicio);
                   return (
-                    <LinhaEvento
+                    <ContarAoVer
                       key={e.id}
+                      tipo="evento_visto"
+                      local={local.id}
+                      alvo={e.id}
+                    >
+                    <LinhaEvento
                       titulo={e.titulo}
                       dia={new Intl.DateTimeFormat("pt-BR", {
                         timeZone: "America/Sao_Paulo",
@@ -338,6 +351,7 @@ export default async function PaginaLocal({
                       descricao={e.descricao}
                       foto={e.imagem_url}
                     />
+                    </ContarAoVer>
                   );
                 })}
               </div>
@@ -346,7 +360,9 @@ export default async function PaginaLocal({
 
           {(local.itens ?? []).length > 0 && (
             <section id="cardapio" className="px-4 pt-6">
-              <TituloSecao>Cardápio</TituloSecao>
+              <ContarAoVer tipo="clique_cardapio" local={local.id}>
+                <TituloSecao>Cardápio</TituloSecao>
+              </ContarAoVer>
               {[...secoes.entries()].map(([secao, itens]) => (
                 <div key={secao} className="mt-3">
                   {secao && (
@@ -417,15 +433,16 @@ export default async function PaginaLocal({
                   altura="h-[340px]"
                 />
               </div>
-              <a
+              {/* Pelo LinkDeContato, e não por um link comum: este botão
+                  do computador era o único "Como chegar" que não contava. */}
+              <LinkDeContato
                 href={linkRota(local)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="vidro-leve flex h-12 items-center justify-center rounded-[11px] text-[14px] font-bold"
-                style={{ color: "var(--color-v-azul)" }}
+                tipo="clique_rota"
+                local={local.id}
+                className="vidro-leve flex h-12 items-center justify-center rounded-[11px] text-[14px] font-bold text-[color:var(--color-v-azul)]"
               >
                 Como chegar
-              </a>
+              </LinkDeContato>
             </div>
           </aside>
         )}

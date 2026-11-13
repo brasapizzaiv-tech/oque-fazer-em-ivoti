@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import ContarAoVer from "@/components/ContarAoVer";
 import CardComFoto from "@/components/vidro/CardComFoto";
 import {
   BlocoRoteiro,
@@ -315,13 +316,19 @@ export default async function Inicio() {
                 <Vazio>Nenhuma promoção valendo hoje.</Vazio>
               ) : (
                 promocoes.map((p) => (
-                  <CardPromocao
+                  <ContarAoVer
                     key={p.id}
-                    href={`/local/${p.local?.slug ?? ""}`}
-                    titulo={p.titulo}
-                    quando={quandoVale(p)}
-                    local={p.local?.nome ?? undefined}
-                  />
+                    tipo="promocao_vista"
+                    local={p.local_id}
+                    alvo={p.id}
+                  >
+                    <CardPromocao
+                      href={`/local/${p.local?.slug ?? ""}`}
+                      titulo={p.titulo}
+                      quando={quandoVale(p)}
+                      local={p.local?.nome ?? undefined}
+                    />
+                  </ContarAoVer>
                 ))
               )}
             </div>

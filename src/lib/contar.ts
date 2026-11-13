@@ -1,4 +1,4 @@
-import { campanhaDaVisita } from "./campanha-link";
+import { campanhaDaVisita, campanhaNaChegada } from "./campanha-link";
 
 /**
  * Manda contar alguma coisa, do lado do navegador.
@@ -16,7 +16,11 @@ export function contar(
 
   // Se a visita chegou por um link de campanha, tudo o que ela conta vai
   // marcado. Quem decide se a campanha existe e o servidor.
-  const campanha = campanhaDaVisita();
+  //
+  // A chegada ("site_origem") é a exceção: ela é o que o relatório chama
+  // de visita pelo link, e cada pessoa conta uma vez só por campanha.
+  const campanha =
+    tipo === "site_origem" ? campanhaNaChegada() : campanhaDaVisita();
   const corpo = JSON.stringify({
     tipo,
     ...onde,

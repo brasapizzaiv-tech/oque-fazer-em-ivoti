@@ -2,6 +2,18 @@ import { ehTipoValido, somar, origemDoAcesso } from "@/lib/metricas";
 import { ehRobo } from "@/lib/robo";
 import { contaAcesso, contaPagina } from "@/lib/site";
 import { idDaCampanha } from "@/lib/campanhas";
+import { dentroDoLimite, identificar } from "@/lib/limite-chat";
+
+/**
+ * Quanto um mesmo visitante pode contar por hora.
+ *
+ * Uma pessoa navegando de verdade gera algumas dezenas de contagens numa
+ * visita longa. O teto existe porque este endereço é público: sem ele,
+ * um laço de pedidos inflava os números de um estabelecimento — ou os de
+ * uma campanha, que são os que se mostram para vender a próxima cota.
+ */
+const POR_VISITANTE_POR_HORA = 300;
+const NA_CAMPANHA_POR_VISITANTE_POR_HORA = 40;
 
 export const runtime = "nodejs";
 
@@ -31,6 +43,11 @@ export async function POST(request: Request) {
   // 2. So conta gente.
   if (ehRobo(request.headers.get("user-agent")))
     return new Response(null, { status: 204 });
+
+  const visitante = identificar(request);
+  if (!(await dentroDoLimite(`metrica:${visitante}`, POR_VISITANTE_POR_HORA))) {
+    return new Response(null, { status: 204 });
+  }
 
   try {
     const corpo = (await request.json()) as {
@@ -77,7 +94,7 @@ export async function POST(request: Request) {
       await somar("site_origem", {
         chave: origemDoAcesso(corpo.de ?? null, host).slice(0, 80),
       });
-      await contarNaCampanha(corpo.campanha, "site_origem", null);
+      await contarNaCampanha(visitante, corpo.campanha, "site_origem", null);
       return new Response(null, { status: 204 });
     }
 
@@ -87,7 +104,12 @@ export async function POST(request: Request) {
       // O caminho da pagina e o unico texto livre aceito, e cortado curto.
       chave: corpo.chave ? corpo.chave.slice(0, 120) : null,
     });
-    await contarNaCampanha(corpo.campanha, corpo.tipo, corpo.local ?? null);
+    await contarNaCampanha(
+      visitante,
+      corpo.campanha,
+      corpo.tipo,
+      corpo.local ?? null,
+    );
   } catch (erro) {
     console.error("Metrica recusada:", erro);
   }
@@ -117,11 +139,24 @@ function caminhoDoReferer(referer: string | null): string | null {
  * quem quiser; sem conferir, a tabela encheria de campanha inventada.
  */
 async function contarNaCampanha(
+  visitante: string,
   slug: string | undefined,
   acao: string,
   local: string | null,
 ) {
   const campanha = await idDaCampanha(slug);
   if (!campanha) return;
+
+  // O nome da campanha está no link que o influenciador divulga, então
+  // qualquer um pode mandá-lo. O teto por visitante é o que impede uma
+  // pessoa só de fabricar o relatório.
+  if (
+    !(await dentroDoLimite(
+      `campanha:${campanha}:${visitante}`,
+      NA_CAMPANHA_POR_VISITANTE_POR_HORA,
+    ))
+  ) {
+    return;
+  }
   await somar("campanha", { alvo: campanha, chave: acao, local });
 }

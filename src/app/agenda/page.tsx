@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContarAoVer from "@/components/ContarAoVer";
 import { imagemDoSite } from "@/lib/imagens";
 import type { Metadata } from "next";
 import {
@@ -138,7 +139,14 @@ export default async function Agenda() {
                     return (
                       // O id é o destino dos cards da capa ("/agenda#id"): sem
                       // ele o toque abria a agenda no topo, e não no evento.
-                      <div key={e.id} id={e.id} className="scroll-mt-24">
+                      <ContarAoVer
+                        key={e.id}
+                        id={e.id}
+                        className="scroll-mt-24"
+                        tipo="evento_visto"
+                        local={e.local_id}
+                        alvo={e.id}
+                      >
                       <LinhaEvento
                         titulo={e.titulo}
                         dia={parte({ day: "2-digit" })}
@@ -152,7 +160,7 @@ export default async function Agenda() {
                         descricao={e.descricao}
                         foto={e.imagem_url}
                       />
-                      </div>
+                      </ContarAoVer>
                     );
                   })}
                 </div>
