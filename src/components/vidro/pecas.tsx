@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { CasaEnxaimel, Petunia, Torii } from "./icones";
+import { Petunia, Torii } from "./icones";
 import { ASSINATURA, NOME_DO_SITE } from "@/lib/marca";
 
 /* ==================================================================== */
@@ -296,12 +297,21 @@ export function Botao({
 /* ==================================================================== */
 
 /**
- * A marca: torii à esquerda, nome ao centro, casa enxaimel à direita.
+ * A marca: o símbolo à esquerda, o nome e a assinatura ao lado.
  *
- * Os dois ícones têm o mesmo tamanho e a mesma linha de base — são as duas
- * heranças da cidade, e uma não pode parecer maior que a outra. A petúnia
- * fecha a assinatura embaixo: é a terceira identidade, e cabe pequena
- * porque já dá nome à frase.
+ * O símbolo é um caminho que passa pelas três heranças da cidade — a
+ * petúnia, a casa enxaimel e o torii — e termina num pino de mapa. Diz
+ * num desenho o que o site faz: um roteiro por Ivoti. Antes o logo
+ * levava o torii de um lado e a casa do outro; o símbolo junta os dois e
+ * a flor, então eles saíram para não dizer a mesma coisa duas vezes.
+ *
+ * É um arquivo de imagem, e não um desenho escrito aqui dentro, porque
+ * usa degradês e sombras com nome: repetido duas vezes na mesma página,
+ * um desenho embutido brigaria consigo mesmo pelos nomes.
+ *
+ * Sobre foto ou barra escura ele ganha uma base clara. O caminho do
+ * símbolo é azul-marinho, e sobre o marrom da barra do painel sumiria —
+ * sobraria um pino e três bolinhas soltas.
  *
  * Sobre foto o nome vai branco com sombra; a assinatura, em rosa-claro.
  */
@@ -314,18 +324,32 @@ export function Logo({
 }) {
   const tinta = sobreFoto ? "#FFFFFF" : "var(--color-v-texto)";
 
-  // Encolhe abaixo de 360px em vez de quebrar. Num iPhone SE, com o botão
-  // redondo do Guia ao lado, o nome em 17px passava para a segunda linha e
-  // a casa descia junto — os dois ícones deixavam de estar na mesma altura,
-  // que é justamente o que o logo não pode perder. O `h-auto` deixa o CSS
-  // vencer a altura que o SVG traz no atributo.
-  const icone = "shrink-0 w-[27px] h-auto min-[360px]:w-[34px]";
-
   return (
     <span className="flex items-center gap-2 min-[360px]:gap-2.5">
-      <Torii tamanho={34} className={icone} />
+      <span
+        className={`flex shrink-0 items-center justify-center ${
+          sobreFoto ? "rounded-[10px] p-[3px]" : ""
+        }`}
+        style={
+          sobreFoto
+            ? { backgroundColor: "rgba(250, 247, 241, 0.94)" }
+            : undefined
+        }
+      >
+        {/* Encolhe abaixo de 360px em vez de empurrar o nome para a
+            segunda linha: num iPhone SE o botão do Guia divide a barra. */}
+        <Image
+          src="/marca/logo-simbolo.svg"
+          alt=""
+          width={200}
+          height={216}
+          unoptimized
+          priority
+          className="h-[34px] w-auto min-[360px]:h-[40px]"
+        />
+      </span>
 
-      <span className="flex flex-col items-center leading-none">
+      <span className="flex flex-col leading-none">
         <span
           className={`text-[14px] font-bold whitespace-nowrap min-[360px]:text-[17px] ${
             sobreFoto ? "sobre-foto" : ""
@@ -348,8 +372,6 @@ export function Logo({
           <Petunia tamanho={11} className="shrink-0" />
         </span>
       </span>
-
-      <CasaEnxaimel tamanho={34} className={icone} />
     </span>
   );
 }
