@@ -42,8 +42,17 @@ export const revalidate = 60;
 // titulo e descricao do layout, e isso basta. O endereco oficial, nao —
 // sem ele o Google trata a capa do dominio e a do endereco da Vercel
 // como duas paginas iguais e nao sabe qual indexar.
+//
+// O titulo e a descricao passaram a ser proprios em 13/11/2026: o titulo
+// herdado era so o nome do site, e a descricao nao continha a frase que
+// as pessoas digitam no buscador ("o que fazer em Ivoti").
 export const metadata: Metadata = {
   alternates: enderecoOficial("/"),
+  title: {
+    absolute: "O que fazer em Ivoti: guia da cidade, eventos e roteiros",
+  },
+  description:
+    "O que fazer em Ivoti, RS: onde comer, o que visitar, os eventos da cidade e roteiros prontos. O guia da Cidade das Flores, com horário, endereço e rota de cada lugar.",
 };
 
 /** A data de daqui a N dias, em AAAA-MM-DD, no fuso de Ivoti. */
@@ -343,7 +352,19 @@ export default async function Inicio() {
 
       {/* ================= sobre Ivoti ================= */}
       <section className="px-4 pb-10 lg:mx-auto lg:max-w-[1440px] lg:px-16 lg:pb-16">
-        <TituloSecao>Sobre Ivoti</TituloSecao>
+        <TituloSecao
+          aoLado={
+            <Link
+              href="/o-que-fazer-em-ivoti"
+              className="inline-flex min-h-11 items-center text-[14px] font-bold"
+              style={{ color: "var(--color-v-azul)" }}
+            >
+              O guia completo
+            </Link>
+          }
+        >
+          Sobre Ivoti
+        </TituloSecao>
         <div className="mt-4 space-y-3 lg:grid lg:grid-cols-3 lg:gap-4 lg:space-y-0">
           <SobreIvoti
             icone={<CasaEnxaimel tamanho={34} />}

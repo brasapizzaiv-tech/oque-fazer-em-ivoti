@@ -22,6 +22,11 @@ export const revalidate = 3600;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const fixas: MetadataRoute.Sitemap = [
     { url: SITE, changeFrequency: "daily", priority: 1 },
+    {
+      url: `${SITE}/o-que-fazer-em-ivoti`,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
     { url: `${SITE}/explorar`, changeFrequency: "daily", priority: 0.9 },
     { url: `${SITE}/mapa`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE}/agenda`, changeFrequency: "daily", priority: 0.8 },
