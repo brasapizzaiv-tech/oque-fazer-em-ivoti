@@ -4,6 +4,7 @@ import { Botao, CardAzul, CardVidro, Legenda } from "@/components/vidro/pecas";
 import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
   COTA_DE_CAMPANHA_CENTAVOS,
+  DIAS_GRATIS,
   ORDEM_DOS_PLANOS,
   PLANOS,
   precoPorExtenso,
@@ -100,8 +101,9 @@ export default function Planos() {
           className="mt-3 max-w-[58ch] text-[15px]"
           style={{ color: "var(--color-v-texto-suave)" }}
         >
-          Três planos mensais, sem fidelidade. Você escolhe o degrau, e pode
-          subir ou descer quando quiser.
+          Os primeiros {DIAS_GRATIS} dias são grátis, para você ver o guia
+          funcionando. Depois, três planos mensais, sem fidelidade: você
+          escolhe o degrau, e pode subir ou descer quando quiser.
         </p>
 
         {/* ---------------- os três degraus ---------------- */}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listarCategorias } from "@/lib/locais";
 import FormularioNovo from "./FormularioNovo";
+import { AvisoDeCobranca } from "@/components/AvisoDoPeriodoGratis";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +28,8 @@ export default async function Novo() {
         Comece pelo básico. Depois você completa fotos, horários e o resto com
         calma.
       </p>
+
+      <AvisoDeCobranca className="aviso-painel mt-4 px-4 py-3" />
 
       <FormularioNovo categorias={categorias} />
     </div>

@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   ORDEM_DOS_PLANOS,
   PLANOS,
+  dataPorExtenso,
+  periodoGratis,
   planoAtivo,
   precoPorExtenso,
 } from "@/lib/planos";
@@ -19,6 +21,7 @@ type Linha = {
   plano: string;
   plano_ate: string | null;
   plano_desde: string | null;
+  gratis_ate: string | null;
   dono_id: string | null;
   categoria: { nome: string } | null;
 };
@@ -29,7 +32,7 @@ export default async function Planos() {
   const { data } = await supabase
     .from("locais")
     .select(
-      "id, slug, nome, bairro, plano, plano_ate, plano_desde, dono_id, categoria:categorias(nome)",
+      "id, slug, nome, bairro, plano, plano_ate, plano_desde, gratis_ate, dono_id, categoria:categorias(nome)",
     )
     .eq("status", "publicado")
     .order("nome");
@@ -109,6 +112,38 @@ export default async function Planos() {
   );
 }
 
+/**
+ * O prazo grátis de um comércio que ainda não tem plano: é a lista de
+ * quem está para ser cobrado, e de quem já passou do prazo.
+ */
+function PrazoGratis({ local }: { local: Linha }) {
+  if (!local.dono_id) return null;
+  if (planoAtivo(local.plano, local.plano_ate) !== "gratuito") return null;
+
+  const periodo = periodoGratis(local.gratis_ate);
+  if (periodo.situacao === "nao_comecou") return null;
+
+  if (periodo.situacao === "terminou") {
+    return (
+      <p className="mt-1 text-sm font-semibold text-[color:var(--color-v-fechado-claro)]">
+        Período grátis terminou em {dataPorExtenso(periodo.ate)}: hora de
+        combinar o plano.
+      </p>
+    );
+  }
+
+  return (
+    <p className="mt-1 text-sm texto-suave">
+      Período grátis até {dataPorExtenso(periodo.ate)}
+      {periodo.dias === 0
+        ? " (termina hoje)"
+        : periodo.dias === 1
+          ? " (falta 1 dia)"
+          : ` (faltam ${periodo.dias} dias)`}
+    </p>
+  );
+}
+
 function Grupo({
   titulo,
   locais,
@@ -137,6 +172,7 @@ function Grupo({
                   {l.bairro ? ` · ${l.bairro}` : ""}
                 </span>
               </div>
+              <PrazoGratis local={l} />
 
               <ControlePlano
                 local={l.id}

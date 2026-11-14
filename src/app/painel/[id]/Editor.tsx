@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import TirarDoAr from "@/components/painel/TirarDoAr";
+import { SituacaoDoPeriodoGratis } from "@/components/AvisoDoPeriodoGratis";
 import {
   AreaTexto,
   Bloco,
@@ -78,6 +79,7 @@ export default function Editor({
       </div>
 
       <BarraPublicacao local={local} />
+      <SituacaoDoPeriodoGratis local={local} />
 
       {/* Quebra em duas linhas no celular em vez de rolar de lado: com cinco
           abas, quem nao adivinha que da para arrastar nunca acha o "Cardapio".

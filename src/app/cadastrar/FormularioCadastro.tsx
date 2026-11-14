@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
 import { irParaRecarregando } from "@/lib/ir-para";
+import { DIAS_GRATIS, menorMensalidade } from "@/lib/planos";
 
 export default function FormularioCadastro() {
   const [nome, setNome] = useState("");
@@ -14,6 +15,8 @@ export default function FormularioCadastro() {
   const [erro, setErro] = useState<string | null>(null);
   const [confirmar, setConfirmar] = useState(false);
   const [indo, setIndo] = useState(false);
+  /** Leu o combinado de preço e marcou que entendeu. */
+  const [ciente, setCiente] = useState(false);
 
   async function cadastrar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -32,7 +35,13 @@ export default function FormularioCadastro() {
         email: email.trim(),
         password: senha,
         options: {
-          data: { nome: nome.trim(), telefone: telefone.trim() },
+          data: {
+            nome: nome.trim(),
+            telefone: telefone.trim(),
+            // O registro de que a pessoa marcou que entendeu o combinado de
+            // preço, e quando. Fica guardado junto da conta.
+            ciente_da_cobranca_em: new Date().toISOString(),
+          },
           // Para onde o link do e-mail de confirmacao volta. Sem isto o Supabase
           // usa o endereco configurado no painel dele, que nasce apontando para
           // localhost — e o link chega quebrado na caixa de entrada de quem se
@@ -110,6 +119,20 @@ export default function FormularioCadastro() {
         onChange={setSenha}
         autoComplete="new-password"
       />
+
+      <label className="flex items-start gap-2.5 text-[14px]">
+        <input
+          type="checkbox"
+          required
+          checked={ciente}
+          onChange={(e) => setCiente(e.target.checked)}
+          className="mt-0.5 h-5 w-5 shrink-0"
+        />
+        <span>
+          Entendi: são {DIAS_GRATIS} dias grátis e, depois, mensalidade a
+          partir de {menorMensalidade()}.
+        </span>
+      </label>
 
       {erro && (
         <p className="vidro px-3 py-2 text-[13px] text-[color:var(--color-v-fechado-claro)]">

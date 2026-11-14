@@ -10,6 +10,8 @@ import {
   Petunia,
 } from "@/components/vidro/icones";
 import FormularioCadastro from "./FormularioCadastro";
+import { AvisoDeCobranca } from "@/components/AvisoDoPeriodoGratis";
+import { DIAS_GRATIS, menorMensalidade } from "@/lib/planos";
 import { enderecoOficial } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -76,7 +78,8 @@ export default function Cadastrar() {
             style={{ color: "var(--color-v-texto-suave)" }}
           >
             Você cria a conta, preenche o perfil do jeito que quiser, e a gente
-            publica.{" "}
+            publica. Os primeiros {DIAS_GRATIS} dias são grátis; depois, a
+            mensalidade é a partir de {menorMensalidade()}.{" "}
             <Link
               href="/planos"
               className="font-semibold underline"
@@ -124,6 +127,9 @@ export default function Cadastrar() {
 
         {/* ---------------- o formulário ---------------- */}
         <div className="mt-8 lg:col-span-6 lg:mt-0">
+          {/* O combinado de preço vem antes do formulário, e não depois:
+              quem cria a conta precisa saber disso antes de começar. */}
+          <AvisoDeCobranca className="vidro mb-4 p-4 text-[color:var(--color-v-texto)]" />
           <div
             className="rounded-[4px] p-5 lg:p-7"
             style={{

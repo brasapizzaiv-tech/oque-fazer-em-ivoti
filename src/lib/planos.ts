@@ -202,3 +202,47 @@ export function diasParaVencer(
       umDia,
   );
 }
+
+// ============================================================
+// O período grátis
+// ============================================================
+// Todo comércio que entra no guia fica 60 dias sem pagar, contados do dia
+// em que o lugar vai ao ar. É o tempo para o dono ver o guia funcionando;
+// depois vem a mensalidade. A data de cada um mora no banco
+// (`locais.gratis_ate`, preenchida sozinha na publicação), e aqui ficam o
+// número e as frases, para as telas, o e-mail e a página de planos dizerem
+// a mesma coisa.
+// ============================================================
+
+/** Quantos dias o comércio fica no guia sem pagar. */
+export const DIAS_GRATIS = 60;
+
+/** "R$ 49,90": a mensalidade mais baixa, que é a que o aviso cita. */
+export function menorMensalidade(): string {
+  return precoPorExtenso(PLANOS.presenca.centavos);
+}
+
+export type PeriodoGratis =
+  /** Ainda não foi ao ar: a contagem não começou. */
+  | { situacao: "nao_comecou" }
+  | { situacao: "valendo"; ate: string; dias: number }
+  | { situacao: "terminou"; ate: string };
+
+/** Em que pé está o período grátis de um lugar. */
+export function periodoGratis(
+  gratis_ate: string | null | undefined,
+): PeriodoGratis {
+  if (!gratis_ate) return { situacao: "nao_comecou" };
+  // Do banco a data pode vir com hora ("2027-01-12T03:00..."): só o dia importa.
+  const ate = gratis_ate.slice(0, 10);
+  const dias = diasParaVencer(ate) ?? 0;
+  return dias >= 0
+    ? { situacao: "valendo", ate, dias }
+    : { situacao: "terminou", ate };
+}
+
+/** "2027-01-12" -> "12/01/2027" */
+export function dataPorExtenso(data: string): string {
+  const [ano, mes, dia] = data.slice(0, 10).split("-");
+  return `${dia}/${mes}/${ano}`;
+}

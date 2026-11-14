@@ -4,6 +4,13 @@ import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { mandarEmail, moldura, semHtml } from "@/lib/email";
 import { SITE } from "@/lib/site";
 import { dentroDoLimite } from "@/lib/limite-chat";
+import {
+  DIAS_GRATIS,
+  dataPorExtenso,
+  menorMensalidade,
+  periodoGratis,
+  planoAtivo,
+} from "@/lib/planos";
 
 export const runtime = "nodejs";
 
@@ -59,7 +66,9 @@ export async function POST(request: Request) {
 
     const { data: lugar } = await admin
       .from("locais")
-      .select("id, nome, slug, status, motivo_rejeicao, dono_id")
+      .select(
+        "id, nome, slug, status, motivo_rejeicao, dono_id, plano, plano_ate, gratis_ate",
+      )
       .eq("id", localId)
       .maybeSingle();
     if (!lugar) return new Response(null, { status: 204 });
@@ -166,6 +175,9 @@ type Lugar = {
   status: string;
   motivo_rejeicao: string | null;
   dono_id: string | null;
+  plano: string;
+  plano_ate: string | null;
+  gratis_ate: string | null;
 };
 
 type Admin = ReturnType<typeof createAdminClient>;
@@ -214,6 +226,19 @@ async function paraAAdministracao(
   }
 }
 
+/**
+ * A frase sobre o período grátis, para o e-mail de "está no ar".
+ *
+ * É o dia em que a contagem começa, então é a hora de dizer até quando
+ * ela vai. Fica vazia para quem já tem plano pago.
+ */
+function recadoDoPeriodoGratis(lugar: Lugar): string {
+  if (planoAtivo(lugar.plano, lugar.plano_ate) !== "gratuito") return "";
+  const periodo = periodoGratis(lugar.gratis_ate);
+  if (periodo.situacao !== "valendo") return "";
+  return ` Seus ${DIAS_GRATIS} dias grátis vão até ${dataPorExtenso(periodo.ate)}. Depois, a mensalidade é a partir de ${menorMensalidade()}, sem fidelidade.`;
+}
+
 /** "Seu cadastro foi publicado" ou "precisa de um ajuste". */
 async function avisarDono(admin: Admin, lugar: Lugar) {
   const para = await emailDe(admin, lugar.dono_id);
@@ -229,8 +254,7 @@ async function avisarDono(admin: Admin, lugar: Lugar) {
         botao: lugar.slug
           ? { rotulo: "Ver no site", href: `${SITE}/local/${encodeURIComponent(lugar.slug)}` }
           : undefined,
-        rodape:
-          "Tudo o que você alterar no painel daqui pra frente aparece no site em poucos minutos.",
+        rodape: `Tudo o que você alterar no painel daqui pra frente aparece no site em poucos minutos.${recadoDoPeriodoGratis(lugar)}`,
       }),
     });
     return;

@@ -78,6 +78,8 @@ export type Local = {
   capa_url: string | null;
   plano: string;
   plano_ate: string | null;
+  /** Último dia do período grátis. Nulo enquanto o lugar não foi ao ar. */
+  gratis_ate?: string | null;
   status: StatusLocal;
   motivo_rejeicao: string | null;
   destaque: boolean;
