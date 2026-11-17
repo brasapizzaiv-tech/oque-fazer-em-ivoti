@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { caminhoInterno, irParaRecarregando } from "@/lib/ir-para";
@@ -25,8 +25,15 @@ export default function Confirmacao() {
   const router = useRouter();
   const params = useSearchParams();
   const [demorou, setDemorou] = useState(false);
+  // O código do e-mail vale uma vez só. Se este trecho rodar duas vezes
+  // (o que o React pode fazer), a segunda tentativa falha e a pessoa caía
+  // na tela de erro logo depois de ter entrado.
+  const jaRodou = useRef(false);
 
   useEffect(() => {
+    if (jaRodou.current) return;
+    jaRodou.current = true;
+
     // So aceita caminho interno: um endereco completo aqui deixaria alguem
     // usar o nosso link pra jogar visitante em pagina de golpe.
     const destino = caminhoInterno(params.get("next"));
@@ -61,6 +68,16 @@ export default function Confirmacao() {
         irParaRecarregando(destino);
       } catch (erro) {
         console.error("Confirmacao de e-mail falhou:", erro);
+
+        // Link já usado, mas a pessoa está logada neste navegador (clicou
+        // duas vezes no e-mail, por exemplo): segue para onde ia, em vez
+        // de mostrar um erro para quem já entrou.
+        const { data } = await supabase.auth.getSession();
+        if (data.session) {
+          irParaRecarregando(destino);
+          return;
+        }
+
         router.replace("/entrar?erro=confirmacao");
       } finally {
         clearTimeout(avisar);

@@ -4,8 +4,15 @@
 
      Assunto:  Confirme seu cadastro no guia de Ivoti
 
-     Cole o bloco abaixo no corpo. Nao mexa em {{ .ConfirmationURL }}:
-     e ali que a Supabase poe o link unico de cada pessoa.
+     Cole o bloco abaixo no corpo. Nao mexa em {{ .TokenHash }}: e ali
+     que a Supabase poe o codigo unico de cada pessoa.
+
+     O link aponta direto para o site, com o codigo, e NAO para o
+     endereco pronto da Supabase ({{ .ConfirmationURL }}). O endereco
+     pronto so abre a conta no mesmo navegador em que ela foi criada:
+     quem se cadastrava pelo Instagram e abria o e-mail no aplicativo
+     de e-mail caia numa tela de erro, mesmo com a conta confirmada.
+     Deste jeito funciona em qualquer navegador e aparelho.
      ============================================================ -->
 <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#faf7f1;padding:32px 16px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
   <tr>
@@ -30,7 +37,7 @@
         </tr>
         <tr>
           <td style="padding-bottom:24px">
-            <a href="{{ .ConfirmationURL }}" style="display:inline-block;background-color:#e03a2f;color:#ffffff;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 28px;border-radius:11px">
+            <a href="https://oquefazeremivoti.com.br/auth/callback?token_hash={{ .TokenHash }}&type=signup&next=/painel/novo" style="display:inline-block;background-color:#e03a2f;color:#ffffff;font-size:16px;font-weight:bold;text-decoration:none;padding:14px 28px;border-radius:11px">
               Confirmar meu cadastro
             </a>
           </td>

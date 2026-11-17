@@ -21,7 +21,11 @@ export default function FormularioEntrar() {
   // tela de erro crua do Supabase.
   const avisoConfirmacao =
     params.get("erro") === "confirmacao"
-      ? "Esse link de confirmação não vale mais — pode ter vencido, já ter sido usado, ou ter sido aberto em outro navegador. Entre com seu e-mail e senha aqui embaixo."
+      ? // Na maior parte das vezes em que alguém cai aqui o e-mail JÁ foi
+        // confirmado; o que não deu foi abrir a conta sozinho pelo link. O
+        // aviso antigo dizia que o link "não vale mais", e a pessoa
+        // achava que o cadastro tinha falhado.
+        "Não deu para abrir sua conta direto pelo link. Se você acabou de confirmar o e-mail, a conta já está valendo: é só entrar com seu e-mail e senha aqui embaixo."
       : null;
 
   async function entrar(evento: React.FormEvent) {
