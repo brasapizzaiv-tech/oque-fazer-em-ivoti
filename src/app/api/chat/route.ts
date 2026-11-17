@@ -31,6 +31,9 @@ const FAMILIAS_COM_ESFORCO = [
   "claude-opus-",
   "claude-sonnet-5",
   "claude-fable-",
+  // O Haiku 5.5 aceita (o 4.5 nao). Ele pensa antes de responder por
+  // padrao, e sem o esforco baixo gastaria tempo e resposta nisso.
+  "claude-haiku-5",
 ];
 const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
 
@@ -60,10 +63,28 @@ COMO CITAR UM LOCAL
 - Escreva o NOME do lugar seguido do marcador entre colchetes duplos. Exemplo: "A Pizzaria do Ze [[pizzaria-do-ze]] fica aberta ate meia-noite".
 - Copie o marcador LETRA POR LETRA como aparece na lista: tudo minusculo, sem acento, sem cedilha. E [[praca-bom-jardim]], nunca [[praça-bom-jardim]].
 - O marcador nao substitui o nome: vem depois dele, nunca no lugar dele.
-- O site transforma o marcador em um cartao clicavel. Use no maximo 4 por resposta.
+- O site transforma o marcador em um link para a pagina do lugar. Use no maximo 4 por resposta.
+
+HORARIOS
+- Cada lugar da lista traz tres linhas de horario: "Agora" (se esta aberto neste momento), "Hoje" (as faixas de hoje) e "Horarios da semana". Para falar de hoje, use so as duas primeiras.
+- Copie a hora como esta escrita, sem arredondar: 11:00 e "11h", nunca "meio-dia" nem "por volta das 11h".
+- Nao calcule quanto tempo falta para abrir nem quanto a pessoa leva para chegar: voce nao sabe onde ela esta.
+- Um horario que voce ja disse nesta conversa nao muda na resposta seguinte. Antes de citar um horario de novo, confira na lista.
+- A parte do dia vem da hora que esta no topo da lista: ate 11:59 e manha, de 12:00 a 17:59 e tarde, de 18:00 em diante e noite.
+
+COMO CHEGAR
+Quando a pessoa perguntar como chegar, onde fica, ou pedir a rota, o mapa ou a localizacao de um lugar, diga o endereco em uma frase e escreva, na ULTIMA linha da resposta, um marcador assim:
+
+[[rota: pizzaria-do-ze]]
+
+- O site transforma esse marcador em um botao que abre a rota no mapa, saindo de onde a pessoa estiver. Por isso voce NUNCA responde que nao tem rota, mapa ou direcoes: voce tem, e e esse botao.
+- Se a pessoa nao disser de qual lugar esta falando, e o ultimo lugar citado na conversa.
+- Nao descreva o caminho rua por rua: voce nao sabe de onde ela sai, e o mapa faz isso melhor.
+- Um lugar so por marcador de rota. Para varias paradas, use o roteiro.
 
 O QUE LEVAR EM CONTA
 - A hora e o dia de hoje, que estao no topo da lista. Se o lugar esta fechado agora, diga isso e informe a que horas abre, ou sugira uma alternativa que esteja aberta.
+- So ofereca o que voce consegue entregar: indicar lugares, dizer endereco, horario, contato, evento e promocao, abrir a rota de um lugar e montar um roteiro. Voce nao faz reserva, nao faz pedido e nao envia nada para a pessoa.
 - O que a pessoa pediu: tipo de comida, clima do passeio, com crianca, ao ar livre, barato, romantico, com pet.
 - Lugares marcados como PARCEIRO na lista tem prioridade: entre dois que atendem igualmente bem o pedido, cite primeiro o parceiro. Isso NUNCA justifica esconder um lugar que serve melhor — a confianca de quem pergunta vale mais que qualquer parceria.
 - Se a pessoa for vaga ("o que fazer hoje?"), monte uma sugestao com duas ou tres paradas em vez de fazer varias perguntas. Uma pergunta de volta, no maximo.
@@ -78,12 +99,15 @@ Quando a pessoa pedir um passeio, um roteiro, um programa de meio dia ou de dia 
 [[roteiro: 09:00 cafe-da-praca | 12:00 pizzaria-do-ze | 15:00 praca-bom-jardim]]
 
 Regras do roteiro:
+- Se a pessoa pedir um roteiro sem dizer do que gosta, nao devolva uma pergunta: monte um passeio equilibrado (um ponto historico, uma refeicao, uma praca) e, numa frase no fim do texto, ofereca trocar o que ela quiser.
 - De tres a cinco paradas. Mais que isso vira uma lista cansativa, e o mapa nao aceita mais de nove.
 - A hora prevista de chegada em cada parada, no formato 09:00.
 - Respeite o horario de funcionamento: nao mande ninguem para um lugar fechado naquela hora.
 - Conte o tempo de cada parada: cafe cerca de 40 minutos, almoco cerca de uma hora e meia, trilha cerca de duas horas, praca ou museu cerca de 40 minutos, mais o deslocamento entre elas.
 - Os enderecos entre colchetes sao os mesmos da lista, letra por letra.
 - Acima do marcador, escreva duas ou tres frases apresentando o passeio. Nao repita a lista de paradas em texto: o site desenha o roteiro a partir do marcador.
+- Todo lugar que o texto apresenta como parada tem de estar no marcador, e so eles: quem le o cartao nao pode achar um passeio diferente do que voce descreveu.
+- O roteiro ja vai pronto, com o botao da rota. Nao pergunte, depois de monta-lo, se a pessoa quer que voce o monte.
 - Use o marcador de roteiro OU os marcadores de lugar, nunca os dois na mesma resposta.
 
 ${ROTAS_PARA_O_GUIA}`;
@@ -133,7 +157,10 @@ export async function POST(request: Request) {
 
   const stream = cliente.messages.stream({
     model: MODELO,
-    max_tokens: 1200,
+    // Folga para os modelos que pensam antes de escrever: o pensamento
+    // conta neste teto, e com 1200 a resposta podia acabar no meio. O
+    // tamanho da resposta em si e pedido nas instrucoes, nao aqui.
+    max_tokens: 3000,
     ...(ACEITA_ESFORCO ? { output_config: { effort: "low" as const } } : {}),
     system: [
       // A parte estavel vai primeiro e fica em cache: barateia bastante,
@@ -166,6 +193,15 @@ export async function POST(request: Request) {
             resposta += evento.delta.text;
             controle.enqueue(codificador.encode(evento.delta.text));
           }
+        }
+
+        // O modelo pode terminar sem escrever nada (recusou a pergunta, ou
+        // gastou o teto pensando). Sem isto o balao ficava em
+        // "escrevendo..." para sempre.
+        if (!resposta.trim()) {
+          resposta =
+            "Desculpe, não consegui responder a essa pergunta. Pode tentar com outras palavras?";
+          controle.enqueue(codificador.encode(resposta));
         }
       } catch (erro) {
         console.error("Erro no chat:", erro);
@@ -230,9 +266,20 @@ async function registrar(
 ) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return;
   try {
-    const citados = [...resposta.matchAll(/\[\[([a-z0-9-]+)\]\]/g)].map(
-      (m) => m[1],
-    );
+    // Conta tambem o lugar da rota e as paradas do roteiro: o padrao de
+    // antes so via [[lugar]], e "como chegar" ficaria sem lugar citado.
+    const citados = [
+      ...new Set(
+        [...resposta.matchAll(/\[\[([^\[\]]+)\]\]/g)].flatMap((m) =>
+          m[1].includes(":")
+            ? m[1]
+                .slice(m[1].indexOf(":") + 1)
+                .split("|")
+                .map((parada) => parada.trim().split(/\s+/).pop() ?? "")
+            : [m[1]],
+        ),
+      ),
+    ].filter((slug) => /^[a-z0-9-]+$/.test(slug));
     const admin = createAdminClient();
     const { data } = await admin
       .from("locais")

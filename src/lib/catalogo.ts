@@ -6,6 +6,7 @@ import {
   resumoSemana,
   situacao,
   quandoPorExtenso,
+  porDia,
   DIAS,
 } from "./horarios";
 import { faixaPreco } from "./texto";
@@ -49,7 +50,18 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
       ? "Agora: horario nao informado. Nao afirme que esta aberto nem que esta fechado."
       : `Agora: ${s.aberto ? "ABERTO" : "FECHADO"} (${s.texto})`,
   );
-  linhas.push(`Horarios: ${resumoSemana(local.horarios)}`);
+  // As faixas de hoje, ja separadas. Com a semana inteira numa linha so, o
+  // Guia pegava a hora do dia errado: num sabado disse "abrem as 11h" e,
+  // duas mensagens depois, "abrem ao meio-dia".
+  if (!s.semHorario) {
+    const hoje = porDia(local.horarios)[agora.diaSemana];
+    linhas.push(
+      `Hoje (${DIAS[agora.diaSemana]}): ${
+        hoje.fechado ? "nao abre hoje" : hoje.faixas.join(", ")
+      }`,
+    );
+  }
+  linhas.push(`Horarios da semana: ${resumoSemana(local.horarios)}`);
 
   if (local.faixa_preco) linhas.push(`Preco: ${faixaPreco(local.faixa_preco)}`);
   if (local.tags.length)

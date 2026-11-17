@@ -3,7 +3,12 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CasaEnxaimel, Torii } from "./icones";
-import { lerRoteiro, linkGoogleMaps, type Parada } from "@/lib/roteiro";
+import {
+  enderecoCurto,
+  lerRoteiro,
+  linkGoogleMaps,
+  type Parada,
+} from "@/lib/roteiro";
 
 type Mensagem = { papel: "pessoa" | "guia"; texto: string };
 
@@ -15,7 +20,58 @@ type LocalMini = {
   lat: number | null;
   lng: number | null;
   endereco: string | null;
+  numero?: string | null;
 };
+
+/**
+ * A lista dos lugares publicados, que a tela usa para trocar marcador por
+ * nome e link. Devolve nada se a busca falhar: os nomes saem sem link e a
+ * conversa continua.
+ */
+async function buscarLista(
+  deNovo = false,
+): Promise<Record<string, LocalMini> | null> {
+  try {
+    const r = await fetch("/api/locais/mini", {
+      // "reload" passa por cima da cópia guardada no navegador.
+      cache: deNovo ? "reload" : "default",
+    });
+    const d: { locais: LocalMini[] } = await r.json();
+    const mapa: Record<string, LocalMini> = {};
+    for (const l of d.locais ?? []) mapa[l.slug] = l;
+    return mapa;
+  } catch {
+    return null;
+  }
+}
+
+/** Todo lugar que a resposta cita, no texto ou dentro de um roteiro. */
+function lugaresCitados(texto: string): string[] {
+  const achados = new Set<string>();
+  for (const m of texto.matchAll(/\[\[([^\[\]]+)\]\]/g)) {
+    const dentro = m[1];
+    if (!dentro.includes(":")) {
+      achados.add(enderecoCurto(dentro));
+      continue;
+    }
+    // "roteiro: 09:00 cafe | 12:00 brasa" — o lugar é a última palavra.
+    for (const parada of dentro.slice(dentro.indexOf(":") + 1).split("|")) {
+      const lugar = parada.trim().split(/\s+/).pop();
+      if (lugar) achados.add(enderecoCurto(lugar));
+    }
+  }
+  achados.delete("");
+  return [...achados];
+}
+
+/** "nei-lanches" vira "Nei Lanches", para quando só se tem o endereço curto. */
+function nomeProvisorio(slug: string): string {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((p) => p[0].toUpperCase() + p.slice(1))
+    .join(" ");
+}
 
 const ABERTURA =
   "Olá! 👋 Eu sou o Guia, bem-vindo à cidade das petúnias. 🌸 Posso indicar onde comer, o que visitar e montar um roteiro para você em Ivoti. Por onde começamos?";
@@ -51,21 +107,35 @@ export default function ChatDoGuia() {
     sessao.current = crypto.randomUUID();
   }
 
+  const vivo = useRef(true);
+  const jaProcurados = useRef(new Set<string>());
+
   useEffect(() => {
-    let vivo = true;
-    fetch("/api/locais/mini")
-      .then((r) => r.json())
-      .then((d: { locais: LocalMini[] }) => {
-        if (!vivo) return;
-        const mapa: Record<string, LocalMini> = {};
-        for (const l of d.locais ?? []) mapa[l.slug] = l;
-        setLocais(mapa);
-      })
-      .catch(() => {});
+    vivo.current = true;
+    buscarLista().then((lista) => {
+      if (vivo.current && lista) setLocais(lista);
+    });
     return () => {
-      vivo = false;
+      vivo.current = false;
     };
   }, []);
+
+  /**
+   * O Guia citou um lugar que esta tela não conhece: a lista daqui ficou
+   * velha. Acontece com quem deixa a conversa aberta enquanto um lugar novo
+   * é publicado. Busca de novo, uma vez por lugar — se ele não existir
+   * mesmo, perguntar de novo a cada resposta não o faria aparecer.
+   */
+  function conferirLugares(resposta: string) {
+    const novos = lugaresCitados(resposta).filter(
+      (slug) => !locais[slug] && !jaProcurados.current.has(slug),
+    );
+    if (novos.length === 0) return;
+    for (const slug of novos) jaProcurados.current.add(slug);
+    buscarLista(true).then((lista) => {
+      if (vivo.current && lista) setLocais(lista);
+    });
+  }
 
   useEffect(() => {
     fim.current?.scrollIntoView({ behavior: "smooth" });
@@ -108,6 +178,8 @@ export default function ChatDoGuia() {
         acumulado += decodificador.decode(value, { stream: true });
         setMensagens([...historico, { papel: "guia", texto: acumulado }]);
       }
+
+      conferirLugares(acumulado);
     } catch (erro) {
       setMensagens([
         ...historico,
@@ -273,24 +345,39 @@ function Balao({
   // O roteiro sai do texto antes de a mensagem ser escrita na tela: ele vira
   // cartão, e repetir a lista em palavras logo acima seria dizer tudo duas
   // vezes.
-  const { limpo, paradas } = lerRoteiro(mensagem.texto);
-  const doRoteiro = paradas
-    .map((p) => {
-      const l = locais[p.slug];
-      return l
-        ? ({
-            id: l.id,
-            slug: l.slug,
-            nome: l.nome,
-            hora: p.hora,
-            lat: l.lat,
-            lng: l.lng,
-            endereco: l.endereco,
-            bairro: l.bairro,
-          } satisfies Parada)
-        : null;
-    })
-    .filter(Boolean) as Parada[];
+  const lido = lerRoteiro(mensagem.texto);
+  // Enquanto a resposta chega, o marcador vem pela metade ("[[praca-bo").
+  // Fica de fora até fechar, em vez de piscar na tela letra por letra.
+  const limpo = lido.limpo.replace(/\[\[[^\]]*\]?$/, "");
+
+  // A parada que esta tela não conhece continua no roteiro, com o nome
+  // tirado do endereço curto e sem link. Antes ela era descartada, e o
+  // cartão mostrava três paradas de um passeio que o texto dizia ter
+  // quatro — a que sumiu era justamente o almoço.
+  const doRoteiro: Parada[] = lido.paradas.map((p) => {
+    const l = locais[p.slug];
+    return l
+      ? {
+          id: l.id,
+          slug: l.slug,
+          nome: l.nome,
+          hora: p.hora,
+          lat: l.lat,
+          lng: l.lng,
+          endereco: l.endereco,
+          numero: l.numero,
+          bairro: l.bairro,
+        }
+      : {
+          slug: p.slug,
+          nome: nomeProvisorio(p.slug),
+          hora: p.hora,
+          lat: null,
+          lng: null,
+          endereco: null,
+          bairro: null,
+        };
+  });
 
   return (
     <div className="space-y-2">
@@ -313,15 +400,20 @@ function Balao({
         </p>
       </div>
 
-      {doRoteiro.length > 0 && <CartaoRoteiroSugerido paradas={doRoteiro} />}
+      {doRoteiro.length === 1 && <CartaoComoChegar parada={doRoteiro[0]} />}
+      {doRoteiro.length > 1 && <CartaoRoteiroSugerido paradas={doRoteiro} />}
     </div>
   );
 }
 
-/** O roteiro que o Guia montou, com a rota já pronta. */
-function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
-  const rota = linkGoogleMaps(paradas);
-
+/** A moldura dos dois cartões que o Guia entrega: a rota e o roteiro. */
+function Cartao({
+  titulo,
+  children,
+}: {
+  titulo: string;
+  children: React.ReactNode;
+}) {
   return (
     <div
       className="rounded-[14px] p-3"
@@ -335,25 +427,102 @@ function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
         className="text-[11px] font-bold tracking-[0.12em] uppercase"
         style={{ color: "var(--color-v-torii)" }}
       >
-        Roteiro sugerido
+        {titulo}
       </p>
+      {children}
+    </div>
+  );
+}
 
+/** O botão vermelho que abre o mapa, em outra aba. */
+function BotaoDoMapa({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-3 flex h-11 items-center justify-center rounded-[10px] text-[14px] font-bold"
+      style={{ backgroundColor: "var(--color-v-torii)", color: "#FFFFFF" }}
+    >
+      {children}
+    </a>
+  );
+}
+
+/** O nome da parada: link para a página dela, quando a tela a conhece. */
+function NomeDaParada({ parada }: { parada: Parada }) {
+  if (!parada.id) {
+    return (
+      <span className="font-medium" style={{ color: "var(--color-v-texto)" }}>
+        {parada.nome}
+      </span>
+    );
+  }
+  return (
+    <Link
+      href={`/local/${parada.slug}`}
+      className="font-medium"
+      style={{ color: "var(--color-v-texto)" }}
+    >
+      {parada.nome}
+    </Link>
+  );
+}
+
+/**
+ * A resposta para "como chegar": o endereço e o botão que abre a rota.
+ *
+ * O mapa parte de onde a pessoa está quando toca no botão, então o Guia
+ * não precisa saber de onde ela sai nem descrever rua por rua.
+ */
+function CartaoComoChegar({ parada }: { parada: Parada }) {
+  const rota = linkGoogleMaps([parada]);
+  const rua = [parada.endereco, parada.numero].filter(Boolean).join(", ");
+  const endereco = [rua, parada.bairro].filter(Boolean).join(" · ");
+
+  return (
+    <Cartao titulo="Como chegar">
+      <p className="mt-2 text-[14px]">
+        <NomeDaParada parada={parada} />
+      </p>
+      {endereco && (
+        <p
+          className="text-[13px]"
+          style={{ color: "var(--color-v-texto-suave)" }}
+        >
+          {endereco}
+        </p>
+      )}
+      {rota && <BotaoDoMapa href={rota}>Abrir a rota no mapa</BotaoDoMapa>}
+    </Cartao>
+  );
+}
+
+/** O roteiro que o Guia montou, com a rota já pronta. */
+function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
+  const rota = linkGoogleMaps(paradas);
+
+  return (
+    <Cartao titulo="Roteiro sugerido">
       <ol className="mt-2 space-y-1.5">
         {paradas.map((p, i) => (
-          <li key={p.slug} className="flex items-baseline gap-2 text-[14px]">
+          <li
+            key={`${i}-${p.slug}`}
+            className="flex items-baseline gap-2 text-[14px]"
+          >
             <span
               className="w-4 shrink-0 text-[12px] font-bold"
               style={{ color: "var(--color-v-torii)" }}
             >
               {i + 1}
             </span>
-            <Link
-              href={`/local/${p.slug}`}
-              className="font-medium"
-              style={{ color: "var(--color-v-texto)" }}
-            >
-              {p.nome}
-            </Link>
+            <NomeDaParada parada={p} />
             {p.hora && (
               <span
                 className="text-[12px]"
@@ -366,18 +535,8 @@ function CartaoRoteiroSugerido({ paradas }: { paradas: Parada[] }) {
         ))}
       </ol>
 
-      {rota && (
-        <a
-          href={rota}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 flex h-11 items-center justify-center rounded-[10px] text-[14px] font-bold"
-          style={{ backgroundColor: "var(--color-v-torii)", color: "#FFFFFF" }}
-        >
-          Ver rota
-        </a>
-      )}
-    </div>
+      {rota && <BotaoDoMapa href={rota}>Ver rota</BotaoDoMapa>}
+    </Cartao>
   );
 }
 
@@ -442,6 +601,28 @@ function tiraNomeRepetido(pedacos: Pedaco[], nome: string) {
 }
 
 /**
+ * Tira o marcador de dentro do negrito.
+ *
+ * O Guia escreve "**Brasa Pizzaria [[brasa-pizzaria]]**" tanto quanto
+ * "**Brasa Pizzaria** [[brasa-pizzaria]]". No primeiro jeito o negrito
+ * engolia o marcador, e a tela mostrava o colchete cru no meio do nome.
+ * Aqui os dois jeitos viram o segundo, que o resto já sabe ler.
+ */
+function soltaMarcadores(texto: string): string {
+  return texto.replace(/\*\*([^*]+)\*\*/g, (tudo, dentro: string) => {
+    if (!dentro.includes("[[")) return tudo;
+    return dentro
+      .split(/(\[\[[^\[\]]+\]\])/)
+      .map((parte) => {
+        if (parte.startsWith("[[")) return parte;
+        return parte.trim() ? `**${parte.trim()}**` : "";
+      })
+      .filter(Boolean)
+      .join(" ");
+  });
+}
+
+/**
  * Quebra a resposta do Guia em pedaços para a tela montar.
  *
  * Dois defeitos moravam aqui, os dois visíveis em 20/10/2026:
@@ -455,21 +636,40 @@ function tiraNomeRepetido(pedacos: Pedaco[], nome: string) {
  * que é melhor que o texto de antes, porque dali a pessoa chega no
  * endereço, no horário e na rota. Marcador de lugar que não existe some,
  * como antes: a frase sem ele é melhor que um colchete cru.
+ *
+ * Em 17/11/2026 o colchete cru voltou por dois caminhos que esta função
+ * não cobria: o marcador dentro do negrito e o marcador com acento. Os
+ * dois estão explicados onde são tratados.
  */
-function emPedacos(texto: string, locais: Record<string, LocalMini>): Pedaco[] {
+function emPedacos(bruto: string, locais: Record<string, LocalMini>): Pedaco[] {
+  const texto = soltaMarcadores(bruto);
   const pedacos: Pedaco[] = [];
-  const padrao = /\[\[([a-z0-9-]+)\]\]|\*\*([^*]+)\*\*/gi;
+  // O marcador aceita qualquer coisa entre os colchetes, e não só letra
+  // sem acento: o Guia às vezes escreve [[praça-bom-jardim]], e o padrão
+  // estreito de antes não o reconhecia — o colchete ia cru para a tela.
+  const padrao = /\[\[([^\[\]]+)\]\]|\*\*([^*]+)\*\*/g;
   let fim = 0;
   let achado: RegExpExecArray | null;
 
-  // Quando um marcador some, o espaço antes dele e o espaço depois
-  // ficariam lado a lado: "Passe no  também". Esta marca manda colar.
+  // Quando um marcador some, sobra o espaço que vinha antes dele: "Passe
+  // no  também", "no Nei Lanches ." Esta marca manda acertar a emenda.
   let colar = false;
   function empurraTexto(valor: string) {
     let v = valor;
     if (colar) {
-      while (v.startsWith(" ")) v = v.slice(1);
       colar = false;
+      const anterior = pedacos[pedacos.length - 1];
+      const semEspaco = v.replace(/^ +/, "");
+      if (/^[.,;:!?)]/.test(semEspaco)) {
+        // Pontuação não leva espaço antes.
+        if (anterior?.tipo === "texto") {
+          anterior.valor = anterior.valor.trimEnd();
+          if (!anterior.valor) pedacos.pop();
+        }
+        v = semEspaco;
+      } else if (anterior?.tipo === "texto" && /\s$/.test(anterior.valor)) {
+        v = semEspaco;
+      }
     }
     if (v) pedacos.push({ tipo: "texto", valor: v });
   }
@@ -483,7 +683,7 @@ function emPedacos(texto: string, locais: Record<string, LocalMini>): Pedaco[] {
       continue;
     }
 
-    const slug = achado[1].toLowerCase();
+    const slug = enderecoCurto(achado[1]);
     // Marcador de um lugar que não existe some, como sempre foi: a frase
     // sem ele é melhor que um colchete cru na tela.
     if (!locais[slug]) {

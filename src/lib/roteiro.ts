@@ -12,6 +12,8 @@ export type Parada = {
   lat: number | null;
   lng: number | null;
   endereco: string | null;
+  /** O número da rua. Sem ele, lugar sem pino cai no meio da avenida. */
+  numero?: string | null;
   bairro: string | null;
   categoria?: string | null;
   id?: string;
@@ -27,7 +29,8 @@ export const LIMITE_DE_PARADAS = 11;
 /** Como o lugar entra no link do mapa: coordenada quando existe, endereço quando não. */
 function comoChegar(p: Parada): string {
   if (p.lat != null && p.lng != null) return `${p.lat},${p.lng}`;
-  const partes = [p.nome, p.endereco, p.bairro, "Ivoti", "RS"].filter(Boolean);
+  const rua = [p.endereco, p.numero].filter(Boolean).join(", ");
+  const partes = [p.nome, rua, p.bairro, "Ivoti", "RS"].filter(Boolean);
   return partes.join(", ");
 }
 
@@ -91,6 +94,10 @@ export function linkWhatsappDoRoteiro(
  * Formato: [[roteiro: 09:00 cafe-da-praca | 12:00 brasa | praca-concordia]]
  * A hora é opcional em cada parada.
  *
+ * O mesmo marcador com um lugar só, [[rota: brasa]], é a resposta para
+ * "como chegar": a tela desenha o botão que abre o mapa. Sem ele o Guia
+ * respondia que não tinha rota, com o botão a um marcador de distância.
+ *
  * Fica no mesmo formato de colchetes duplos que os cartões de lugar já usam,
  * porque é o que o modelo já aprendeu a escrever sem errar.
  */
@@ -98,8 +105,10 @@ export function lerRoteiro(texto: string): {
   limpo: string;
   paradas: { slug: string; hora?: string }[];
 } {
-  const marcador = /\[\[roteiro:([^\]]+)\]\]/i;
-  const achado = texto.match(marcador);
+  // Todos saem do texto, mesmo que o Guia escreva dois: o que sobrasse
+  // apareceria cru na tela. O cartão é desenhado a partir do primeiro.
+  const marcador = /\[\[\s*(?:roteiro|rota)\s*:([^\]]*)\]\]/gi;
+  const achado = marcador.exec(texto);
   if (!achado) return { limpo: texto, paradas: [] };
 
   const paradas = achado[1]
