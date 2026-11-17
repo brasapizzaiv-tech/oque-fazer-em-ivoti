@@ -5,6 +5,7 @@ import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
   COTA_DE_CAMPANHA_CENTAVOS,
   DIAS_GRATIS,
+  IMPLANTACAO,
   ORDEM_DOS_PLANOS,
   PLANOS,
   precoPorExtenso,
@@ -56,24 +57,6 @@ const ANTERIOR: Partial<Record<PlanoPago, PlanoPago>> = {
   movimento: "presenca",
   campanha: "movimento",
 };
-
-const IMPLANTACAO = [
-  {
-    nome: "Orientação",
-    texto:
-      "A gente senta com você e monta o cadastro junto, com as fotos que você já tem.",
-  },
-  {
-    nome: "Com fotos",
-    texto:
-      "Orientação e uma visita ao seu estabelecimento para fotografar o lugar.",
-  },
-  {
-    nome: "Completa",
-    texto:
-      "Orientação, fotos e um vídeo curto do lugar, que também serve para as suas redes.",
-  },
-];
 
 function linkDoWhats(mensagem: string): string {
   return `https://wa.me/${WHATSAPP_DO_GUIA}?text=${encodeURIComponent(mensagem)}`;
@@ -237,13 +220,16 @@ export default function Planos() {
               Não quer preencher nada? A gente monta para você
             </h2>
             <ul className="mt-4 space-y-3">
-              {IMPLANTACAO.map(({ nome, texto }) => (
+              {IMPLANTACAO.map(({ nome, centavos, texto }) => (
                 <li key={nome}>
                   <p
-                    className="text-[15px] font-bold"
+                    className="flex flex-wrap items-baseline justify-between gap-x-3 text-[15px] font-bold"
                     style={{ color: "var(--color-v-texto)" }}
                   >
-                    {nome}
+                    <span>{nome}</span>
+                    <span className="tabular-nums">
+                      {precoPorExtenso(centavos)}
+                    </span>
                   </p>
                   <p
                     className="text-[14px]"

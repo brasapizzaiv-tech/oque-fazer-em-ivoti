@@ -246,3 +246,32 @@ export function dataPorExtenso(data: string): string {
   const [ano, mes, dia] = data.slice(0, 10).split("-");
   return `${dia}/${mes}/${ano}`;
 }
+
+// ============================================================
+// A implantação
+// ============================================================
+// Serviço avulso, pago uma vez, para o comerciante que não quer (ou não
+// consegue) montar o cadastro sozinho. Os três níveis e os preços foram
+// definidos pelo Rafael em 17/11/2026.
+// ============================================================
+
+export const IMPLANTACAO = [
+  {
+    nome: "Orientação",
+    centavos: 14990,
+    texto:
+      "A gente senta com você e monta o cadastro junto, com as fotos que você já tem.",
+  },
+  {
+    nome: "Com fotos",
+    centavos: 44990,
+    texto:
+      "Orientação e uma visita ao seu estabelecimento para fotografar o lugar.",
+  },
+  {
+    nome: "Completa",
+    centavos: 99990,
+    texto:
+      "Orientação, fotos e um vídeo curto do lugar, que também serve para as suas redes.",
+  },
+] as const;
