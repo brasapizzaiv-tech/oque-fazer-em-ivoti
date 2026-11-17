@@ -5,15 +5,25 @@ import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import type { Foto } from "@/lib/tipos";
 
+/** A moldura da foto grande. O porquê do formato está no texto abaixo. */
+const MOLDURA =
+  "relative aspect-[4/3] overflow-hidden lg:mt-4 lg:aspect-[3/2] lg:rounded-[18px]";
+
 /**
  * As fotos do estabelecimento.
  *
  * A capa entra como primeira imagem, sem repetir se já estiver na galeria.
  *
+ * A moldura tem o formato das fotos, e não uma altura fixa: a foto de
+ * celular é quatro por três, e numa faixa baixa e larga ela aparecia
+ * pequena no meio, com um borrão de cada lado ocupando dois terços da
+ * largura. No celular a moldura é quatro por três; no computador, três
+ * por dois, para a página não virar só foto.
+ *
  * O fundo é a própria foto ampliada e desfocada: a de cima aparece
- * inteira, sem corte, e como quase nenhuma tem o formato exato da moldura
- * sobrariam tarjas vazias dos lados. Assim a moldura fica preenchida pelas
- * cores da própria imagem.
+ * inteira, sem corte, e a que não tem o formato da moldura (a foto em pé,
+ * por exemplo) deixaria tarjas vazias dos lados. Assim a moldura fica
+ * preenchida pelas cores da própria imagem.
  */
 export default function Galeria({
   capa,
@@ -66,7 +76,7 @@ export default function Galeria({
 
   if (total === 0) {
     return (
-      <div className="relative h-[250px] overflow-hidden lg:mt-4 lg:rounded-[18px]">
+      <div className={MOLDURA}>
         <span
           aria-hidden
           className="absolute inset-0"
@@ -86,7 +96,7 @@ export default function Galeria({
 
   return (
     <>
-      <div className="relative h-[250px] overflow-hidden lg:mt-4 lg:rounded-[18px]">
+      <div className={MOLDURA}>
         <Image
           src={imagens[atual]}
           alt=""

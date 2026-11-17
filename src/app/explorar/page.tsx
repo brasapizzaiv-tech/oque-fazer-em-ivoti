@@ -249,17 +249,21 @@ export default async function Explorar({
               </Suspense>
             </div>
 
-            <div className="space-y-3 px-4 pt-3 pb-8 lg:px-0">
+            {/* Em grade de quadrados, e não em faixas de um lado a outro:
+                a faixa cortava a foto até sobrar uma tira do meio. */}
+            <div className="grid grid-cols-2 gap-3 px-4 pt-3 pb-8 lg:grid-cols-3 lg:px-0">
               {comDistancia.length === 0 ? (
-                <Vazio>
-                  {soComPromocao
-                    ? "Nenhum lugar com promoção valendo hoje. As promoções mudam por dia da semana — amanhã a lista pode ser outra."
-                    : soComEvento
-                      ? "Nenhum lugar com evento hoje. Veja a agenda da cidade para o que vem pela frente."
-                      : soDaFeira
-                        ? "Nenhum expositor da feira cadastrado no guia ainda."
-                        : "Nada encontrado com esses filtros. Tente afrouxar a busca."}
-                </Vazio>
+                <div className="col-span-full">
+                  <Vazio>
+                    {soComPromocao
+                      ? "Nenhum lugar com promoção valendo hoje. As promoções mudam por dia da semana — amanhã a lista pode ser outra."
+                      : soComEvento
+                        ? "Nenhum lugar com evento hoje. Veja a agenda da cidade para o que vem pela frente."
+                        : soDaFeira
+                          ? "Nenhum expositor da feira cadastrado no guia ainda."
+                          : "Nada encontrado com esses filtros. Tente afrouxar a busca."}
+                  </Vazio>
+                </div>
               ) : (
                 comDistancia.map(({ local, metros }) => (
                   <CardComFoto
@@ -273,8 +277,7 @@ export default async function Explorar({
                     canto={
                       metros != null ? formatarDistancia(metros) : undefined
                     }
-                    alto={150}
-                    className="lg:h-[180px]"
+                    alto="quadrado"
                   />
                 ))
               )}
