@@ -231,7 +231,7 @@ export async function catalogo(): Promise<Catalogo> {
 
   // Quem está aberto agora, numa linha só, no topo. A situação de cada
   // lugar já vai no bloco dele ("Agora: FECHADO"), mas não bastava: em
-  // 17/11/2026, às 20h45, o Guia montou um passeio com a Casa do Artesão,
+  // 17/11/2026, às 20h25, o Guia montou um passeio com a Casa do Artesão,
   // fechada desde as 17h. Uma lista pronta é mais difícil de ignorar do
   // que dezesseis linhas espalhadas.
   const abertos = locais

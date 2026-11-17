@@ -710,6 +710,18 @@ function emPedacos(bruto: string, locais: Record<string, LocalMini>): Pedaco[] {
       continue;
     }
 
+    // O Guia às vezes põe o próprio nome entre colchetes e o marcador em
+    // seguida: "[[Praça Concórdia]] [[praca-concordia]]". Os dois viram o
+    // mesmo link, e a tela mostrava o nome duas vezes. O segundo some.
+    const ultimo = pedacos[pedacos.length - 1];
+    const emBranco = ultimo?.tipo === "texto" && ultimo.valor.trim() === "";
+    const antes = emBranco ? pedacos[pedacos.length - 2] : ultimo;
+    if (antes?.tipo === "lugar" && antes.slug === slug) {
+      if (emBranco) pedacos.pop();
+      colar = true;
+      continue;
+    }
+
     tiraNomeRepetido(pedacos, locais[slug].nome);
     pedacos.push({ tipo: "lugar", slug });
   }
