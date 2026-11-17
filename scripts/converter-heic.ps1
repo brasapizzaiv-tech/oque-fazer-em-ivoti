@@ -1,9 +1,19 @@
-param([string]$Origem, [string]$Destino)
+# Converte as fotos do iPhone (HEIC) de uma pasta para JPG numerado
+# (01.jpg, 02.jpg...), que e o que o scripts/subir-fotos.mjs sabe ler.
+#
+# Uso: powershell -File scripts/converter-heic.ps1 -Origem <pasta> -Destino <pasta> [-Filtro <regex>]
+#
+# -Filtro escolhe so parte da pasta pelo nome do arquivo: serve para
+# converter apenas a leva nova quando a pasta ja tem fotos antigas.
+# O mapa.txt gravado no destino diz qual numero veio de qual arquivo.
+param([string]$Origem, [string]$Destino, [string]$Filtro = '.')
 
 Add-Type -AssemblyName PresentationCore
 New-Item -ItemType Directory -Force $Destino | Out-Null
 
-$arquivos = Get-ChildItem -LiteralPath $Origem -File | Sort-Object Name
+$arquivos = Get-ChildItem -LiteralPath $Origem -File |
+  Where-Object { $_.Name -match $Filtro } |
+  Sort-Object Name
 $n = 0
 $mapa = @()
 
