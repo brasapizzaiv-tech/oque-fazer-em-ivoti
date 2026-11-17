@@ -229,9 +229,22 @@ export async function catalogo(): Promise<Catalogo> {
   const agora = agoraNaCidade();
   const perto = vizinhos(locais);
 
+  // Quem está aberto agora, numa linha só, no topo. A situação de cada
+  // lugar já vai no bloco dele ("Agora: FECHADO"), mas não bastava: em
+  // 17/11/2026, às 20h45, o Guia montou um passeio com a Casa do Artesão,
+  // fechada desde as 17h. Uma lista pronta é mais difícil de ignorar do
+  // que dezesseis linhas espalhadas.
+  const abertos = locais
+    .filter((l) => {
+      const s = situacao(l.horarios, agora);
+      return !s.semHorario && s.aberto;
+    })
+    .map((l) => l.nome);
+
   const cabecalho = [
     `Hoje e ${DIAS[agora.diaSemana]}, sao ${agora.hhmm} em Ivoti (RS).`,
     `Locais cadastrados no guia: ${locais.length}.`,
+    `ABERTOS AGORA (${agora.hhmm}): ${abertos.length ? abertos.join(", ") : "nenhum"}. Os outros lugares com horario informado estao FECHADOS agora.`,
     "",
   ].join("\n");
 
@@ -241,8 +254,13 @@ export async function catalogo(): Promise<Catalogo> {
     proximos +
     promocoes;
 
-  cache = { texto, locais, em: Date.now() };
-  return cache;
+  const montado = { texto, locais, em: Date.now() };
+  // Lista vazia aqui é falha do banco (a busca devolve vazio no erro), não
+  // uma cidade sem lugares. Guardar isso faria o Guia dizer por cinco
+  // minutos que não conhece lugar nenhum; sem guardar, a próxima pergunta
+  // tenta de novo.
+  if (locais.length > 0) cache = montado;
+  return montado;
 }
 
 /** Derruba o cache — usado quando um local e publicado ou editado. */

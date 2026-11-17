@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
+import ReenviarConfirmacao from "@/components/ReenviarConfirmacao";
 import { irParaRecarregando } from "@/lib/ir-para";
 import { DIAS_GRATIS, menorMensalidade } from "@/lib/planos";
 
@@ -85,6 +86,8 @@ export default function FormularioCadastro() {
           Mandamos um link de confirmação para <strong>{email}</strong>. Clique
           nele e depois volte aqui para entrar.
         </p>
+        <p className="mt-3 texto-suave">Não chegou, ou o link venceu?</p>
+        <ReenviarConfirmacao email={email} />
         <Link
           href="/entrar"
           className="mt-3 inline-block font-semibold text-[color:var(--color-v-torii)] underline"

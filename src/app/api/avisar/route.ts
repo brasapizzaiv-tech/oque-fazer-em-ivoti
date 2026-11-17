@@ -32,14 +32,32 @@ export const runtime = "nodejs";
  * que fazer com a resposta, e um aviso que falha nao pode derrubar a
  * acao que o provocou.
  */
+/** Os ids do banco, sempre no mesmo formato. */
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/**
+ * O id que veio no pedido, só se for mesmo um id.
+ *
+ * O teto de avisos conta por id. Com o texto cru, o mesmo cadastro escrito
+ * em maiúsculas ou entre chaves era outro contador para nós e o mesmo
+ * lugar para o banco: bastava variar a grafia para o teto nunca chegar.
+ */
+function idLimpo(valor: unknown): string | undefined {
+  if (typeof valor !== "string") return undefined;
+  const id = valor.trim().toLowerCase();
+  return UUID.test(id) ? id : undefined;
+}
+
 export async function POST(request: Request) {
   if (!SUPABASE_CONFIGURADO) return new Response(null, { status: 204 });
 
   try {
-    const { local: localId, evento: eventoId } = (await request.json()) as {
-      local?: string;
-      evento?: string;
+    const corpo = (await request.json()) as {
+      local?: unknown;
+      evento?: unknown;
     };
+    const localId = idLimpo(corpo.local);
+    const eventoId = idLimpo(corpo.evento);
     if (!localId && !eventoId) return new Response(null, { status: 204 });
 
     // Quem esta pedindo. Sem sessao, nao se avisa ninguem.
@@ -48,6 +66,13 @@ export async function POST(request: Request) {
       data: { user },
     } = await sb.auth.getUser();
     if (!user) return new Response(null, { status: 204 });
+
+    // Teto por conta, somando lugares e eventos. O teto por cadastro, logo
+    // abaixo, não segura quem cria vários cadastros só para mandar aviso.
+    // Trinta por hora cobre a administração publicando uma leva inteira.
+    if (!(await dentroDoLimite(`aviso:conta:${user.id}`, 30))) {
+      return new Response(null, { status: 204 });
+    }
 
     if (!localId) {
       await avisarSobreEvento(user.id, eventoId!);

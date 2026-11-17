@@ -584,10 +584,29 @@ function tiraNomeRepetido(pedacos: Pedaco[], nome: string) {
   if (alvo.tipo === "lugar") return;
 
   const semEspaco = alvo.valor.trimEnd();
-  if (nome.length > semEspaco.length) return;
-  if (!igual(semEspaco.slice(-nome.length), nome)) return;
 
-  const resto = semEspaco.slice(0, semEspaco.length - nome.length).trimEnd();
+  // Quanto do nome já está escrito. O Guia abrevia tanto quanto escreve
+  // por inteiro: "vá ao **Memorial** [[memorial-da-colonia-japonesa]]"
+  // saía "vá ao Memorial Memorial da Colônia Japonesa". Vale o maior
+  // começo do nome, em palavras inteiras, com que o texto termina. Uma
+  // palavra só conta se tiver quatro letras ou mais: "a", "de" e "do"
+  // são começo de nome e fim de frase o tempo todo.
+  const palavras = nome.trim().split(/\s+/);
+  let escrito = "";
+  for (let k = palavras.length; k >= 1; k--) {
+    const comeco = palavras.slice(0, k).join(" ");
+    if (k === 1 && comeco.length < 4) break;
+    if (comeco.length > semEspaco.length) continue;
+    if (!igual(semEspaco.slice(-comeco.length), comeco)) continue;
+    // Tem de começar em palavra: "compraça" não termina com "Praça".
+    const antes = semEspaco.charAt(semEspaco.length - comeco.length - 1);
+    if (antes && /[\p{L}\p{N}]/u.test(antes)) continue;
+    escrito = comeco;
+    break;
+  }
+  if (!escrito) return;
+
+  const resto = semEspaco.slice(0, semEspaco.length - escrito.length).trimEnd();
 
   // Sobrou só o nome: o pedaço inteiro sai, e o espaço que vinha depois
   // dele vai junto, senão fica um buraco duplo antes do link.

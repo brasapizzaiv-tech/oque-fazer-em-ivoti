@@ -29,6 +29,7 @@ export default function Confirmacao() {
   // (o que o React pode fazer), a segunda tentativa falha e a pessoa caía
   // na tela de erro logo depois de ter entrado.
   const jaRodou = useRef(false);
+  const trocaDeSenha = params.get("type") === "recovery";
 
   useEffect(() => {
     if (jaRodou.current) return;
@@ -69,6 +70,14 @@ export default function Confirmacao() {
       } catch (erro) {
         console.error("Confirmacao de e-mail falhou:", erro);
 
+        // Link de troca de senha que não valeu NÃO aproveita a conta que
+        // por acaso esteja aberta neste navegador: a tela de senha nova
+        // trocaria a senha dessa outra conta, sem dizer de quem é.
+        if (params.get("type") === "recovery") {
+          router.replace("/entrar?erro=senha");
+          return;
+        }
+
         // Link já usado, mas a pessoa está logada neste navegador (clicou
         // duas vezes no e-mail, por exemplo): segue para onde ia, em vez
         // de mostrar um erro para quem já entrou.
@@ -97,10 +106,12 @@ export default function Confirmacao() {
           fontFamily: "var(--fonte-titulo-nova)",
         }}
       >
-        Confirmando seu e-mail...
+        {trocaDeSenha ? "Conferindo o link..." : "Confirmando seu e-mail..."}
       </h1>
       <p className="mt-2 text-[14px] text-[color:var(--color-v-texto-suave)]">
-        Só um instante, já te levamos pro painel.
+        {trocaDeSenha
+          ? "Só um instante, já abrimos a tela da senha nova."
+          : "Só um instante, já te levamos pro painel."}
       </p>
       {demorou && (
         <p className="mt-6 text-[14px] text-[color:var(--color-v-texto-suave)]">

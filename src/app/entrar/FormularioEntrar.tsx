@@ -6,12 +6,16 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { erroEmPortugues } from "@/lib/erros-auth";
 import { caminhoInterno, irParaRecarregando } from "@/lib/ir-para";
+import ReenviarConfirmacao from "@/components/ReenviarConfirmacao";
 
 export default function FormularioEntrar() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState<string | null>(null);
   const [indo, setIndo] = useState(false);
+  // O login respondeu "e-mail não confirmado": além do recado, a tela
+  // oferece mandar outro e-mail (ver ReenviarConfirmacao).
+  const [faltaConfirmar, setFaltaConfirmar] = useState(false);
 
   const params = useSearchParams();
   const voltar = params.get("voltar") ?? "/painel";
@@ -19,18 +23,23 @@ export default function FormularioEntrar() {
   // Quem chega de um link de confirmacao que nao valeu (ja usado, vencido, ou
   // aberto em outro navegador) cai aqui com um aviso em portugues, em vez da
   // tela de erro crua do Supabase.
+  const erroDoLink = params.get("erro");
   const avisoConfirmacao =
-    params.get("erro") === "confirmacao"
+    erroDoLink === "confirmacao"
       ? // Na maior parte das vezes em que alguém cai aqui o e-mail JÁ foi
         // confirmado; o que não deu foi abrir a conta sozinho pelo link. O
         // aviso antigo dizia que o link "não vale mais", e a pessoa
-        // achava que o cadastro tinha falhado.
-        "Não deu para abrir sua conta direto pelo link. Se você acabou de confirmar o e-mail, a conta já está valendo: é só entrar com seu e-mail e senha aqui embaixo."
-      : null;
+        // achava que o cadastro tinha falhado. Quando o link venceu de
+        // fato, o login avisa e oferece mandar outro e-mail.
+        "Não deu para abrir sua conta direto pelo link. Tente entrar com seu e-mail e senha aqui embaixo: se o e-mail ainda não estiver confirmado, a gente manda outro link."
+      : erroDoLink === "senha"
+        ? "Esse link de troca de senha não vale mais. Toque em “Esqueci minha senha” para receber outro."
+        : null;
 
   async function entrar(evento: React.FormEvent) {
     evento.preventDefault();
     setErro(null);
+    setFaltaConfirmar(false);
     setIndo(true);
 
     try {
@@ -41,6 +50,7 @@ export default function FormularioEntrar() {
       });
 
       if (error) {
+        setFaltaConfirmar(/email not confirmed/i.test(error.message));
         setErro(erroEmPortugues(error.message));
         setIndo(false);
         return;
@@ -95,6 +105,8 @@ export default function FormularioEntrar() {
           {erro}
         </p>
       )}
+
+      {faltaConfirmar && <ReenviarConfirmacao email={email} />}
 
       <button
         type="submit"

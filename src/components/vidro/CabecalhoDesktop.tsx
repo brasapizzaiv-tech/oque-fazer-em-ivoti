@@ -67,10 +67,13 @@ export default function CabecalhoDesktop({
 
         <nav className="flex items-center gap-1">
           {MENU.map((item) => {
+            // Item com filtro no endereço ("Promoções" é o Explorar com um
+            // filtro) nunca acende: o menu só enxerga o caminho, e os dois
+            // acendiam juntos em qualquer tela do Explorar.
             const ativo =
               item.href === "/"
                 ? caminho === "/"
-                : caminho.startsWith(item.href.split("?")[0]);
+                : !item.href.includes("?") && caminho.startsWith(item.href);
             return (
               <Link
                 key={item.rotulo}

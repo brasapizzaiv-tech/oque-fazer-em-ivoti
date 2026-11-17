@@ -9,7 +9,7 @@ import {
 import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Chip } from "@/components/vidro/pecas";
 import Mapa from "@/components/Mapa";
-import { buscarLocais, listarCategorias } from "@/lib/locais";
+import { buscarLocais, categoriasComLugar } from "@/lib/locais";
 import { CAMINHOS, extensaoPorExtenso } from "@/lib/caminhos";
 import { enderecoOficial } from "@/lib/site";
 
@@ -27,13 +27,14 @@ export default async function PaginaMapa({ searchParams }: PageProps<"/mapa">) {
     ? params.categoria[0]
     : params.categoria;
 
-  const [categorias, locais, capa] = await Promise.all([
-    listarCategorias(),
+  // Só as categorias que têm lugar, como na capa e no Explorar: com a
+  // lista inteira, seis dos nove botões abriam um mapa com "0 lugares".
+  const [principais, locais, capa] = await Promise.all([
+    categoriasComLugar(),
     buscarLocais({ categoria, limite: 300 }),
     imagemDoSite("capa-mapa"),
   ]);
 
-  const principais = categorias.filter((c) => c.pai_id === null);
   const noMapa = locais.filter((l) => l.lat != null && l.lng != null);
   const semPosicao = locais.length - noMapa.length;
 

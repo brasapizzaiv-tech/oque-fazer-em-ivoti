@@ -34,12 +34,23 @@ export async function GET() {
   }
 
   const supabase = createClientPublico();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("locais")
     .select(
       "id, slug, nome, capa_url, resumo, bairro, lat, lng, endereco, numero, categoria:categorias(nome, emoji)",
     )
     .eq("status", "publicado");
+
+  // Falha do banco não fica guardada: com o cabeçalho de sempre, a lista
+  // vazia era servida a todo mundo até o cache vencer, e o Guia mostrava
+  // os nomes dos lugares sem link.
+  if (error) {
+    console.error("Lista curta de lugares falhou:", error.message);
+    return Response.json(
+      { locais: [] },
+      { headers: { "Cache-Control": "no-store" } },
+    );
+  }
 
   return Response.json(
     { locais: data ?? [] },

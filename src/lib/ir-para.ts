@@ -47,6 +47,11 @@ export function caminhoInterno(
   try {
     const url = new URL(pedido, ORIGEM_DE_CONFERENCIA);
     if (url.origin !== ORIGEM_DE_CONFERENCIA) return padrao;
+    // "/.//outro-site.com" não muda a origem na conferência, mas o caminho
+    // já resolvido sai "//outro-site.com" — e o navegador lê duas barras
+    // no começo como "outro site". O que vale é o caminho depois de
+    // resolvido, não o que foi pedido.
+    if (url.pathname.startsWith("//")) return padrao;
     return `${url.pathname}${url.search}${url.hash}`;
   } catch {
     return padrao;

@@ -43,7 +43,7 @@ const PARTES: Record<string, { titulo: string; texto: string }> = {
   natureza: {
     titulo: "Praças e ar livre",
     texto:
-      "Para descansar entre uma visita e outra, ou deixar as crianças soltas. As praças ficam abertas o dia todo e não cobram entrada.",
+      "Para descansar entre uma visita e outra, ou deixar as crianças soltas. As praças não cobram entrada; o horário de cada uma está na página dela.",
   },
   gastronomia: {
     titulo: "Onde comer e beber",

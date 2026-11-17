@@ -37,8 +37,11 @@ export const ROTAS_REGIONAIS: RotaRegional[] = [
     nome: "Rota Romântica",
     texto:
       "Roteiro por catorze municípios de colonização alemã, de São Leopoldo a São Francisco de Paula, passando por Nova Petrópolis, Gramado e Canela. Foi inspirado na Romantische Strasse, da Alemanha.",
-    link: "https://rotaromantica.com.br/pt_BR/municipio/ivoti",
-    rotulo: "Ivoti na Rota Romântica",
+    // A página do município ("/pt_BR/municipio/ivoti") passou a devolver a
+    // capa do site deles (conferido em 17/11/2026). O link vai para a capa,
+    // que é o que abre de fato, e o rótulo não promete a página de Ivoti.
+    link: "https://rotaromantica.com.br/pt_BR/",
+    rotulo: "Conhecer a Rota Romântica",
     site: "rotaromantica.com.br",
   },
 ];
