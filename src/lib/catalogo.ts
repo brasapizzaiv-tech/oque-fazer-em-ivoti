@@ -10,6 +10,7 @@ import {
   DIAS,
 } from "./horarios";
 import { faixaPreco } from "./texto";
+import { distancia, formatarDistancia } from "./geo";
 import { planoAtivo, podeUsar } from "./planos";
 import { quandoVale } from "./promocoes";
 import type { LocalCompleto } from "./tipos";
@@ -23,7 +24,60 @@ type Catalogo = { texto: string; locais: LocalCompleto[]; em: number };
 let cache: Catalogo | null = null;
 const VALIDADE = 5 * 60 * 1000; // 5 minutos
 
-function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
+/** Quantos vizinhos cada lugar leva na linha "Perto". */
+const VIZINHOS = 6;
+
+/**
+ * Para cada lugar, os vizinhos mais proximos e quanto se leva ate eles.
+ *
+ * Sem isto o Guia nao tinha como saber o que fica perto de que, e chutava:
+ * em 17/11/2026, para quem tinha uma hora, juntou o Portico, o Nucleo de
+ * Casas Enxaimel e a Praca Concordia — so do primeiro ao segundo sao mais
+ * de seis quilometros. Na mesma tarde disse que a Ponte do Imperador fica
+ * "a apenas 1 km do centro", numero que nao estava em lugar nenhum.
+ *
+ * A distancia e em linha reta com 30% de folga, a mesma conta do resumo
+ * dos roteiros. A pe ate 800 metros (80 m por minuto); dali em diante, de
+ * carro a 30 km/h mais um minuto para sair e estacionar. E estimativa, e
+ * por isso sai arredondada: serve para decidir o que cabe no passeio, nao
+ * para prometer horario.
+ */
+function vizinhos(locais: LocalCompleto[]): Map<string, string> {
+  const comPino = locais.filter((l) => l.lat != null && l.lng != null);
+  const linhas = new Map<string, string>();
+
+  for (const a of comPino) {
+    const perto = comPino
+      .filter((b) => b.id !== a.id)
+      .map((b) => ({
+        nome: b.nome,
+        metros:
+          distancia(
+            { lat: a.lat as number, lng: a.lng as number },
+            { lat: b.lat as number, lng: b.lng as number },
+          ) * 1.3,
+      }))
+      .sort((x, y) => x.metros - y.metros)
+      .slice(0, VIZINHOS)
+      .map(({ nome, metros }) => {
+        const tempo =
+          metros <= 800
+            ? `${Math.max(1, Math.round(metros / 80))} min a pe`
+            : `${Math.round(metros / 500) + 1} min de carro`;
+        return `${nome} (${formatarDistancia(metros)}, ${tempo})`;
+      });
+
+    if (perto.length) linhas.set(a.id, perto.join("; "));
+  }
+
+  return linhas;
+}
+
+function descrever(
+  local: LocalCompleto,
+  agora = agoraNaCidade(),
+  perto?: string,
+): string {
   const s = situacao(local.horarios, agora);
   const linhas: string[] = [];
 
@@ -44,6 +98,11 @@ function descrever(local: LocalCompleto, agora = agoraNaCidade()): string {
     .filter(Boolean)
     .join(", ");
   if (endereco) linhas.push(`Endereco: ${endereco}`);
+  linhas.push(
+    perto
+      ? `Perto: ${perto}`
+      : "Perto: sem ponto no mapa. Nao afirme distancia nem diga que fica perto de outro lugar.",
+  );
 
   linhas.push(
     s.semHorario
@@ -168,6 +227,7 @@ export async function catalogo(): Promise<Catalogo> {
     promocoesDeHoje(nomePorId),
   ]);
   const agora = agoraNaCidade();
+  const perto = vizinhos(locais);
 
   const cabecalho = [
     `Hoje e ${DIAS[agora.diaSemana]}, sao ${agora.hhmm} em Ivoti (RS).`,
@@ -177,7 +237,7 @@ export async function catalogo(): Promise<Catalogo> {
 
   const texto =
     cabecalho +
-    locais.map((l) => descrever(l, agora)).join("\n\n") +
+    locais.map((l) => descrever(l, agora, perto.get(l.id))).join("\n\n") +
     proximos +
     promocoes;
 
