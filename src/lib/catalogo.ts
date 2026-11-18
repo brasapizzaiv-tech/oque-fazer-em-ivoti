@@ -81,15 +81,17 @@ function descrever(
   const s = situacao(local.horarios, agora);
   const linhas: string[] = [];
 
-  const parceiro = podeUsar(
-    "prioridade_guia",
-    planoAtivo(local.plano, local.plano_ate),
-  );
+  const plano = planoAtivo(local.plano, local.plano_ate);
+  const parceiro = podeUsar("prioridade_guia", plano);
+  const noRoteiro = podeUsar("roteiro_guia", plano);
 
   linhas.push(`### ${local.nome} [[${local.slug}]]`);
   // A marca que o Guia usa para desempatar entre dois lugares que servem
   // igualmente bem. Nunca para esconder os demais: o catalogo vai inteiro.
   if (parceiro) linhas.push("PARCEIRO");
+  // A preferência nos passeios é um módulo à parte na tabela de planos, e
+  // por isso tem marca própria: se um dia mudar de degrau, basta lá.
+  if (noRoteiro) linhas.push("PARCEIRO DE ROTEIRO");
   if (local.categoria) linhas.push(`Categoria: ${local.categoria.nome}`);
   if (local.resumo) linhas.push(`Resumo: ${local.resumo}`);
   if (local.descricao) linhas.push(`Sobre: ${local.descricao.slice(0, 600)}`);

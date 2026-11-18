@@ -56,8 +56,9 @@ export default async function Planos() {
       <TituloPainel>Planos</TituloPainel>
       <p className="mt-1 text-[14px] texto-suave">
         Você combina o pagamento fora do site e marca aqui qual plano vale e até
-        quando. Quando a data passa, os recursos do plano se fecham sozinhos —
-        nada é apagado.
+        quando. Quando a data passa, os recursos do plano se fecham sozinhos:
+        as promoções e os eventos do comerciante saem do ar e voltam quando o
+        plano for renovado. Nada é apagado.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3 text-sm">

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { quandoVale, type Promocao } from "@/lib/promocoes";
+import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
@@ -11,7 +12,22 @@ import {
 
 export const dynamic = "force-dynamic";
 
-type Linha = Promocao & { local: { nome: string } | null };
+type Linha = Promocao & {
+  local: { nome: string; plano: string | null; plano_ate: string | null } | null;
+};
+
+/**
+ * O plano do lugar ainda cobre promoções?
+ *
+ * Mesma pergunta que o banco faz em `promocoes_de_hoje`: plano vencido, ou
+ * abaixo do que o módulo pede, tira a promoção do ar sem apagá-la.
+ */
+function planoCobre(p: Linha): boolean {
+  return podeUsar(
+    "promocoes",
+    planoAtivo(p.local?.plano, p.local?.plano_ate),
+  );
+}
 
 async function buscar() {
   const supabase = await createClient();
@@ -30,21 +46,22 @@ async function buscar() {
   // admin enxerga tudo por elas mesmas.
   const { data } = await supabase
     .from("promocoes")
-    .select("*, local:locais(nome)")
+    .select("*, local:locais(nome, plano, plano_ate)")
     .order("ativa", { ascending: false })
     .order("titulo");
 
   const lista = (data ?? []) as unknown as Linha[];
   return {
     admin,
-    ativas: lista.filter((p) => p.ativa),
+    ativas: lista.filter((p) => p.ativa && planoCobre(p)),
+    semPlano: lista.filter((p) => p.ativa && !planoCobre(p)),
     guardadas: lista.filter((p) => !p.ativa),
     total: lista.length,
   };
 }
 
 export default async function Promocoes() {
-  const { admin, ativas, guardadas, total } = await buscar();
+  const { admin, ativas, semPlano, guardadas, total } = await buscar();
 
   return (
     <>
@@ -78,6 +95,14 @@ export default async function Promocoes() {
             promocoes={ativas}
             vazio="Nenhuma promoção no ar agora."
           />
+          {semPlano.length > 0 && (
+            <Lista
+              titulo="Fora do ar"
+              aviso={`Não aparecem no guia porque o plano do lugar venceu ou não inclui promoções. Voltam sozinhas quando o ${planoDoModulo("promocoes")} estiver em dia.`}
+              promocoes={semPlano}
+              apagado
+            />
+          )}
           {guardadas.length > 0 && (
             <Lista titulo="Guardadas" promocoes={guardadas} apagado />
           )}
@@ -91,17 +116,28 @@ function Lista({
   titulo,
   promocoes,
   vazio,
+  aviso,
   apagado = false,
 }: {
   titulo: string;
   promocoes: Linha[];
   vazio?: string;
+  /** Uma frase sob o título, para explicar por que a lista existe. */
+  aviso?: string;
   /** As guardadas entram esmaecidas: continuam acessíveis, sem disputar a vez. */
   apagado?: boolean;
 }) {
   return (
     <section className="mt-8">
       <SubTitulo>{titulo}</SubTitulo>
+      {aviso && (
+        <p
+          className="mt-2 text-[14px]"
+          style={{ color: "var(--color-v-texto-suave)" }}
+        >
+          {aviso}
+        </p>
+      )}
 
       {promocoes.length === 0 ? (
         <p

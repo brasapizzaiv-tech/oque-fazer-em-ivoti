@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { quandoPorExtenso } from "@/lib/horarios";
+import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
 import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
@@ -20,15 +21,53 @@ const SITUACAO: Record<string, { texto: string; fundo: string }> = {
   },
 };
 
+/** Publicado, mas escondido: o plano de quem cadastrou não cobre eventos. */
+const SEM_PLANO = { texto: "Fora do ar", fundo: "var(--color-v-fechado-claro)" };
+
 type Linha = {
   id: string;
   titulo: string;
   inicio: string;
   sem_hora: boolean;
   status: string;
+  criado_por: string | null;
   local_texto: string | null;
   local: { nome: string } | null;
 };
+
+/**
+ * Quem, entre os autores, é comerciante sem plano que cubra eventos.
+ *
+ * Mesma pergunta que o banco faz em `eventos_visiveis`: evento sem autor ou
+ * da administração aparece sempre; o de comerciante, só enquanto ele tiver
+ * um estabelecimento com o plano do módulo. Aqui serve para a etiqueta não
+ * dizer "Na agenda" de um evento que o visitante não vê.
+ */
+async function autoresSemPlano(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  autores: string[],
+): Promise<Set<string>> {
+  if (autores.length === 0) return new Set();
+
+  const [{ data: perfis }, { data: locais }] = await Promise.all([
+    supabase.from("perfis").select("id, papel").in("id", autores),
+    supabase
+      .from("locais")
+      .select("dono_id, plano, plano_ate")
+      .in("dono_id", autores),
+  ]);
+
+  const comPlano = new Set(
+    (locais ?? [])
+      .filter((l) => podeUsar("eventos", planoAtivo(l.plano, l.plano_ate)))
+      .map((l) => l.dono_id as string),
+  );
+  const admins = new Set(
+    (perfis ?? []).filter((p) => p.papel === "admin").map((p) => p.id),
+  );
+
+  return new Set(autores.filter((a) => !admins.has(a) && !comPlano.has(a)));
+}
 
 /**
  * Busca os eventos e ja separa o que ainda vai acontecer do que ficou pra
@@ -52,7 +91,7 @@ async function buscarEventos() {
   let consulta = supabase
     .from("eventos")
     .select(
-      "id, titulo, inicio, sem_hora, status, local_texto, local:locais(nome)",
+      "id, titulo, inicio, sem_hora, status, criado_por, local_texto, local:locais(nome)",
     )
     .order("inicio", { ascending: false });
 
@@ -61,9 +100,14 @@ async function buscarEventos() {
   const { data } = await consulta;
   const eventos = (data ?? []) as unknown as Linha[];
 
+  const semPlano = await autoresSemPlano(supabase, [
+    ...new Set(eventos.map((e) => e.criado_por).filter((a) => a != null)),
+  ]);
+
   const agora = Date.now();
   return {
     admin,
+    semPlano,
     total: eventos.length,
     futuros: eventos.filter((e) => new Date(e.inicio).getTime() >= agora),
     passados: eventos.filter((e) => new Date(e.inicio).getTime() < agora),
@@ -71,7 +115,9 @@ async function buscarEventos() {
 }
 
 export default async function MeusEventos() {
-  const { admin, total, futuros, passados } = await buscarEventos();
+  const { admin, semPlano, total, futuros, passados } = await buscarEventos();
+  // Para o comerciante, o aviso vale para a lista toda: os eventos são dele.
+  const avisarPlano = !admin && semPlano.size > 0 && futuros.length > 0;
 
   return (
     <>
@@ -100,13 +146,29 @@ export default async function MeusEventos() {
         </div>
       ) : (
         <>
+          {avisarPlano && (
+            <p
+              className="mt-6 text-[14px]"
+              style={{ color: "var(--color-v-texto-suave)" }}
+            >
+              Seus eventos não aparecem na agenda porque o plano venceu ou não
+              inclui eventos. Eles continuam guardados e voltam sozinhos quando
+              o {planoDoModulo("eventos")} estiver em dia.
+            </p>
+          )}
           <Lista
             titulo="Próximos"
             eventos={futuros}
+            semPlano={semPlano}
             vazio="Nenhum evento marcado daqui para frente."
           />
           {passados.length > 0 && (
-            <Lista titulo="Já aconteceram" eventos={passados} apagado />
+            <Lista
+              titulo="Já aconteceram"
+              eventos={passados}
+              semPlano={semPlano}
+              apagado
+            />
           )}
         </>
       )}
@@ -117,11 +179,14 @@ export default async function MeusEventos() {
 function Lista({
   titulo,
   eventos,
+  semPlano,
   vazio,
   apagado = false,
 }: {
   titulo: string;
   eventos: Linha[];
+  /** Autores cujo plano não cobre eventos: o publicado deles está escondido. */
+  semPlano: Set<string>;
   vazio?: string;
   /** O que já passou entra esmaecido: continua acessível, sem disputar a vez. */
   apagado?: boolean;
@@ -140,7 +205,14 @@ function Lista({
       ) : (
         <ul className={`mt-3 space-y-2 ${apagado ? "opacity-60" : ""}`}>
           {eventos.map((e) => {
-            const s = SITUACAO[e.status] ?? SITUACAO.em_analise;
+            const escondido =
+              e.status === "publicado" &&
+              !apagado &&
+              e.criado_por != null &&
+              semPlano.has(e.criado_por);
+            const s = escondido
+              ? SEM_PLANO
+              : (SITUACAO[e.status] ?? SITUACAO.em_analise);
             return (
               <li key={e.id}>
                 <Caixa className="flex flex-wrap items-center gap-3">
