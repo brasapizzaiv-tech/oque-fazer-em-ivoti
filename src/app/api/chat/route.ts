@@ -18,8 +18,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-// Modelo configuravel: da pra trocar por um mais barato (claude-sonnet-5 ou
-// claude-haiku-4-5) sem mexer no codigo, so mudando a variavel na Vercel.
+// Modelo configuravel: da pra trocar (claude-haiku-5-5, claude-sonnet-5-5,
+// claude-opus-5-5) sem mexer no codigo, so mudando a variavel na Vercel.
 // Usa "||" e nao "??" de proposito: uma variavel vazia (CHAT_MODELO=) tem que
 // cair no padrao, e o "??" so cairia se ela nao existisse.
 const MODELO = process.env.CHAT_MODELO || "claude-opus-5";
@@ -36,6 +36,18 @@ const FAMILIAS_COM_ESFORCO = [
   "claude-haiku-5",
 ];
 const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
+
+// O Haiku 5.5 fica com a etapa de pensar LIGADA, de propósito. Medido em
+// 18/11/2026, com as mesmas perguntas:
+//   - desligada: primeira letra em 1 s, resposta inteira em 2 a 3 s, mas
+//     ele volta a errar o que as regras proíbem (três paradas num passeio
+//     de uma hora, "a poucos passos dali" sem a linha "Perto" confirmar,
+//     a lista de paradas repetida em texto);
+//   - ligada: pergunta simples em 3 a 7 s, roteiro de dia inteiro em 15 a
+//     25 s, e as regras são cumpridas.
+// Um guia que manda a pessoa a um lugar fechado custa mais do que alguns
+// segundos de espera. Para inverter a escolha, basta mandar
+// `thinking: { type: "disabled" }` no pedido abaixo.
 
 const INSTRUCOES = `Voce e ${NOME_DO_ASSISTENTE}, o assistente do site "${NOME_DO_SITE}" — alguem que conhece a cidade inteira e gosta de ajudar quem chega.
 
@@ -162,9 +174,10 @@ export async function POST(request: Request) {
   const stream = cliente.messages.stream({
     model: MODELO,
     // Folga para os modelos que pensam antes de escrever: o pensamento
-    // conta neste teto, e com 1200 a resposta podia acabar no meio. O
+    // conta neste teto. Com 3000, o Haiku 5.5 gastava tudo pensando num
+    // roteiro de dia inteiro e a resposta voltava vazia (18/11/2026). O
     // tamanho da resposta em si e pedido nas instrucoes, nao aqui.
-    max_tokens: 3000,
+    max_tokens: 10000,
     ...(ACEITA_ESFORCO ? { output_config: { effort: "low" as const } } : {}),
     system: [
       // A parte estavel vai primeiro e fica em cache: barateia bastante,
@@ -203,6 +216,14 @@ export async function POST(request: Request) {
         // gastou o teto pensando). Sem isto o balao ficava em
         // "escrevendo..." para sempre.
         if (!resposta.trim()) {
+          // Fica no registro o motivo: sem ele, "voltou vazio" não dizia se
+          // foi o teto (max_tokens), uma recusa (refusal) ou outra coisa.
+          const fim = await stream.finalMessage().catch(() => null);
+          console.error(
+            "Chat voltou sem texto:",
+            fim?.stop_reason,
+            JSON.stringify(fim?.usage ?? null),
+          );
           resposta =
             "Desculpe, não consegui responder a essa pergunta. Pode tentar com outras palavras?";
           controle.enqueue(codificador.encode(resposta));

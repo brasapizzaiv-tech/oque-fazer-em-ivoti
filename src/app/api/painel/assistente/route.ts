@@ -17,6 +17,9 @@ const FAMILIAS_COM_ESFORCO = [
   "claude-opus-",
   "claude-sonnet-5",
   "claude-fable-",
+  // O Haiku 5.5 aceita (o 4.5 não), e pensa antes de responder por padrão:
+  // sem o esforço baixo, gastaria nisso parte do teto da resposta.
+  "claude-haiku-5",
 ];
 const ACEITA_ESFORCO = FAMILIAS_COM_ESFORCO.some((f) => MODELO.startsWith(f));
 
@@ -120,7 +123,10 @@ export async function POST(request: Request) {
 
   const stream = cliente.messages.stream({
     model: MODELO,
-    max_tokens: 1200,
+    // Folga para o modelo que pensa antes de escrever: o pensamento conta
+    // neste teto, e com pouco a resposta podia acabar no meio ou nem
+    // começar. O tamanho da resposta em si é pedido nas instruções.
+    max_tokens: 8000,
     ...(ACEITA_ESFORCO ? { output_config: { effort: "low" as const } } : {}),
     system: [
       { type: "text", text: INSTRUCOES },

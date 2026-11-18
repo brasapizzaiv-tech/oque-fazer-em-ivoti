@@ -11,7 +11,7 @@ import {
 } from "./horarios";
 import { faixaPreco } from "./texto";
 import { distancia, formatarDistancia } from "./geo";
-import { planoAtivo, podeUsar } from "./planos";
+import { hojeEmIvoti, planoAtivo, podeUsar, somarDias } from "./planos";
 import { quandoVale } from "./promocoes";
 import type { LocalCompleto } from "./tipos";
 
@@ -151,8 +151,10 @@ function descrever(
 async function agenda(): Promise<string> {
   // Mesma regra das telas: publicado, ja liberado, ainda nao passou.
   // O teto existe para o texto não crescer sem fim, mas tem de caber um
-  // ano de calendário: com 40, o Guia não sabia do Natal.
-  const eventos = await eventosVisiveis({ limite: 120 }, createAdminClient());
+  // ano de calendário: com 40, o Guia não sabia do Natal. Subiu de 120 para
+  // 200 quando as feiras de fim de semana entraram na agenda: elas somam
+  // umas dez linhas por mês e empurrariam para fora os eventos do fim do ano.
+  const eventos = await eventosVisiveis({ limite: 200 }, createAdminClient());
 
   if (eventos.length === 0) {
     return "\n\n## AGENDA\nNenhum evento marcado no guia por enquanto. Nao invente eventos.";
@@ -243,8 +245,22 @@ export async function catalogo(): Promise<Catalogo> {
     })
     .map((l) => l.nome);
 
+  // A data de hoje e as do fim de semana, já calculadas. Sem elas o Guia
+  // sabia o dia da semana, mas não o do mês: numa quarta, 18/11/2026,
+  // respondeu que "este fim de semana" era o sábado 28, pulando o dia 21.
+  const hoje = hojeEmIvoti();
+  const ddmm = (d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`;
+  const ateSabado = (6 - agora.diaSemana) % 7;
+  const fimDeSemana =
+    agora.diaSemana === 0
+      ? `O fim de semana termina hoje, domingo ${ddmm(hoje)}. O proximo e sabado ${ddmm(somarDias(hoje, 6))} e domingo ${ddmm(somarDias(hoje, 7))}.`
+      : agora.diaSemana === 6
+        ? `O fim de semana e hoje, sabado ${ddmm(hoje)}, e amanha, domingo ${ddmm(somarDias(hoje, 1))}.`
+        : `"Este fim de semana" e "o proximo fim de semana" sao sabado ${ddmm(somarDias(hoje, ateSabado))} e domingo ${ddmm(somarDias(hoje, ateSabado + 1))}.`;
+
   const cabecalho = [
-    `Hoje e ${DIAS[agora.diaSemana]}, sao ${agora.hhmm} em Ivoti (RS).`,
+    `Hoje e ${DIAS[agora.diaSemana]}, ${ddmm(hoje)}/${hoje.slice(0, 4)}, sao ${agora.hhmm} em Ivoti (RS).`,
+    fimDeSemana,
     `Locais cadastrados no guia: ${locais.length}.`,
     `ABERTOS AGORA (${agora.hhmm}): ${abertos.length ? abertos.join(", ") : "nenhum"}. Os outros lugares com horario informado estao FECHADOS agora.`,
     "",
