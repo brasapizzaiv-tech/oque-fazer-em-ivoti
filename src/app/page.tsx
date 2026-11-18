@@ -28,6 +28,7 @@ import { temaAtivo } from "@/lib/temas";
 import { imagemDoSite } from "@/lib/imagens";
 import { categoriasComLugar } from "@/lib/locais";
 import { ROTAS_REGIONAIS } from "@/lib/rotas-regionais";
+import { NUMEROS_DO_INVENTARIO } from "@/dados/centro-historico";
 import { eventosVisiveis } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { quandoVale } from "@/lib/promocoes";
@@ -369,9 +370,19 @@ export default async function Inicio() {
           <SobreIvoti
             icone={<CasaEnxaimel tamanho={34} />}
             titulo="Herança alemã"
+            link={{
+              href: "/centro-historico",
+              rotulo: "Passeio pelo centro histórico",
+            }}
           >
-            As casas enxaimel do Núcleo e da Picada 48, de madeira aparente e
-            reboco branco, construídas pelos colonos que chegaram em 1826.
+            {/* O número e a comparação vêm do Inventário do Patrimônio
+                Cultural de Ivoti (2020-2021), que afirma isso "salvo novos
+                estudos". Por isso a frase cita a fonte em vez de dizer por
+                conta própria que é o maior conjunto do estado. */}
+            Ivoti tem {NUMEROS_DO_INVENTARIO.enxaimel} casas ou conjuntos em
+            enxaimel, herança dos colonos que chegaram em 1826. Segundo o
+            inventário do patrimônio do município, de 2021, nenhuma outra
+            cidade gaúcha tem tantos.
           </SobreIvoti>
           <SobreIvoti icone={<Torii tamanho={34} />} titulo="Colônia japonesa">
             A partir de 1966, famílias japonesas se estabeleceram aqui e
@@ -457,10 +468,13 @@ function SobreIvoti({
   icone,
   titulo,
   children,
+  link,
 }: {
   icone: React.ReactNode;
   titulo: string;
   children: React.ReactNode;
+  /** Para onde o cartão leva quem quer saber mais. */
+  link?: { href: string; rotulo: string };
 }) {
   return (
     <CardVidro className="p-5">
@@ -474,6 +488,15 @@ function SobreIvoti({
       >
         {children}
       </p>
+      {link && (
+        <Link
+          href={link.href}
+          className="mt-2 inline-flex min-h-11 items-center text-[14px] font-bold underline"
+          style={{ color: "var(--color-v-azul)" }}
+        >
+          {link.rotulo}
+        </Link>
+      )}
     </CardVidro>
   );
 }
