@@ -13,6 +13,7 @@ import {
   tempoDeCarro,
 } from "@/lib/caminhos";
 import { enderecoOficial } from "@/lib/site";
+import { PARADAS_DO_CENTRO, caminhoDoCentro } from "@/dados/centro-historico";
 
 export const revalidate = 300;
 
@@ -137,6 +138,55 @@ export default async function Roteiros() {
             ))}
           </div>
         )}
+
+        {/* O passeio pelo centro é escrito à mão, parada por parada, e por
+            isso tem página própria em vez de sair da lista de roteiros. */}
+        <section className="px-4 pb-8 lg:px-0">
+          <FileiraDePetunias />
+
+          <h2
+            className="text-[22px] font-bold"
+            style={{
+              color: "var(--color-v-texto)",
+              fontFamily: "var(--fonte-titulo-nova)",
+            }}
+          >
+            A pé pelo centro histórico
+          </h2>
+          <p
+            className="mt-1 text-[14px]"
+            style={{ color: "var(--color-v-texto-suave)" }}
+          >
+            A avenida onde a cidade nasceu, prédio por prédio, com a história
+            de cada um.
+          </p>
+
+          <div className="vidro mt-4">
+            <Link href="/centro-historico" className="block p-4">
+              <Legenda cor="var(--color-v-torii)">
+                {PARADAS_DO_CENTRO.length} paradas ·{" "}
+                {extensaoPorExtenso(caminhoDoCentro().metros)}
+              </Legenda>
+              <span
+                className="mt-1 block text-[18px] leading-tight font-bold"
+                style={{
+                  color: "var(--color-v-texto)",
+                  fontFamily: "var(--fonte-titulo-nova)",
+                }}
+              >
+                Centro histórico de Ivoti
+              </span>
+              <span
+                className="mt-1 block text-[14px]"
+                style={{ color: "var(--color-v-texto-suave)" }}
+              >
+                Da praça de Burle Marx à igreja matriz antiga, passando pelo
+                Salão Holler e pelas casas tombadas da Avenida Presidente
+                Lucena.
+              </span>
+            </Link>
+          </div>
+        </section>
 
         {CAMINHOS.length > 0 && (
           <section className="px-4 pb-10 lg:px-0">

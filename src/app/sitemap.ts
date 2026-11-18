@@ -32,6 +32,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE}/mapa`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${SITE}/agenda`, changeFrequency: "daily", priority: 0.8 },
     { url: `${SITE}/roteiros`, changeFrequency: "weekly", priority: 0.8 },
+    {
+      url: `${SITE}/centro-historico`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
     { url: `${SITE}/chat`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE}/cadastrar`, changeFrequency: "monthly", priority: 0.5 },
     // Os caminhos sao codigo, nao banco: entram junto com as fixas.

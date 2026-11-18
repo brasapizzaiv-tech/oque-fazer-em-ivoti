@@ -246,6 +246,15 @@ export default async function OQueFazer() {
               Diga quanto tempo tem e com quem vem. O Guia monta o passeio com
               as paradas na ordem e a rota pronta para abrir no mapa.
             </Atalho>
+            <Atalho
+              href="/centro-historico"
+              titulo="Centro histórico a pé"
+              rotulo="Ver o passeio"
+            >
+              A Avenida Presidente Lucena em 14 paradas: a igreja matriz
+              antiga, o Salão Holler, as casas tombadas e a praça de Burle
+              Marx, com a história de cada prédio.
+            </Atalho>
             {CAMINHOS.length > 0 && (
               <Atalho
                 href="/mapa"

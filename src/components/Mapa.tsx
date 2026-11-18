@@ -28,12 +28,23 @@ export type PontoNoMapa = Pick<
   categoria?: { nome: string; emoji: string | null } | null;
 };
 
+export type ParadaNoMapa = {
+  numero: number;
+  nome: string;
+  lat: number;
+  lng: number;
+  /** Para onde o toque leva: a âncora da parada na página. */
+  href: string;
+};
+
 export default function Mapa({
   locais,
   altura = "h-[60vh]",
   focoSlug,
   caminho,
   caminhos,
+  paradas,
+  margemDoCaminho,
 }: {
   locais: PontoNoMapa[];
   altura?: string;
@@ -42,6 +53,14 @@ export default function Mapa({
   caminho?: Caminho;
   /** Vários caminhos desenhados juntos, sem reenquadrar o mapa. */
   caminhos?: Caminho[];
+  /**
+   * As paradas numeradas de um passeio, na ordem da visita. Não são lugares
+   * do guia: são pontos de um percurso, e tocar num deles leva ao trecho da
+   * página que fala dele.
+   */
+  paradas?: ParadaNoMapa[];
+  /** A folga entre o caminho e a borda do mapa (ver TracoNoMapa). */
+  margemDoCaminho?: number;
 }) {
   const [pronto, setPronto] = useState(false);
 
@@ -93,10 +112,13 @@ export default function Mapa({
           fullscreenControl={false}
           className="h-full w-full"
         >
-          {caminho && <TracoNoMapa caminho={caminho} />}
+          {caminho && (
+            <TracoNoMapa caminho={caminho} margem={margemDoCaminho} />
+          )}
           {caminhos?.map((c) => (
             <TracoNoMapa key={c.slug} caminho={c} enquadrar={false} />
           ))}
+          {paradas?.map((p) => <Parada key={p.numero} parada={p} />)}
           <Conteudo
             locais={comCoordenada}
             focoSlug={focoSlug}
@@ -105,6 +127,55 @@ export default function Mapa({
         </Map>
       </div>
     </APIProvider>
+  );
+}
+
+/**
+ * O pino numerado de uma parada.
+ *
+ * Vermelho torii, a mesma cor da linha do percurso, para se distinguir dos
+ * pinos verdes dos lugares do guia. O número é a ordem da visita e bate com
+ * a lista da página.
+ */
+function Parada({ parada }: { parada: ParadaNoMapa }) {
+  const posicao = { lat: parada.lat, lng: parada.lng };
+  const ir = () => {
+    window.location.hash = parada.href.replace(/^#/, "");
+  };
+
+  return PINO_MODERNO ? (
+    <AdvancedMarker
+      position={posicao}
+      title={`${parada.numero}. ${parada.nome}`}
+      clickable
+      onClick={ir}
+      zIndex={10}
+    >
+      <span
+        className="grid h-8 w-8 place-items-center rounded-full border-2 text-[13px] font-bold shadow-md"
+        style={{
+          borderColor: "#FFFFFF",
+          backgroundColor: "var(--color-v-torii)",
+          color: "#FFFFFF",
+        }}
+      >
+        {parada.numero}
+      </span>
+    </AdvancedMarker>
+  ) : (
+    <Marker
+      position={posicao}
+      title={`${parada.numero}. ${parada.nome}`}
+      label={{
+        text: String(parada.numero),
+        color: "#ffffff",
+        fontSize: "13px",
+        fontWeight: "700",
+      }}
+      icon={{ ...PINO_SIMPLES, scale: 14, fillColor: "#c8362b" }}
+      zIndex={10}
+      onClick={ir}
+    />
   );
 }
 

@@ -19,10 +19,17 @@ import type { Caminho } from "@/dados/caminhos";
 export default function TracoNoMapa({
   caminho,
   enquadrar = true,
+  margem = 40,
 }: {
   caminho: Caminho;
   /** Ajusta o mapa para o caminho caber inteiro. */
   enquadrar?: boolean;
+  /**
+   * A folga, em pixels, entre o caminho e a borda do mapa. O Google só
+   * aproxima em degraus inteiros: uma folga grande demais num percurso
+   * comprido e estreito faz o mapa cair um degrau e mostrar o dobro da área.
+   */
+  margem?: number;
 }) {
   const mapa = useMap();
 
@@ -52,14 +59,14 @@ export default function TracoNoMapa({
     if (enquadrar) {
       const limites = new google.maps.LatLngBounds();
       for (const p of pontos) limites.extend(p);
-      mapa.fitBounds(limites, 40);
+      mapa.fitBounds(limites, margem);
     }
 
     return () => {
       contorno.setMap(null);
       linha.setMap(null);
     };
-  }, [mapa, caminho, enquadrar]);
+  }, [mapa, caminho, enquadrar, margem]);
 
   return null;
 }
