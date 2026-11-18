@@ -16,7 +16,10 @@ import { ROTAS_PARA_O_GUIA } from "@/lib/rotas-regionais";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// Dois minutos. No ar, em 18/11/2026, o Haiku 5.5 levou 33 s pensando antes
+// de escrever um roteiro de dia inteiro; com o teto de 60 s, um pedido um
+// pouco maior seria cortado no meio e o visitante ficaria sem resposta.
+export const maxDuration = 120;
 
 // Modelo configuravel: da pra trocar (claude-haiku-5-5, claude-sonnet-5-5,
 // claude-opus-5-5) sem mexer no codigo, so mudando a variavel na Vercel.
