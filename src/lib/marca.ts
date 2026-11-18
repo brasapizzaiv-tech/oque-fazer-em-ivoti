@@ -26,5 +26,14 @@ export const ASSINATURA = "A cidade das flores";
  */
 export const WHATSAPP_DO_GUIA = "5551997099859";
 
+/**
+ * O e-mail de contato do guia.
+ *
+ * É para onde escreve quem prefere e-mail ao WhatsApp, e para onde vai a
+ * resposta de quem responde um aviso do site: o remetente dos avisos
+ * (nao-responda@...) só envia, não tem caixa de entrada.
+ */
+export const EMAIL_DO_GUIA = "oquefazeremivoti@gmail.com";
+
 /** Como o assistente se chama. */
 export const NOME_DO_ASSISTENTE = "O Guia";

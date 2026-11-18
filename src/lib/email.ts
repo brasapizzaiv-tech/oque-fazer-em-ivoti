@@ -1,4 +1,5 @@
 import { SITE_LIMPO } from "./site";
+import { EMAIL_DO_GUIA } from "./marca";
 
 // ============================================================
 // Mandar e-mail
@@ -43,7 +44,15 @@ export async function mandarEmail({
         Authorization: `Bearer ${CHAVE}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ from: DE, to: [para], subject: assunto, html }),
+      // O remetente só envia. Quem responder ao aviso cai na caixa de
+      // contato do guia, em vez de receber um erro de volta.
+      body: JSON.stringify({
+        from: DE,
+        to: [para],
+        reply_to: EMAIL_DO_GUIA,
+        subject: assunto,
+        html,
+      }),
     });
 
     if (!resposta.ok) {

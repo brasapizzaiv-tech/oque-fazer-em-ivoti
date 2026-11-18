@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import CabecalhoSimples from "@/components/vidro/CabecalhoSimples";
 import { Botao, CardAzul, CardVidro, Legenda } from "@/components/vidro/pecas";
-import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
+import { EMAIL_DO_GUIA, NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
   COTA_DE_CAMPANHA_CENTAVOS,
   DIAS_DE_PRAZO,
@@ -264,6 +264,16 @@ export default function Planos() {
             Cadastrar meu estabelecimento
           </Botao>
         </div>
+        <p
+          className="mt-4 text-[14px]"
+          style={{ color: "var(--color-v-texto-suave)" }}
+        >
+          Prefere e-mail? Escreva para{" "}
+          <a href={`mailto:${EMAIL_DO_GUIA}`} className="font-bold underline">
+            {EMAIL_DO_GUIA}
+          </a>
+          .
+        </p>
       </div>
     </>
   );

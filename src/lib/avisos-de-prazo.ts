@@ -149,7 +149,7 @@ function recadoAoDono(
             : "Seu período grátis terminou",
         texto: `${oQueTerminou(nome, prazo)} Para continuar aparecendo, escolha um plano até <strong>${ate}</strong>. A mensalidade é a partir de ${menorMensalidade()}, sem fidelidade.<br><br>Se nenhum plano for escolhido até essa data, ${nome} sai do ar no dia seguinte. Nada é apagado: ao escolher um plano, ele volta.`,
         botao: { rotulo: "Ver os planos", href: `${SITE}/planos` },
-        rodape: `Para combinar o plano, fale com a gente pelo WhatsApp: <a href="${FALAR}" style="color:#e03a2f">abrir a conversa</a>. Este e-mail não recebe resposta.`,
+        rodape: `Para combinar o plano, fale com a gente pelo WhatsApp: <a href="${FALAR}" style="color:#e03a2f">abrir a conversa</a>. Se preferir, é só responder a este e-mail.`,
       }),
     };
   }
@@ -160,7 +160,7 @@ function recadoAoDono(
       titulo: "Seu lugar saiu do ar",
       texto: `${oQueTerminou(nome, prazo)} Nenhum plano foi escolhido nos ${DIAS_DE_PRAZO} dias de prazo, e desde ${dataPorExtenso(prazo.desde)} ${nome} não aparece mais para quem visita o guia.<br><br>O cadastro, as fotos e os textos continuam guardados. É só escolher um plano que ele volta ao ar, do jeito que estava.`,
       botao: { rotulo: "Ver os planos", href: `${SITE}/planos` },
-      rodape: `Para escolher o plano, fale com a gente pelo WhatsApp: <a href="${FALAR}" style="color:#e03a2f">abrir a conversa</a>. Este e-mail não recebe resposta.`,
+      rodape: `Para escolher o plano, fale com a gente pelo WhatsApp: <a href="${FALAR}" style="color:#e03a2f">abrir a conversa</a>. Se preferir, é só responder a este e-mail.`,
     }),
   };
 }
