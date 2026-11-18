@@ -9,6 +9,7 @@ import { FileiraDePetunias } from "@/components/vidro/blocos";
 import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { linkGoogleMaps, resumoDoPasseio, type Parada } from "@/lib/roteiro";
+import { aindaNoAr } from "@/lib/planos";
 
 export const dynamic = "force-dynamic";
 
@@ -37,7 +38,8 @@ async function buscar(token: string) {
       "id, slug, nome, lat, lng, endereco, bairro, categoria:categorias(nome)",
     )
     .in("id", ids)
-    .eq("status", "publicado");
+    .eq("status", "publicado")
+    .or(aindaNoAr());
 
   // A consulta devolve em qualquer ordem; a do roteiro é a que importa.
   const porId = new Map((locais ?? []).map((l) => [l.id, l]));

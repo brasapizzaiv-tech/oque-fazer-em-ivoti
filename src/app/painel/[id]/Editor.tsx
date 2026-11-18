@@ -6,6 +6,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import TirarDoAr from "@/components/painel/TirarDoAr";
 import { SituacaoDoPeriodoGratis } from "@/components/AvisoDoPeriodoGratis";
+import { prazoDoLugar } from "@/lib/planos";
 import {
   AreaTexto,
   Bloco,
@@ -68,7 +69,8 @@ export default function Editor({
             {local.categoria?.nome ?? "Sem categoria"}
           </p>
         </div>
-        {local.status === "publicado" && (
+        {local.status === "publicado" &&
+          prazoDoLugar(local).situacao !== "fora_do_ar" && (
           <Link
             href={`/local/${local.slug}`}
             className="botao-vazado px-4 py-2.5 text-[14px]"

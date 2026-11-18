@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "./supabase/server";
 import { SUPABASE_CONFIGURADO } from "./supabase/config";
 import type { Parada } from "./roteiro";
+import { aindaNoAr } from "./planos";
 
 // ============================================================
 // Roteiros prontos
@@ -117,7 +118,8 @@ export async function roteiroCurado(
     .from("locais")
     .select("id, slug, nome, lat, lng, endereco, bairro")
     .in("id", ids.length > 0 ? ids : ["00000000-0000-0000-0000-000000000000"])
-    .eq("status", "publicado");
+    .eq("status", "publicado")
+    .or(aindaNoAr());
 
   const porId = new Map((locais ?? []).map((l) => [l.id, l]));
   const paradas: Parada[] = ids

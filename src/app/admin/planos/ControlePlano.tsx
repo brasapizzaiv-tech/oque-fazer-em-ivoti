@@ -135,7 +135,10 @@ export default function ControlePlano({
 
     const { error } = await supabase
       .from("locais")
-      .update({ plano: "gratuito", plano_ate: null, plano_desde: null })
+      // A data fica: é dela que o banco conta os 7 dias de prazo antes de
+      // tirar o lugar do ar. Sem ela, encerrar o plano de quem já passou do
+      // período grátis tirava o lugar do site no mesmo instante.
+      .update({ plano: "gratuito", plano_ate: hojeEmIvoti(), plano_desde: null })
       .eq("id", local);
 
     if (error) {

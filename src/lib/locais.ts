@@ -5,6 +5,7 @@ import { CATEGORIAS_DEMO, LOCAIS_DEMO, TAGS_DEMO } from "./demo";
 import type { Categoria, LocalCompleto, Tag } from "./tipos";
 import { agoraNaCidade, situacao } from "./horarios";
 import { normalizar } from "./texto";
+import { aindaNoAr } from "./planos";
 
 // Tudo que a pagina de um local (e o chat) precisam, em uma consulta so.
 const CAMPOS = `
@@ -216,7 +217,12 @@ export async function categoriasComLugar(
     // mais na abertura da capa.
     const [todas, { data, error }] = await Promise.all([
       listarCategorias(sb),
-      sb.from("locais").select("categoria_id").eq("status", "publicado").limit(1000),
+      sb
+        .from("locais")
+        .select("categoria_id")
+        .eq("status", "publicado")
+        .or(aindaNoAr())
+        .limit(1000),
     ]);
     categorias = todas;
     // Na dúvida, mostra todas: atalho que leva a uma lista vazia é ruim,
@@ -280,6 +286,7 @@ export async function buscarLocais(
     .from("locais")
     .select(CAMPOS)
     .eq("status", "publicado")
+    .or(aindaNoAr())
     .limit(1000);
 
   const categorias =
@@ -357,6 +364,7 @@ export async function locaisParecidos(
     .from("locais")
     .select(CAMPOS)
     .eq("status", "publicado")
+    .or(aindaNoAr())
     .eq("categoria_id", local.categoria_id)
     .neq("id", local.id)
     .limit(quantidade);

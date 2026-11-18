@@ -4,6 +4,7 @@ import { Botao, CardAzul, CardVidro, Legenda } from "@/components/vidro/pecas";
 import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
   COTA_DE_CAMPANHA_CENTAVOS,
+  DIAS_DE_PRAZO,
   DIAS_GRATIS,
   IMPLANTACAO,
   ORDEM_DOS_PLANOS,
@@ -86,7 +87,9 @@ export default function Planos() {
         >
           Os primeiros {DIAS_GRATIS} dias são grátis, para você ver o guia
           funcionando. Depois, três planos mensais, sem fidelidade: você
-          escolhe o degrau, e pode subir ou descer quando quiser.
+          escolhe o degrau, e pode subir ou descer quando quiser. Ao fim dos
+          dias grátis a gente avisa, e você tem {DIAS_DE_PRAZO} dias para
+          escolher; sem plano, o lugar sai do ar até você escolher um.
         </p>
 
         {/* ---------------- os três degraus ---------------- */}

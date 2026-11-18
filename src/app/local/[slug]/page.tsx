@@ -23,6 +23,7 @@ import type { TipoMetrica } from "@/lib/metricas";
 import { faixaPreco } from "@/lib/texto";
 import { quandoVale } from "@/lib/promocoes";
 import { localPorSlug } from "@/lib/locais";
+import { prazoDoLugar } from "@/lib/planos";
 import { porDia, situacao } from "@/lib/horarios";
 import { createClient } from "@/lib/supabase/server";
 import { eventosVisiveis } from "@/lib/eventos";
@@ -79,6 +80,10 @@ export default async function PaginaLocal({
   const local = await localPorSlug(slug);
 
   if (!local || local.status !== "publicado") notFound();
+  // Passou do prazo sem escolher um plano: a página não abre para ninguém,
+  // nem para o dono logado — senão ele veria o lugar "no ar" enquanto o
+  // visitante já não o encontra. O aviso e o caminho de volta estão no painel.
+  if (prazoDoLugar(local).situacao === "fora_do_ar") notFound();
 
   const [eventos, promocoes] = await Promise.all([
     eventosVisiveis({ local: local.id, limite: 5 }),

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
+  DIAS_DE_PRAZO,
   DIAS_GRATIS,
   dataPorExtenso,
   menorMensalidade,
   periodoGratis,
   planoAtivo,
+  prazoDoLugar,
 } from "@/lib/planos";
 
 /**
@@ -29,8 +31,10 @@ export function AvisoDeCobranca({ className = "" }: { className?: string }) {
         sem fidelidade.
       </p>
       <p className="mt-1 text-[14px]">
-        Nada é cobrado sozinho: não pedimos cartão. Ao fim do período, você
-        escolhe um plano para continuar.{" "}
+        Nada é cobrado sozinho: não pedimos cartão. Ao fim do período, a gente
+        avisa e você tem {DIAS_DE_PRAZO} dias para escolher um plano. Sem
+        plano depois disso, o lugar sai do ar até você escolher; nada é
+        apagado.{" "}
         <Link href="/planos" className="font-bold underline">
           Ver os planos
         </Link>
@@ -91,15 +95,43 @@ export function SituacaoDoPeriodoGratis({
     );
   }
 
+  // Terminou. Daqui em diante quem fala é o prazo: uma semana para
+  // escolher um plano e, depois dela, o lugar fora do ar.
+  const prazo = prazoDoLugar(local);
+  if (prazo.situacao === "em_dia") return null;
+
+  const oQueTerminou =
+    prazo.motivo === "plano"
+      ? `O seu plano venceu em ${dataPorExtenso(prazo.terminou)}.`
+      : `O período grátis terminou em ${dataPorExtenso(prazo.terminou)}.`;
+
   return (
     <p className="mt-3 aviso-painel px-4 py-3 text-[14px]">
-      <strong>
-        O período grátis terminou em {dataPorExtenso(periodo.ate)}.
-      </strong>{" "}
-      Para continuar no guia, escolha um plano.{" "}
+      {prazo.situacao === "no_prazo" ? (
+        <>
+          <strong>{oQueTerminou}</strong> Escolha um plano até{" "}
+          <strong>{dataPorExtenso(prazo.ate)}</strong>
+          {prazo.dias === 0
+            ? " (é hoje)"
+            : prazo.dias === 1
+              ? " (falta 1 dia)"
+              : ` (faltam ${prazo.dias} dias)`}{" "}
+          para continuar no guia. Depois dessa data, o seu lugar sai do ar até
+          você escolher um plano. Nada é apagado.
+        </>
+      ) : (
+        <>
+          <strong>
+            Seu lugar está fora do ar desde {dataPorExtenso(prazo.desde)}.
+          </strong>{" "}
+          {oQueTerminou} Nenhum plano foi escolhido nos {DIAS_DE_PRAZO} dias
+          de prazo. O cadastro, as fotos e os textos continuam guardados: ao
+          escolher um plano, ele volta ao ar.
+        </>
+      )}{" "}
       <a
         href={`https://wa.me/${WHATSAPP_DO_GUIA}?text=${encodeURIComponent(
-          "Olá! Meu período grátis no guia terminou e quero escolher um plano.",
+          "Olá! Quero escolher um plano para o meu estabelecimento no guia.",
         )}`}
         target="_blank"
         rel="noopener noreferrer"

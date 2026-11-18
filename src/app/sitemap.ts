@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
 import { SITE } from "@/lib/site";
 import { CAMINHOS } from "@/lib/caminhos";
+import { aindaNoAr } from "@/lib/planos";
 
 // O mapa do site se refaz de hora em hora. Cadastro novo nao precisa esperar
 // um deploy para o Google saber que existe.
@@ -49,7 +50,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     supabase
       .from("locais")
       .select("slug, atualizado_em")
-      .eq("status", "publicado"),
+      .eq("status", "publicado")
+      .or(aindaNoAr()),
     supabase
       .from("roteiros")
       .select("slug, criado_em")

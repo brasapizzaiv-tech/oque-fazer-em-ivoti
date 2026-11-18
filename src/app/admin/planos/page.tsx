@@ -8,6 +8,7 @@ import {
   dataPorExtenso,
   periodoGratis,
   planoAtivo,
+  prazoDoLugar,
   precoPorExtenso,
 } from "@/lib/planos";
 
@@ -58,7 +59,9 @@ export default async function Planos() {
         Você combina o pagamento fora do site e marca aqui qual plano vale e até
         quando. Quando a data passa, os recursos do plano se fecham sozinhos:
         as promoções e os eventos do comerciante saem do ar e voltam quando o
-        plano for renovado. Nada é apagado.
+        plano for renovado. O comércio sem plano fica mais 7 dias no guia
+        depois que o período grátis ou o plano termina; passado o prazo, sai do
+        site até você ativar um plano aqui. Nada é apagado.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-3 text-sm">
@@ -125,10 +128,19 @@ function PrazoGratis({ local }: { local: Linha }) {
   if (periodo.situacao === "nao_comecou") return null;
 
   if (periodo.situacao === "terminou") {
+    const prazo = prazoDoLugar(local);
+    if (prazo.situacao === "em_dia") return null;
+
+    const oQueTerminou =
+      prazo.motivo === "plano"
+        ? `Plano venceu em ${dataPorExtenso(prazo.terminou)}`
+        : `Período grátis terminou em ${dataPorExtenso(prazo.terminou)}`;
+
     return (
       <p className="mt-1 text-sm font-semibold text-[color:var(--color-v-fechado-claro)]">
-        Período grátis terminou em {dataPorExtenso(periodo.ate)}: hora de
-        combinar o plano.
+        {prazo.situacao === "no_prazo"
+          ? `${oQueTerminou}. Fica no ar até ${dataPorExtenso(prazo.ate)}: hora de combinar o plano.`
+          : `Fora do ar desde ${dataPorExtenso(prazo.desde)}. ${oQueTerminou} e nenhum plano foi marcado. Volta sozinho quando você ativar um.`}
       </p>
     );
   }

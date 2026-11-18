@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { SITE } from "@/lib/site";
+import { aindaNoAr } from "@/lib/planos";
 
 export const runtime = "nodejs";
 
@@ -35,7 +36,8 @@ export async function POST(request: Request) {
       .from("locais")
       .select("id, slug")
       .in("slug", lista)
-      .eq("status", "publicado");
+      .eq("status", "publicado")
+      .or(aindaNoAr());
 
     const porSlug = new Map((locais ?? []).map((l) => [l.slug, l.id]));
     // A ordem do roteiro é a ordem que a pessoa vê; a consulta não a preserva.

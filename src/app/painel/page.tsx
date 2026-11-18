@@ -1,7 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
-import { planoAtivo, diasParaVencer, nomeDoPlano } from "@/lib/planos";
+import {
+  planoAtivo,
+  diasParaVencer,
+  nomeDoPlano,
+  prazoDoLugar,
+  dataPorExtenso,
+} from "@/lib/planos";
 import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
@@ -69,7 +75,7 @@ export default async function Painel() {
   let consulta = supabase
     .from("locais")
     .select(
-      "id, slug, nome, status, capa_url, motivo_rejeicao, dono_id, plano, plano_ate, categoria:categorias(nome, emoji)",
+      "id, slug, nome, status, capa_url, motivo_rejeicao, dono_id, plano, plano_ate, gratis_ate, categoria:categorias(nome, emoji)",
     )
     .order("criado_em", { ascending: false });
 
@@ -111,6 +117,18 @@ export default async function Painel() {
           {lista.map((l) => {
             const situacao = l.status as Situacao;
             const s = SITUACOES[situacao] ?? SITUACOES.rascunho;
+            // Publicado, mas escondido do visitante ou perto disso: o prazo
+            // para escolher um plano. O selo "No ar" sozinho enganaria.
+            const prazo =
+              l.status === "publicado"
+                ? prazoDoLugar({
+                    dono_id: l.dono_id as string | null,
+                    plano: l.plano as string,
+                    plano_ate: l.plano_ate as string | null,
+                    gratis_ate: l.gratis_ate as string | null,
+                  })
+                : null;
+            const semPlano = prazo?.situacao === "fora_do_ar";
             const categoria = l.categoria as unknown as {
               nome: string;
               emoji: string | null;
@@ -147,7 +165,7 @@ export default async function Painel() {
                       >
                         {l.nome}
                       </p>
-                      <SeloSituacao situacao={situacao} />
+                      <SeloSituacao situacao={semPlano ? "inativo" : situacao} />
                       <SeloPlano
                         plano={l.plano as string}
                         ate={l.plano_ate as string | null}
@@ -157,7 +175,11 @@ export default async function Painel() {
                       className="mt-0.5 text-[13px]"
                       style={{ color: "var(--color-v-texto-suave)" }}
                     >
-                      {s.dica}
+                      {prazo?.situacao === "fora_do_ar"
+                        ? `Fora do ar desde ${dataPorExtenso(prazo.desde)}: falta escolher um plano. Nada foi apagado.`
+                        : prazo?.situacao === "no_prazo"
+                          ? `No ar até ${dataPorExtenso(prazo.ate)}. Depois disso, só com um plano.`
+                          : s.dica}
                     </p>
                     {l.status === "rejeitado" && l.motivo_rejeicao && (
                       <p
@@ -170,7 +192,7 @@ export default async function Painel() {
                   </div>
 
                   <div className="flex shrink-0 gap-2">
-                    {l.status === "publicado" && (
+                    {l.status === "publicado" && !semPlano && (
                       <Link
                         href={`/local/${l.slug}`}
                         className="inline-flex h-11 items-center rounded-[9px] px-4 text-[14px] font-semibold"

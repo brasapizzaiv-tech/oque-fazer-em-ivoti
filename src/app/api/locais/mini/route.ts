@@ -1,5 +1,6 @@
 import { LOCAIS_DEMO } from "@/lib/demo";
 import { SUPABASE_CONFIGURADO } from "@/lib/supabase/config";
+import { aindaNoAr } from "@/lib/planos";
 import { createClientPublico } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -39,7 +40,8 @@ export async function GET() {
     .select(
       "id, slug, nome, capa_url, resumo, bairro, lat, lng, endereco, numero, categoria:categorias(nome, emoji)",
     )
-    .eq("status", "publicado");
+    .eq("status", "publicado")
+    .or(aindaNoAr());
 
   // Falha do banco não fica guardada: com o cabeçalho de sempre, a lista
   // vazia era servida a todo mundo até o cache vencer, e o Guia mostrava

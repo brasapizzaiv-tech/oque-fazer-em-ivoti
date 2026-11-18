@@ -248,6 +248,103 @@ export function dataPorExtenso(data: string): string {
 }
 
 // ============================================================
+// O prazo para escolher um plano
+// ============================================================
+// Decisão do Rafael em 18/11/2026: quando os dias grátis terminam, o
+// comerciante é avisado e tem mais uma semana para escolher um plano. Se
+// não escolher, o lugar sai do ar até escolher. O mesmo vale para quem
+// tinha plano pago e deixou vencer.
+//
+// A conta que decide QUEM APARECE mora no banco, na coluna
+// `locais.no_ar_ate` (migration 0030), e as consultas do site filtram por
+// ela com `aindaNoAr()`. A função `prazoDoLugar` faz a mesma conta aqui só
+// para as telas e os e-mails saberem o que dizer.
+// ============================================================
+
+/**
+ * Quantos dias o comerciante tem para escolher um plano depois que o
+ * período grátis (ou o plano) termina. O mesmo 7 está na migration 0030.
+ */
+export const DIAS_DE_PRAZO = 7;
+
+/** "2027-01-12" mais 7 dias -> "2027-01-19" */
+export function somarDias(data: string, dias: number): string {
+  const [ano, mes, dia] = data.slice(0, 10).split("-").map(Number);
+  return new Date(Date.UTC(ano, mes - 1, dia + dias)).toISOString().slice(0, 10);
+}
+
+/**
+ * O filtro "ainda está no ar", para as consultas do Supabase.
+ *
+ * Vai sempre junto de `.eq("status", "publicado")`. As regras de acesso do
+ * banco já escondem do visitante o lugar que passou do prazo; o filtro
+ * existe para o servidor (que lê com a chave de serviço) e para a
+ * administração logada verem o site igual ao visitante.
+ */
+export function aindaNoAr(): string {
+  return `no_ar_ate.is.null,no_ar_ate.gte.${hojeEmIvoti()}`;
+}
+
+export type PrazoDoLugar =
+  /** Ponto da cidade, lugar que ainda não foi ao ar, plano ou grátis valendo. */
+  | { situacao: "em_dia" }
+  | {
+      /** Terminou, e os dias de prazo estão correndo. */
+      situacao: "no_prazo";
+      /** O que terminou: os dias grátis ou um plano pago. */
+      motivo: "gratis" | "plano";
+      /** O dia em que terminou. */
+      terminou: string;
+      /** Último dia no ar sem plano. */
+      ate: string;
+      /** Quantos dias faltam, contando hoje como zero. */
+      dias: number;
+    }
+  | {
+      situacao: "fora_do_ar";
+      motivo: "gratis" | "plano";
+      terminou: string;
+      /** Primeiro dia fora do ar. */
+      desde: string;
+    };
+
+/** Em que pé está o lugar: em dia, no prazo de uma semana, ou fora do ar. */
+export function prazoDoLugar(local: {
+  dono_id: string | null;
+  plano: string | null | undefined;
+  plano_ate: string | null | undefined;
+  gratis_ate?: string | null;
+}): PrazoDoLugar {
+  if (!local.dono_id || !local.gratis_ate) return { situacao: "em_dia" };
+  if (planoAtivo(local.plano, local.plano_ate) !== "gratuito") {
+    return { situacao: "em_dia" };
+  }
+
+  const gratis = local.gratis_ate.slice(0, 10);
+  const plano = local.plano_ate?.slice(0, 10);
+  // Vale o que terminou por último: quem pagou um plano depois do período
+  // grátis conta o prazo a partir do fim do plano.
+  const motivo = plano && plano > gratis ? "plano" : "gratis";
+  const terminou = motivo === "plano" ? (plano as string) : gratis;
+
+  const hoje = hojeEmIvoti();
+  if (hoje <= terminou) return { situacao: "em_dia" };
+
+  const ate = somarDias(terminou, DIAS_DE_PRAZO);
+  if (hoje <= ate) {
+    return {
+      situacao: "no_prazo",
+      motivo,
+      terminou,
+      ate,
+      dias: diasParaVencer(ate) ?? 0,
+    };
+  }
+
+  return { situacao: "fora_do_ar", motivo, terminou, desde: somarDias(ate, 1) };
+}
+
+// ============================================================
 // A implantação
 // ============================================================
 // Serviço avulso, pago uma vez, para o comerciante que não quer (ou não
