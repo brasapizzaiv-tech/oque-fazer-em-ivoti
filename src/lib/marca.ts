@@ -24,7 +24,7 @@ export const ASSINATURA = "A cidade das flores";
  * aqui para as duas telas nunca mandarem o comerciante para números
  * diferentes.
  */
-export const WHATSAPP_DO_GUIA = "5551998323298";
+export const WHATSAPP_DO_GUIA = "5551997099859";
 
 /** Como o assistente se chama. */
 export const NOME_DO_ASSISTENTE = "O Guia";
