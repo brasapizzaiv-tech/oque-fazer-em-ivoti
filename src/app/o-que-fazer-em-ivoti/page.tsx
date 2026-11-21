@@ -38,7 +38,7 @@ const PARTES: Record<string, { titulo: string; texto: string }> = {
   cultura: {
     titulo: "História e cultura",
     texto:
-      "Os colonos alemães chegaram em 1826 e deixaram o Núcleo de Casas Enxaimel, apontado como o maior do Brasil. A partir de 1966 vieram as famílias japonesas, que trouxeram a floricultura e deram à cidade o apelido de Cidade das Flores. As duas histórias se visitam a poucos minutos uma da outra.",
+      "Os colonos alemães chegaram em 1826 e deixaram o Núcleo de Casas Enxaimel, apontado como o maior do Brasil. A partir de 1966 vieram as famílias japonesas, que formaram a colônia e cultivam uvas de mesa, kiwi, hortaliças e flores. O apelido de Cidade das Flores é mais antigo: Ivoti quer dizer flor em tupi-guarani, nome que a cidade adotou em 1938. As duas histórias se visitam a poucos minutos uma da outra.",
   },
   natureza: {
     titulo: "Praças e ar livre",

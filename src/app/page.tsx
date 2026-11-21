@@ -385,15 +385,21 @@ export default async function Inicio() {
             cidade gaúcha tem tantos.
           </SobreIvoti>
           <SobreIvoti icone={<Torii tamanho={34} />} titulo="Colônia japonesa">
-            A partir de 1966, famílias japonesas se estabeleceram aqui e
-            trouxeram a floricultura que deu o apelido à cidade.
+            A partir de 1966, famílias japonesas se estabeleceram aqui. A
+            colônia produz uvas de mesa, kiwi, hortaliças e flores.
           </SobreIvoti>
           <SobreIvoti
             icone={<Petunia tamanho={30} />}
             titulo="Cidade das Flores"
           >
-            Ivoti é o maior produtor de flores do Rio Grande do Sul, e a petúnia
-            é a flor símbolo do município.
+            {/* Já esteve escrito aqui que Ivoti é o maior produtor de flores
+                do Estado. Não achamos fonte nenhuma para isso (o polo de
+                flores gaúcho é o Vale do Caí), e a frase saiu em 21/11/2026.
+                O apelido vem do nome, não de um ranking de produção. */}
+            Ivoti quer dizer flor em tupi-guarani. O nome é de 1938 e veio
+            depois de Bom Jardim: os dois lembram os jardins que os moradores
+            cultivam na frente das casas. A petúnia é a flor símbolo do
+            município.
           </SobreIvoti>
         </div>
 
