@@ -179,6 +179,80 @@ function Parada({ parada }: { parada: ParadaNoMapa }) {
   );
 }
 
+/**
+ * O pino de um lugar do guia: a foto de capa num círculo, com o emoji da
+ * categoria num selo no canto e uma ponta embaixo.
+ *
+ * A foto faz o visitante reconhecer o lugar antes de tocar. O selo continua
+ * dizendo o que ele é (praça, pizzaria, museu), que a foto pequena nem
+ * sempre conta. E a ponta marca o endereço exato: num círculo solto, o olho
+ * lê o lugar no centro, que fica uns 20 pixels acima do ponto verdadeiro.
+ *
+ * A foto vem pelo otimizador de imagens, em 48 ou 96 pixels: são uns poucos
+ * kilobytes por pino, e não a foto inteira do cadastro. Lugar sem foto, ou
+ * com foto que não carregou, fica com o círculo verde e o emoji de antes.
+ */
+function PinoDoLugar({ lugar }: { lugar: PontoNoMapa }) {
+  const [semFoto, setSemFoto] = useState(false);
+  const emoji = lugar.categoria?.emoji ?? "📍";
+  const comFoto = Boolean(lugar.capa_url) && !semFoto;
+
+  return (
+    <span className="flex flex-col items-center transition-transform duration-150 hover:scale-110">
+      <span className="relative z-10 block">
+        {comFoto ? (
+          <>
+            <span
+              className="block h-11 w-11 overflow-hidden rounded-full border-2 shadow-md"
+              style={{
+                borderColor: "#FFFFFF",
+                backgroundColor: "var(--color-v-verde)",
+              }}
+            >
+              <Image
+                src={lugar.capa_url!}
+                alt=""
+                width={44}
+                height={44}
+                // São poucas e pequenas, e o mapa já é a tela inteira: não
+                // vale deixar o pino vazio esperando a rolagem.
+                loading="eager"
+                onError={() => setSemFoto(true)}
+                className="h-full w-full object-cover"
+              />
+            </span>
+            <span
+              aria-hidden
+              className="absolute -right-1 -bottom-0.5 grid h-5 w-5 place-items-center rounded-full border text-[11px] leading-none shadow"
+              style={{
+                borderColor: "#FFFFFF",
+                backgroundColor: "var(--color-v-verde)",
+              }}
+            >
+              {emoji}
+            </span>
+          </>
+        ) : (
+          <span
+            className="grid h-9 w-9 place-items-center rounded-full border-2 text-base shadow-md"
+            style={{
+              borderColor: "#FFFFFF",
+              backgroundColor: "var(--color-v-verde)",
+            }}
+          >
+            {emoji}
+          </span>
+        )}
+      </span>
+      <span
+        aria-hidden
+        className="-mt-[7px] block h-3 w-3 rotate-45 rounded-[2px] shadow-md"
+        style={{ backgroundColor: "#FFFFFF" }}
+      />
+    </span>
+  );
+}
+
 // Circulo verde usado como fundo do pino classico (sem Map ID).
 const PINO_SIMPLES = {
   path: 0 as google.maps.SymbolPath, // google.maps.SymbolPath.CIRCLE
@@ -258,16 +332,14 @@ function Conteudo({
             // pino clicavel, e ele fica bonito e inerte.
             clickable
             onClick={() => setAberto(l)}
+            // O pino tocado vem para a frente dos vizinhos. As paradas
+            // numeradas de um passeio (zIndex 10) continuam por cima de
+            // todos. O número precisa estar sempre escrito: pino sem
+            // zIndex o Google ordena pela posição na tela, e a foto de um
+            // lugar mais ao sul passava por cima do número da parada.
+            zIndex={aberto?.id === l.id ? 5 : 1}
           >
-            <span
-              className="grid h-9 w-9 place-items-center rounded-full border-2 text-base shadow-md"
-              style={{
-                borderColor: "#FFFFFF",
-                backgroundColor: "var(--color-v-verde)",
-              }}
-            >
-              {l.categoria?.emoji ?? "📍"}
-            </span>
+            <PinoDoLugar lugar={l} />
           </AdvancedMarker>
         ) : (
           <Marker
