@@ -151,7 +151,7 @@ export default async function CentroHistorico() {
         >
           Os números vermelhos são as paradas, na ordem da visita; toque num
           deles para ler sobre o prédio. A linha liga uma parada à seguinte,
-          sem desenhar cada esquina. Os pinos verdes são lugares do guia que
+          sem desenhar cada esquina. Os pinos com foto são lugares do guia que
           ficam pelo caminho. Aproxime o mapa para separar as paradas do
           trecho final, que ficam a poucos passos umas das outras.
         </p>

@@ -15,6 +15,11 @@ import {
   tempoAPe,
   tempoDeCarro,
 } from "@/lib/caminhos";
+import { SELOS } from "@/dados/centro-historico";
+import {
+  FONTE_DOS_CAMINHOS,
+  HISTORIA_DOS_CAMINHOS,
+} from "@/dados/historia-dos-caminhos";
 import { imagemDoSite } from "@/lib/imagens";
 import { buscarLocais } from "@/lib/locais";
 import { enderecoOficial } from "@/lib/site";
@@ -52,6 +57,15 @@ export default async function PaginaCaminho({
   ]);
   const naBeira = lugaresNoCaminho(caminho, locais);
   const outros = CAMINHOS.filter((c) => c.slug !== caminho.slug);
+
+  // A história da picada e as paradas que o inventário do patrimônio
+  // permite contar, já na ordem do percurso. O raio é maior que o dos
+  // lugares do guia porque a capela e a escolinha ficam um pouco para
+  // dentro da estrada.
+  const historia = HISTORIA_DOS_CAMINHOS[caminho.slug];
+  const paradas = historia
+    ? lugaresNoCaminho(caminho, historia.paradas, 250)
+    : [];
 
   return (
     <>
@@ -110,15 +124,29 @@ export default async function PaginaCaminho({
         {/* ---------------- o traçado ---------------- */}
         <div className="px-4 pt-5">
           <div className="vidro overflow-hidden p-2">
-            <Mapa locais={locais} caminho={caminho} altura="h-[380px]" />
+            <Mapa
+              locais={locais}
+              caminho={caminho}
+              altura="h-[380px]"
+              paradas={paradas.map(({ lugar }, i) => ({
+                numero: i + 1,
+                nome: lugar.nome,
+                lat: lugar.lat,
+                lng: lugar.lng,
+                href: `#${lugar.ancora}`,
+              }))}
+            />
           </div>
 
           <p
             className="mt-2 text-[12px]"
             style={{ color: "var(--color-v-texto-suave)" }}
           >
-            A linha vermelha é o caminho. Os pinos verdes são os lugares que
+            A linha vermelha é o caminho. Os pinos com foto são os lugares que
             estão no guia.
+            {paradas.length > 0
+              ? " Os números vermelhos são as paradas com história, contadas mais abaixo."
+              : ""}
           </p>
         </div>
 
@@ -207,6 +235,126 @@ export default async function PaginaCaminho({
             </ol>
           )}
         </section>
+
+        {/* ---------------- a história pelo caminho ---------------- */}
+        {historia && (
+          <section className="px-4 pt-7">
+            <h2
+              className="text-[20px] font-bold"
+              style={{
+                color: "var(--color-v-texto)",
+                fontFamily: "var(--fonte-titulo-nova)",
+              }}
+            >
+              A história pelo caminho
+            </h2>
+
+            {historia.abertura.map((paragrafo) => (
+              <p
+                key={paragrafo.slice(0, 24)}
+                className="mt-3 text-[15px]"
+                style={{ color: "var(--color-v-texto)" }}
+              >
+                {paragrafo}
+              </p>
+            ))}
+
+            <ol className="mt-4 space-y-3">
+              {paradas.map(({ lugar: p, km }, i) => (
+                <li
+                  key={p.ancora}
+                  id={p.ancora}
+                  className="vidro scroll-mt-20 px-4 py-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <span
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-[15px] font-bold"
+                      style={{
+                        backgroundColor: "var(--color-v-torii)",
+                        color: "#FFFFFF",
+                        fontFamily: "var(--fonte-titulo-nova)",
+                      }}
+                    >
+                      {i + 1}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <h3
+                        className="text-[17px] leading-tight font-bold"
+                        style={{
+                          color: "var(--color-v-texto)",
+                          fontFamily: "var(--fonte-titulo-nova)",
+                        }}
+                      >
+                        {p.nome}
+                      </h3>
+                      <p
+                        className="mt-0.5 text-[13px]"
+                        style={{ color: "var(--color-v-texto-suave)" }}
+                      >
+                        No km {km.toFixed(1).replace(".", ",")} do percurso
+                      </p>
+                      {p.selos.length > 0 && (
+                        <p className="mt-2 flex flex-wrap gap-1.5">
+                          {p.selos.map((s) => (
+                            <span
+                              key={s}
+                              className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
+                              style={{
+                                backgroundColor: SELOS[s].fundo,
+                                color: "#FFFFFF",
+                              }}
+                            >
+                              {SELOS[s].texto}
+                            </span>
+                          ))}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {p.texto.map((paragrafo) => (
+                    <p
+                      key={paragrafo.slice(0, 24)}
+                      className="mt-3 text-[14px]"
+                      style={{ color: "var(--color-v-texto)" }}
+                    >
+                      {paragrafo}
+                    </p>
+                  ))}
+
+                  {p.olhe && (
+                    <p
+                      className="mt-3 text-[14px]"
+                      style={{ color: "var(--color-v-texto-suave)" }}
+                    >
+                      <strong style={{ color: "var(--color-v-texto)" }}>
+                        Da estrada:
+                      </strong>{" "}
+                      {p.olhe}
+                    </p>
+                  )}
+                </li>
+              ))}
+            </ol>
+
+            <p
+              className="mt-3 text-[12px]"
+              style={{ color: "var(--color-v-texto-suave)" }}
+            >
+              Fonte:{" "}
+              <a
+                href={FONTE_DOS_CAMINHOS.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline"
+              >
+                {FONTE_DOS_CAMINHOS.texto}
+              </a>
+              . O que o texto diz sobre o uso de cada prédio vale para 2021,
+              quando o inventário foi feito.
+            </p>
+          </section>
+        )}
 
         {/* ---------------- antes de sair ---------------- */}
         <section className="px-4 pt-7">
