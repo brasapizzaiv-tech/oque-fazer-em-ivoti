@@ -9,7 +9,7 @@ import {
 } from "@/components/vidro/blocos";
 import { CasaEnxaimel } from "@/components/vidro/icones";
 import { Legenda } from "@/components/vidro/pecas";
-import { eventosVisiveis } from "@/lib/eventos";
+import { eventosVisiveis, fotoDoEvento } from "@/lib/eventos";
 import { anoEmIvoti, FUSO } from "@/lib/horarios";
 import { enderecoOficial } from "@/lib/site";
 import Ficha from "@/components/Ficha";
@@ -164,7 +164,7 @@ export default async function Agenda() {
                         }
                         onde={e.local?.nome ?? e.local_texto ?? undefined}
                         descricao={e.descricao}
-                        foto={e.imagem_url}
+                        foto={fotoDoEvento(e)}
                       />
                       </ContarAoVer>
                     );

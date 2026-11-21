@@ -40,8 +40,23 @@ export type EventoNaTela = {
     uf: string | null;
     lat: number | null;
     lng: number | null;
+    /** A foto de capa do lugar, para o evento que não tem foto própria. */
+    capa_url: string | null;
   } | null;
 };
+
+/**
+ * A foto que representa o evento.
+ *
+ * A do próprio evento, quando quem cadastrou mandou uma. Senão, a foto de
+ * capa do lugar onde ele acontece: a maioria dos eventos entra sem imagem
+ * (as feiras que se repetem todo fim de semana, por exemplo), e o card sem
+ * foto ficava um retângulo cinza. Evento sem lugar cadastrado, como festa
+ * de rua, continua sem foto.
+ */
+export function fotoDoEvento(e: EventoNaTela): string | null {
+  return e.imagem_url ?? e.local?.capa_url ?? null;
+}
 
 export type FiltroEventos = {
   /** Só os deste estabelecimento. */
@@ -93,7 +108,7 @@ export async function eventosVisiveis(
     const { data: locais } = await sb
       .from("locais")
       .select(
-        "id, slug, nome, categoria_id, endereco, numero, bairro, cidade, uf, lat, lng",
+        "id, slug, nome, categoria_id, endereco, numero, bairro, cidade, uf, lat, lng, capa_url",
       )
       .in("id", ids as string[]);
 
@@ -109,6 +124,7 @@ export async function eventosVisiveis(
         uf: l.uf,
         lat: l.lat,
         lng: l.lng,
+        capa_url: l.capa_url,
       });
     }
   }

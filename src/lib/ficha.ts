@@ -1,5 +1,5 @@
 import type { LocalCompleto } from "./tipos";
-import type { EventoNaTela } from "./eventos";
+import { fotoDoEvento, type EventoNaTela } from "./eventos";
 import { SITE } from "./site";
 import { usuarioInstagram } from "./texto";
 
@@ -291,7 +291,10 @@ export function fichaDoEvento(evento: EventoNaTela): object | null {
 
   if (evento.fim) ficha.endDate = evento.fim;
   if (evento.descricao) ficha.description = evento.descricao;
-  if (evento.imagem_url) ficha.image = [evento.imagem_url];
+  // Sem foto própria, vai a do lugar: o buscador pede imagem na ficha de
+  // evento, e a do local onde ele acontece é a que o visitante vai ver.
+  const foto = fotoDoEvento(evento);
+  if (foto) ficha.image = [foto];
 
   return ficha;
 }

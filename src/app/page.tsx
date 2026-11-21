@@ -29,7 +29,7 @@ import { imagemDoSite } from "@/lib/imagens";
 import { categoriasComLugar } from "@/lib/locais";
 import { ROTAS_REGIONAIS } from "@/lib/rotas-regionais";
 import { NUMEROS_DO_INVENTARIO } from "@/dados/centro-historico";
-import { eventosVisiveis } from "@/lib/eventos";
+import { eventosVisiveis, fotoDoEvento } from "@/lib/eventos";
 import { promocoesDeHoje } from "@/lib/promocoes-de-hoje";
 import { quandoVale } from "@/lib/promocoes";
 import { hojeEmIvoti } from "@/lib/planos";
@@ -271,7 +271,7 @@ export default async function Inicio() {
                 <CardComFoto
                   key={e.id}
                   href={`/agenda#${e.id}`}
-                  foto={e.imagem_url}
+                  foto={fotoDoEvento(e)}
                   etiqueta={quandoPorExtenso(e.inicio, e.sem_hora)}
                   titulo={e.titulo}
                   apoio={e.local?.nome ?? e.local_texto ?? undefined}
@@ -304,7 +304,7 @@ export default async function Inicio() {
                 <CardComFoto
                   key={e.id}
                   href={`/agenda#${e.id}`}
-                  foto={e.imagem_url}
+                  foto={fotoDoEvento(e)}
                   etiqueta={quandoPorExtenso(e.inicio, e.sem_hora)}
                   titulo={e.titulo}
                   apoio={e.local?.nome ?? e.local_texto ?? undefined}
