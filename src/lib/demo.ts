@@ -432,6 +432,7 @@ export const LOCAIS_DEMO: LocalCompleto[] = RASCUNHOS.map((r, i) => {
     outras_categorias: [],
     horarios: r.horarios,
     fotos: [],
+    cardapio_fotos: [],
     tags: etiquetas(...r.tags),
     itens: (r.itens ?? []).map(([secao, nome, descricao, preco], ordem) => ({
       id: `demo-${i}-${ordem}`,

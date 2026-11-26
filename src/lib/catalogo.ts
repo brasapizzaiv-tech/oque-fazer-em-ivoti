@@ -140,6 +140,15 @@ function descrever(
       .join("; ");
     linhas.push(`O que tem la: ${amostra}`);
   }
+  // A foto do cardapio o Guia nao le. Mas saber que ela existe evita o
+  // "nao tenho o cardapio deles" quando o cardapio esta a um toque.
+  if (local.cardapio_fotos.length) {
+    linhas.push(
+      local.itens.length
+        ? "Cardapio completo: em foto, na pagina do lugar."
+        : "Cardapio: so em foto, na pagina do lugar. Voce nao sabe os pratos nem os precos: nao invente, e diga que o cardapio esta na pagina.",
+    );
+  }
 
   if (local.whatsapp || local.telefone)
     linhas.push(`Contato: ${local.whatsapp ?? local.telefone}`);

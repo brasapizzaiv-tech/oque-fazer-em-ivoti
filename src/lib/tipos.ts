@@ -41,6 +41,16 @@ export type Foto = {
   ordem: number;
 };
 
+/** Uma página do cardápio em imagem. */
+export type PaginaDoCardapio = {
+  id: string;
+  url: string;
+  /** O tamanho da imagem. Vazio só se o envio não conseguiu medir. */
+  largura: number | null;
+  altura: number | null;
+  ordem: number;
+};
+
 export type Item = {
   id?: string;
   local_id?: string;
@@ -103,6 +113,8 @@ export type LocalCompleto = Local & {
   fotos: Foto[];
   tags: Tag[];
   itens: Item[];
+  /** O cardápio em foto, uma imagem por página. Vale junto com os itens. */
+  cardapio_fotos: PaginaDoCardapio[];
 };
 
 export type Evento = {

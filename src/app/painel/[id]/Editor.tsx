@@ -16,6 +16,7 @@ import {
 import EditorFotos from "@/components/painel/EditorFotos";
 import EditorHorarios from "@/components/painel/EditorHorarios";
 import EditorItens from "@/components/painel/EditorItens";
+import EditorCardapioFotos from "@/components/painel/EditorCardapioFotos";
 import EscolherPosicao from "@/components/painel/EscolherPosicao";
 import EscolherCategorias from "@/components/painel/EscolherCategorias";
 import { nomesDasCategorias } from "@/lib/categorias";
@@ -140,8 +141,20 @@ export default function Editor({
           </div>
         )}
         {abertas.includes("itens") && (
-          <div hidden={aba !== "itens"}>
-            <EditorItens localId={local.id} itens={local.itens} />
+          <div hidden={aba !== "itens"} className="space-y-5">
+            {/* A foto vem primeiro: é o caminho curto, para quem já tem o
+                cardápio pronto. Os itens digitados ficam embaixo, para
+                quem quer ser achado pelo prato. */}
+            <EditorCardapioFotos
+              localId={local.id}
+              paginas={local.cardapio_fotos}
+            />
+            <EditorItens
+              localId={local.id}
+              itens={local.itens}
+              titulo="Itens digitados"
+              descricao="Opcional, mesmo com a foto enviada. Mas é só o que está escrito aqui que a busca e o Guia leem: sem isto, ninguém acha o seu lugar procurando “pizza de calabresa”. Vale pôr ao menos os principais."
+            />
           </div>
         )}
       </div>

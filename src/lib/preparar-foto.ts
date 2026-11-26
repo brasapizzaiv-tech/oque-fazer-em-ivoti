@@ -14,11 +14,20 @@
 /** Lado maior da imagem que vai para o site. */
 const LADO_MAXIMO = 1920;
 
+/**
+ * Lado maior da foto de um cardápio. Maior que o das fotos comuns porque
+ * ali o que importa é ler letra pequena, e o visitante amplia a imagem.
+ */
+export const LADO_MAXIMO_DO_CARDAPIO = 2400;
+
 export type FotoPronta = {
   arquivo: Blob;
   /** "jpg" ou "png", para o nome do arquivo. */
   extensao: "jpg" | "png";
   tipo: "image/jpeg" | "image/png";
+  /** O tamanho da imagem já reduzida, em pontos. */
+  largura: number;
+  altura: number;
 };
 
 /**
@@ -28,12 +37,17 @@ export type FotoPronta = {
  * tem fundo transparente e viraria um retângulo branco em JPG.
  *
  * Devolve nulo quando o navegador não consegue abrir o arquivo (é o caso
- * do HEIC fora do Safari). Melhor recusar com um recado claro do que
+ * do HEIC fora do Safari).
+ *
+ * `ladoMaximo` troca o teto de tamanho: o cardápio sobe maior que a foto. Melhor recusar com um recado claro do que
  * publicar uma imagem que não aparece.
  */
 export async function prepararFoto(
   arquivo: File,
-  { manterPng = false }: { manterPng?: boolean } = {},
+  {
+    manterPng = false,
+    ladoMaximo = LADO_MAXIMO,
+  }: { manterPng?: boolean; ladoMaximo?: number } = {},
 ): Promise<FotoPronta | null> {
   try {
     const imagem = await createImageBitmap(arquivo, {
@@ -42,7 +56,7 @@ export async function prepararFoto(
 
     const escala = Math.min(
       1,
-      LADO_MAXIMO / Math.max(imagem.width, imagem.height),
+      ladoMaximo / Math.max(imagem.width, imagem.height),
     );
     const tela = document.createElement("canvas");
     tela.width = Math.round(imagem.width * escala);
@@ -66,7 +80,13 @@ export async function prepararFoto(
     );
     if (!pronto) return null;
 
-    return { arquivo: pronto, extensao: emPng ? "png" : "jpg", tipo };
+    return {
+      arquivo: pronto,
+      extensao: emPng ? "png" : "jpg",
+      tipo,
+      largura: tela.width,
+      altura: tela.height,
+    };
   } catch {
     return null;
   }

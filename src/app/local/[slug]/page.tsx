@@ -8,6 +8,7 @@ import LinkDeContato from "@/components/LinkDeContato";
 import type { PromocaoNaTela } from "@/lib/promocoes";
 import Favoritar from "@/components/vidro/Favoritar";
 import Galeria from "@/components/vidro/Galeria";
+import CardapioEmFotos from "@/components/vidro/CardapioEmFotos";
 import {
   AcoesDoLocal,
   CardPromocao,
@@ -110,6 +111,11 @@ export default async function PaginaLocal({
     secoes.set(chave, [...(secoes.get(chave) ?? []), item]);
   }
 
+  // O cardápio pode vir em foto, em itens digitados ou nos dois.
+  const paginasDoCardapio = local.cardapio_fotos ?? [];
+  const temCardapio =
+    (local.itens ?? []).length > 0 || paginasDoCardapio.length > 0;
+
   // Só entra o que o estabelecimento preencheu: botão que não leva a lugar
   // nenhum ensina a pessoa a desconfiar dos outros.
   const whats = linkWhatsapp(local.whatsapp, "Oi! Vi vocês no guia da cidade.");
@@ -133,7 +139,7 @@ export default async function PaginaLocal({
       icone: "📷",
       tipo: "clique_instagram" as const,
     },
-    (local.itens ?? []).length > 0 && {
+    temCardapio && {
       rotulo: "Cardápio",
       href: "#cardapio",
       icone: "📋",
@@ -364,11 +370,12 @@ export default async function PaginaLocal({
             </section>
           )}
 
-          {(local.itens ?? []).length > 0 && (
+          {temCardapio && (
             <section id="cardapio" className="px-4 pt-6">
               <ContarAoVer tipo="clique_cardapio" local={local.id}>
                 <TituloSecao>Cardápio</TituloSecao>
               </ContarAoVer>
+              <CardapioEmFotos paginas={paginasDoCardapio} nome={local.nome} />
               {[...secoes.entries()].map(([secao, itens]) => (
                 <div key={secao} className="mt-3">
                   {secao && (
@@ -422,7 +429,7 @@ export default async function PaginaLocal({
           )}
 
           <div className="px-4 pt-7 pb-8 lg:px-0">
-            <ConviteAoGuia temCardapio={local.itens.length > 0} />
+            <ConviteAoGuia temCardapio={temCardapio} />
           </div>
         </div>
 

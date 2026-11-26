@@ -15,6 +15,7 @@ const CAMPOS = `
   horarios:locais_horarios(dia_semana, abre, fecha, observacao),
   fotos:locais_fotos(id, url, legenda, ordem),
   itens:locais_itens(id, secao, nome, descricao, preco, ordem),
+  cardapio_fotos:locais_cardapio_fotos(id, url, largura, altura, ordem),
   locais_tags(tag:tags(*))
 `;
 
@@ -22,6 +23,7 @@ type LinhaBruta = Record<string, unknown> & {
   locais_tags?: { tag: Tag | null }[] | null;
   fotos?: LocalCompleto["fotos"] | null;
   itens?: LocalCompleto["itens"] | null;
+  cardapio_fotos?: LocalCompleto["cardapio_fotos"] | null;
   horarios?: LocalCompleto["horarios"] | null;
 };
 
@@ -198,6 +200,9 @@ function montar(linha: LinhaBruta, categorias: Categoria[]): LocalCompleto {
 
   const fotos = [...(linha.fotos ?? [])].sort((a, b) => a.ordem - b.ordem);
   const itens = [...(linha.itens ?? [])].sort((a, b) => a.ordem - b.ordem);
+  const cardapio_fotos = [...(linha.cardapio_fotos ?? [])].sort(
+    (a, b) => a.ordem - b.ordem,
+  );
   const horarios = [...(linha.horarios ?? [])];
 
   const { locais_tags: _ignorar, ...resto } = linha;
@@ -216,6 +221,7 @@ function montar(linha: LinhaBruta, categorias: Categoria[]): LocalCompleto {
     tags,
     fotos,
     itens,
+    cardapio_fotos,
     horarios,
   } as LocalCompleto;
 }

@@ -204,19 +204,28 @@ async function montarFicha(
 ): Promise<string> {
   const categoria = (local.categoria as { nome: string } | null)?.nome ?? null;
 
-  const [{ data: horarios }, { data: fotos }, { data: itens }, resumo30] =
-    await Promise.all([
-      supabase
-        .from("locais_horarios")
-        .select("dia_semana, abre, fecha")
-        .eq("local_id", local.id),
-      supabase.from("locais_fotos").select("id").eq("local_id", local.id),
-      supabase
-        .from("locais_itens")
-        .select("nome, preco")
-        .eq("local_id", local.id),
-      resumoDoLocal(local.id, 30, supabase),
-    ]);
+  const [
+    { data: horarios },
+    { data: fotos },
+    { data: itens },
+    { data: paginas },
+    resumo30,
+  ] = await Promise.all([
+    supabase
+      .from("locais_horarios")
+      .select("dia_semana, abre, fecha")
+      .eq("local_id", local.id),
+    supabase.from("locais_fotos").select("id").eq("local_id", local.id),
+    supabase
+      .from("locais_itens")
+      .select("nome, preco")
+      .eq("local_id", local.id),
+    supabase
+      .from("locais_cardapio_fotos")
+      .select("id")
+      .eq("local_id", local.id),
+    resumoDoLocal(local.id, 30, supabase),
+  ]);
 
   const [{ data: eventos }, { data: promocoes }] = await Promise.all([
     supabase
@@ -241,8 +250,18 @@ async function montarFicha(
   if ((horarios ?? []).length === 0) faltando.push("os horarios");
   if (quantasFotos === 0) faltando.push("as fotos");
   if (!local.telefone && !local.whatsapp) faltando.push("telefone ou WhatsApp");
-  // O cardapio do guia sao os itens cadastrados; nao ha link externo.
-  if ((itens ?? []).length === 0) faltando.push("os itens do cardapio");
+  // O cardapio do guia tem duas formas: a foto (o que o visitante ve) e os
+  // itens digitados (o que a busca e o Guia leem). Sem nenhuma das duas,
+  // falta o cardapio; so com a foto, faltam os itens que fazem o lugar ser
+  // achado pelo prato.
+  const quantasPaginas = (paginas ?? []).length;
+  if ((itens ?? []).length === 0) {
+    faltando.push(
+      quantasPaginas === 0
+        ? "o cardapio (a foto dele ou os itens digitados)"
+        : "os itens digitados do cardapio (a foto ja foi enviada, mas a busca e o Guia so leem o que esta escrito)",
+    );
+  }
 
   const cliques = resumo30.cliques
     .map((c) => `${NOME_DO_TIPO[c.tipo as TipoMetrica]}: ${c.contagem}`)
@@ -259,7 +278,8 @@ async function montarFicha(
     `Descricao cadastrada: ${local.descricao ?? "(vazia)"}`,
     `Horarios: ${(horarios ?? []).length > 0 ? resumoSemana((horarios ?? []) as Horario[]) : "nao informados"}`,
     `Fotos: ${quantasFotos}`,
-    `Itens no cardapio: ${(itens ?? []).length}`,
+    `Itens digitados no cardapio: ${(itens ?? []).length}`,
+    `Paginas do cardapio em foto: ${quantasPaginas}`,
     `Contatos: ${
       [
         local.telefone && "telefone",
