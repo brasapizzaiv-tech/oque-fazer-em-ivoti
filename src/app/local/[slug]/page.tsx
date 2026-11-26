@@ -23,6 +23,7 @@ import type { TipoMetrica } from "@/lib/metricas";
 import { faixaPreco } from "@/lib/texto";
 import { quandoVale } from "@/lib/promocoes";
 import { localPorSlug } from "@/lib/locais";
+import { nomesDasCategorias } from "@/lib/categorias";
 import { prazoDoLugar } from "@/lib/planos";
 import { porDia, situacao } from "@/lib/horarios";
 import { createClient } from "@/lib/supabase/server";
@@ -206,7 +207,7 @@ export default async function PaginaLocal({
               className="mt-1 text-[14px]"
               style={{ color: "var(--color-v-texto-suave)" }}
             >
-              {local.categoria?.nome}
+              {nomesDasCategorias(local)}
               {local.faixa_preco ? ` · ${faixaPreco(local.faixa_preco)}` : ""}
               {endereco ? ` · ${endereco}` : ""}
             </p>

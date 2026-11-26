@@ -6,6 +6,7 @@ import type { Categoria, LocalCompleto, Tag } from "./tipos";
 import { agoraNaCidade, situacao } from "./horarios";
 import { normalizar } from "./texto";
 import { aindaNoAr } from "./planos";
+import { categoriasDoLugar, outrasCategorias } from "./categorias";
 
 // Tudo que a pagina de um local (e o chat) precisam, em uma consulta so.
 const CAMPOS = `
@@ -89,11 +90,12 @@ function palavrasDaBusca(q: string): string[] {
 function pontosNaBusca(
   local: LocalCompleto,
   palavras: string[],
-  categoriaPai: string | undefined,
+  /** Os nomes de todas as categorias do lugar e das categorias-mãe delas. */
+  nomesDeCategoria: string,
 ): number {
   const cantos: [number, string][] = [
     [8, local.nome],
-    [5, `${local.categoria?.nome ?? ""} ${categoriaPai ?? ""}`],
+    [5, nomesDeCategoria],
     [4, local.tags.map((t) => t.nome).join(" ")],
     [3, local.resumo ?? ""],
     [2, local.itens.map((i) => `${i.secao ?? ""} ${i.nome}`).join(" ")],
@@ -120,24 +122,48 @@ function filtrarPorTexto(
   const palavras = palavrasDaBusca(q);
   if (palavras.length === 0) return locais;
 
-  const nomeDaCategoria = new Map(categorias.map((c) => [c.id, c.nome]));
+  const porId = new Map(categorias.map((c) => [c.id, c]));
+
+  // A principal, as outras e a categoria-mãe de cada uma: quem digita
+  // "padaria" acha o café colonial que também é padaria, e quem digita
+  // "comer" acha os dois.
+  const nomesDeCategoria = (local: LocalCompleto) =>
+    [local.categoria, ...local.outras_categorias]
+      .filter((c): c is Categoria => Boolean(c))
+      .flatMap((c) => [
+        c.nome,
+        c.pai_id != null ? (porId.get(c.pai_id)?.nome ?? "") : "",
+      ])
+      .join(" ");
 
   return locais
     .map((local) => ({
       local,
-      pontos: pontosNaBusca(
-        local,
-        palavras,
-        local.categoria?.pai_id != null
-          ? nomeDaCategoria.get(local.categoria.pai_id)
-          : undefined,
-      ),
+      pontos: pontosNaBusca(local, palavras, nomesDeCategoria(local)),
     }))
     .filter((x) => x.pontos > 0)
     // A ordenação do JavaScript é estável: empate mantém a ordem que já
     // veio (destaque primeiro, depois alfabética).
     .sort((a, b) => b.pontos - a.pontos)
     .map((x) => x.local);
+}
+
+/**
+ * Só os lugares desta categoria ou das filhas dela.
+ *
+ * Vale a principal e vale qualquer uma das outras: o lugar que é café
+ * colonial e padaria aparece nos dois filtros.
+ */
+function naCategoria(
+  locais: LocalCompleto[],
+  alvo: Categoria,
+  categorias: Categoria[],
+): LocalCompleto[] {
+  const ids = new Set([
+    alvo.id,
+    ...categorias.filter((c) => c.pai_id === alvo.id).map((c) => c.id),
+  ]);
+  return locais.filter((l) => categoriasDoLugar(l).some((id) => ids.has(id)));
 }
 
 /** Busca nos locais de demonstração, imitando o que o banco faria. */
@@ -148,11 +174,7 @@ function buscarNaDemonstracao(filtros: FiltrosBusca): LocalCompleto[] {
   if (categoria) {
     const alvo = CATEGORIAS_DEMO.find((c) => c.slug === categoria);
     if (alvo) {
-      const ids = [
-        alvo.id,
-        ...CATEGORIAS_DEMO.filter((c) => c.pai_id === alvo.id).map((c) => c.id),
-      ];
-      locais = locais.filter((l) => l.categoria_id != null && ids.includes(l.categoria_id));
+      locais = naCategoria(locais, alvo, CATEGORIAS_DEMO);
     }
   }
 
@@ -162,8 +184,13 @@ function buscarNaDemonstracao(filtros: FiltrosBusca): LocalCompleto[] {
   );
 }
 
-/** Arruma a linha crua do banco no formato que o site usa. */
-function montar(linha: LinhaBruta): LocalCompleto {
+/**
+ * Arruma a linha crua do banco no formato que o site usa.
+ *
+ * A lista de categorias vem junto porque as "outras categorias" do lugar
+ * são guardadas só pelo número: é aqui que elas ganham nome e emoji.
+ */
+function montar(linha: LinhaBruta, categorias: Categoria[]): LocalCompleto {
   const tags = (linha.locais_tags ?? [])
     .map((lt) => lt.tag)
     .filter((t): t is Tag => Boolean(t))
@@ -176,7 +203,21 @@ function montar(linha: LinhaBruta): LocalCompleto {
   const { locais_tags: _ignorar, ...resto } = linha;
   void _ignorar;
 
-  return { ...resto, tags, fotos, itens, horarios } as LocalCompleto;
+  const categoria_id = (resto.categoria_id as number | null) ?? null;
+  const categorias_extras = (resto.categorias_extras as number[] | null) ?? [];
+
+  return {
+    ...resto,
+    categorias_extras,
+    outras_categorias: outrasCategorias(
+      { categoria_id, categorias_extras },
+      categorias,
+    ),
+    tags,
+    fotos,
+    itens,
+    horarios,
+  } as LocalCompleto;
 }
 
 export async function listarCategorias(
@@ -204,12 +245,12 @@ export async function listarCategorias(
 export async function categoriasComLugar(
   supabase?: SupabaseClient,
 ): Promise<Categoria[]> {
-  let usadas: (number | null)[];
+  let usadas: number[];
   let categorias: Categoria[];
 
   if (!SUPABASE_CONFIGURADO) {
     categorias = CATEGORIAS_DEMO;
-    usadas = LOCAIS_DEMO.map((l) => l.categoria_id);
+    usadas = LOCAIS_DEMO.flatMap((l) => categoriasDoLugar(l));
   } else {
     const sb = supabase ?? (await createClient());
     // As duas consultas saem juntas, e a página chama esta função ao lado
@@ -219,7 +260,7 @@ export async function categoriasComLugar(
       listarCategorias(sb),
       sb
         .from("locais")
-        .select("categoria_id")
+        .select("categoria_id, categorias_extras")
         .eq("status", "publicado")
         .or(aindaNoAr())
         .limit(1000),
@@ -228,13 +269,16 @@ export async function categoriasComLugar(
     // Na dúvida, mostra todas: atalho que leva a uma lista vazia é ruim,
     // mas capa sem atalho nenhum é pior.
     if (error) return categorias.filter((c) => c.pai_id === null);
-    usadas = (data ?? []).map((l) => l.categoria_id as number | null);
+    // Conta a principal e as outras: o atalho "Compras" aparece se um
+    // restaurante também se cadastrou como loja.
+    usadas = (data ?? []).flatMap((l) =>
+      categoriasDoLugar(l as { categoria_id: number | null; categorias_extras: number[] | null }),
+    );
   }
 
   const comLugar = new Set<number>();
   const paiDe = new Map(categorias.map((c) => [c.id, c.pai_id]));
   for (const id of usadas) {
-    if (id == null) continue;
     comLugar.add(id);
     const pai = paiDe.get(id);
     if (pai != null) comLugar.add(pai);
@@ -282,40 +326,36 @@ export async function buscarLocais(
 
   // Traz todos os publicados e só corta no fim, depois de filtrar e
   // ordenar. Cortar aqui deixaria de fora lugares que o filtro escolheria.
-  let consulta = sb
-    .from("locais")
-    .select(CAMPOS)
-    .eq("status", "publicado")
-    .or(aindaNoAr())
-    .limit(1000);
-
-  const categorias =
-    categoria || (q && q.trim()) ? await listarCategorias(sb) : [];
-
-  if (categoria) {
-    const alvo = categorias.find((c) => c.slug === categoria);
-    if (alvo) {
-      const filhas = categorias
-        .filter((c) => c.pai_id === alvo.id)
-        .map((c) => c.id);
-      consulta = consulta.in("categoria_id", [alvo.id, ...filhas]);
-    }
-  }
-
-  const { data, error } = await consulta;
+  // As categorias saem junto com os lugares, na mesma espera: é com elas
+  // que as "outras categorias" de cada lugar ganham nome.
+  const [categorias, { data, error }] = await Promise.all([
+    listarCategorias(sb),
+    sb
+      .from("locais")
+      .select(CAMPOS)
+      .eq("status", "publicado")
+      .or(aindaNoAr())
+      .limit(1000),
+  ]);
   if (error) {
     console.error("Erro ao buscar locais:", error.message);
     return [];
   }
 
-  return filtrarPorTexto(
-    afinar(
-      (data ?? []).map((l) => montar(l as LinhaBruta)),
-      filtros,
-    ),
-    q,
-    categorias,
-  ).slice(0, limite);
+  let locais = (data ?? []).map((l) => montar(l as LinhaBruta, categorias));
+
+  // O filtro de categoria é feito aqui, e não no banco, pelo mesmo motivo
+  // das etiquetas: a lista inteira já está na mão, e a regra ("a principal
+  // ou qualquer uma das outras, nela ou nas filhas") fica num lugar só.
+  if (categoria) {
+    const alvo = categorias.find((c) => c.slug === categoria);
+    if (alvo) locais = naCategoria(locais, alvo, categorias);
+  }
+
+  return filtrarPorTexto(afinar(locais, filtros), q, categorias).slice(
+    0,
+    limite,
+  );
 }
 
 export async function localPorSlug(
@@ -325,12 +365,11 @@ export async function localPorSlug(
   if (!SUPABASE_CONFIGURADO)
     return LOCAIS_DEMO.find((l) => l.slug === slug) ?? null;
   const sb = supabase ?? (await createClient());
-  const { data } = await sb
-    .from("locais")
-    .select(CAMPOS)
-    .eq("slug", slug)
-    .maybeSingle();
-  return data ? montar(data as LinhaBruta) : null;
+  const [categorias, { data }] = await Promise.all([
+    listarCategorias(sb),
+    sb.from("locais").select(CAMPOS).eq("slug", slug).maybeSingle(),
+  ]);
+  return data ? montar(data as LinhaBruta, categorias) : null;
 }
 
 export async function localPorId(
@@ -340,33 +379,45 @@ export async function localPorId(
   if (!SUPABASE_CONFIGURADO)
     return LOCAIS_DEMO.find((l) => l.id === id) ?? null;
   const sb = supabase ?? (await createClient());
-  const { data } = await sb
-    .from("locais")
-    .select(CAMPOS)
-    .eq("id", id)
-    .maybeSingle();
-  return data ? montar(data as LinhaBruta) : null;
+  const [categorias, { data }] = await Promise.all([
+    listarCategorias(sb),
+    sb.from("locais").select(CAMPOS).eq("id", id).maybeSingle(),
+  ]);
+  return data ? montar(data as LinhaBruta, categorias) : null;
 }
 
-/** Locais parecidos: mesma categoria, tirando o próprio. */
+/**
+ * Locais parecidos: os que têm alguma categoria em comum, tirando o
+ * próprio. Vale a principal e valem as outras, dos dois lados: a padaria
+ * aparece como parecida do café colonial que também é padaria.
+ */
 export async function locaisParecidos(
   local: LocalCompleto,
   quantidade = 4,
   supabase?: SupabaseClient,
 ): Promise<LocalCompleto[]> {
-  if (!local.categoria_id) return [];
+  const ids = categoriasDoLugar(local);
+  if (ids.length === 0) return [];
   if (!SUPABASE_CONFIGURADO)
     return LOCAIS_DEMO.filter(
-      (l) => l.categoria_id === local.categoria_id && l.id !== local.id,
+      (l) =>
+        l.id !== local.id &&
+        categoriasDoLugar(l).some((id) => ids.includes(id)),
     ).slice(0, quantidade);
   const sb = supabase ?? (await createClient());
-  const { data } = await sb
-    .from("locais")
-    .select(CAMPOS)
-    .eq("status", "publicado")
-    .or(aindaNoAr())
-    .eq("categoria_id", local.categoria_id)
-    .neq("id", local.id)
-    .limit(quantidade);
-  return (data ?? []).map((l) => montar(l as LinhaBruta));
+  const lista = ids.join(",");
+  const [categorias, { data }] = await Promise.all([
+    listarCategorias(sb),
+    sb
+      .from("locais")
+      .select(CAMPOS)
+      .eq("status", "publicado")
+      .or(aindaNoAr())
+      // "ov" é "tem algum em comum": a lista de outras categorias do lugar
+      // cruza com as categorias deste.
+      .or(`categoria_id.in.(${lista}),categorias_extras.ov.{${lista}}`)
+      .neq("id", local.id)
+      .limit(quantidade),
+  ]);
+  return (data ?? []).map((l) => montar(l as LinhaBruta, categorias));
 }

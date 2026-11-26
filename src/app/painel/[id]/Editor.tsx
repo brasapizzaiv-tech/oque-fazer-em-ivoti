@@ -17,6 +17,8 @@ import EditorFotos from "@/components/painel/EditorFotos";
 import EditorHorarios from "@/components/painel/EditorHorarios";
 import EditorItens from "@/components/painel/EditorItens";
 import EscolherPosicao from "@/components/painel/EscolherPosicao";
+import EscolherCategorias from "@/components/painel/EscolherCategorias";
+import { nomesDasCategorias } from "@/lib/categorias";
 import type { Categoria, LocalCompleto, Tag } from "@/lib/tipos";
 import { pedirAviso } from "@/lib/avisar";
 import { videoParaMostrar } from "@/lib/video";
@@ -66,7 +68,7 @@ export default function Editor({
             {local.nome}
           </h1>
           <p className="text-sm texto-suave">
-            {local.categoria?.nome ?? "Sem categoria"}
+            {nomesDasCategorias(local) || "Sem categoria"}
           </p>
         </div>
         {local.status === "publicado" &&
@@ -270,12 +272,15 @@ function Sobre({
     instagram: local.instagram ?? "",
     video: local.video_url ?? "",
   });
+  // As outras categorias do lugar, além da principal.
+  const [extras, setExtras] = useState<number[]>(
+    local.categorias_extras ?? [],
+  );
   const [salvando, setSalvando] = useState(false);
   const [salvo, setSalvo] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
   const router = useRouter();
 
-  const principais = categorias.filter((c) => c.pai_id === null);
   const mudar = (campo: keyof typeof dados) => (valor: string) => {
     setDados((a) => ({ ...a, [campo]: valor }));
     setSalvo(false);
@@ -300,6 +305,8 @@ function Sobre({
       .update({
         nome: dados.nome.trim(),
         categoria_id: dados.categoria_id ? Number(dados.categoria_id) : null,
+        // Sem principal não há "outras": a pergunta nem aparece na tela.
+        categorias_extras: dados.categoria_id ? extras : [],
         resumo: dados.resumo.trim() || null,
         descricao: dados.descricao.trim() || null,
         faixa_preco: dados.faixa_preco ? Number(dados.faixa_preco) : null,
@@ -338,28 +345,16 @@ function Sobre({
       >
         <Texto rotulo="Nome" valor={dados.nome} onChange={mudar("nome")} />
 
-        <label className="block">
-          <span className="text-sm font-medium">Categoria</span>
-          <select
-            value={dados.categoria_id}
-            onChange={(e) => mudar("categoria_id")(e.target.value)}
-            className="mt-1 w-full caixa-painel px-4 py-2.5 outline-none"
-          >
-            <option value="">Sem categoria</option>
-            {principais.map((pai) => (
-              <optgroup key={pai.id} label={`${pai.emoji ?? ""} ${pai.nome}`}>
-                <option value={pai.id}>{pai.nome} (geral)</option>
-                {categorias
-                  .filter((c) => c.pai_id === pai.id)
-                  .map((f) => (
-                    <option key={f.id} value={f.id}>
-                      {f.emoji} {f.nome}
-                    </option>
-                  ))}
-              </optgroup>
-            ))}
-          </select>
-        </label>
+        <EscolherCategorias
+          categorias={categorias}
+          principal={dados.categoria_id}
+          extras={extras}
+          aoMudarPrincipal={mudar("categoria_id")}
+          aoMudarExtras={(ids) => {
+            setExtras(ids);
+            setSalvo(false);
+          }}
+        />
 
         <Texto
           rotulo="Resumo"

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { paraSlug } from "@/lib/texto";
 import { explicarErro } from "@/lib/erro-do-banco";
 import type { Categoria } from "@/lib/tipos";
+import EscolherCategorias from "@/components/painel/EscolherCategorias";
 
 export default function FormularioNovo({
   categorias,
@@ -14,11 +15,11 @@ export default function FormularioNovo({
 }) {
   const [nome, setNome] = useState("");
   const [categoriaId, setCategoriaId] = useState("");
+  // As outras categorias do lugar, além da principal.
+  const [extras, setExtras] = useState<number[]>([]);
   const [erro, setErro] = useState<string | null>(null);
   const [indo, setIndo] = useState(false);
   const router = useRouter();
-
-  const principais = categorias.filter((c) => c.pai_id === null);
 
   async function criar(evento: React.FormEvent) {
     evento.preventDefault();
@@ -55,6 +56,7 @@ export default function FormularioNovo({
           nome: nome.trim(),
           slug: tentativa === 1 ? base : `${base}-${tentativa}`,
           categoria_id: categoriaId ? Number(categoriaId) : null,
+          categorias_extras: categoriaId ? extras : [],
           dono_id: user.id,
           status: "rascunho",
         })
@@ -90,29 +92,15 @@ export default function FormularioNovo({
         />
       </label>
 
-      <label className="block">
-        <span className="text-sm font-medium">O que é</span>
-        <select
-          required
-          value={categoriaId}
-          onChange={(e) => setCategoriaId(e.target.value)}
-          className="mt-1 w-full caixa-painel px-4 py-3 outline-none"
-        >
-          <option value="">Escolha...</option>
-          {principais.map((pai) => (
-            <optgroup key={pai.id} label={`${pai.emoji ?? ""} ${pai.nome}`}>
-              <option value={pai.id}>{pai.nome} (geral)</option>
-              {categorias
-                .filter((c) => c.pai_id === pai.id)
-                .map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.emoji} {f.nome}
-                  </option>
-                ))}
-            </optgroup>
-          ))}
-        </select>
-      </label>
+      <EscolherCategorias
+        categorias={categorias}
+        principal={categoriaId}
+        extras={extras}
+        aoMudarPrincipal={setCategoriaId}
+        aoMudarExtras={setExtras}
+        obrigatoria
+        rotulo="O que é"
+      />
 
       {erro && (
         <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-[color:var(--color-v-fechado-claro)]">

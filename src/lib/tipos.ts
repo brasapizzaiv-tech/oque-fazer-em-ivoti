@@ -55,7 +55,10 @@ export type Local = {
   id: string;
   slug: string;
   nome: string;
+  /** A categoria principal: aparece junto do nome e dá o emoji do pino. */
   categoria_id: number | null;
+  /** Até duas outras categorias em que o lugar também aparece. */
+  categorias_extras: number[];
   resumo: string | null;
   descricao: string | null;
   endereco: string | null;
@@ -94,6 +97,8 @@ export type Local = {
 // Local ja com tudo que a pagina e o chat precisam.
 export type LocalCompleto = Local & {
   categoria: Categoria | null;
+  /** As de `categorias_extras`, já com nome e emoji. */
+  outras_categorias: Categoria[];
   horarios: Horario[];
   fotos: Foto[];
   tags: Tag[];

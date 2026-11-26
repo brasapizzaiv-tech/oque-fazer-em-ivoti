@@ -92,7 +92,12 @@ function descrever(
   // A preferência nos passeios é um módulo à parte na tabela de planos, e
   // por isso tem marca própria: se um dia mudar de degrau, basta lá.
   if (noRoteiro) linhas.push("PARCEIRO DE ROTEIRO");
-  if (local.categoria) linhas.push(`Categoria: ${local.categoria.nome}`);
+  // Todas as categorias do lugar, a principal primeiro: é assim que o Guia
+  // indica o café colonial também para quem pede uma padaria.
+  const categorias = [local.categoria, ...local.outras_categorias]
+    .filter(Boolean)
+    .map((c) => c!.nome);
+  if (categorias.length) linhas.push(`Categoria: ${categorias.join(", ")}`);
   if (local.resumo) linhas.push(`Resumo: ${local.resumo}`);
   if (local.descricao) linhas.push(`Sobre: ${local.descricao.slice(0, 600)}`);
 
