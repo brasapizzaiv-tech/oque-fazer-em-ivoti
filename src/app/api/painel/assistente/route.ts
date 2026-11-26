@@ -3,7 +3,7 @@ import { NOME_DO_SITE } from "@/lib/marca";
 import { createClient } from "@/lib/supabase/server";
 import { podeConversar } from "@/lib/limite-chat";
 import { conversaLimpa } from "@/lib/conversa";
-import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
+import { planoDoModulo, planoEmUso, podeUsar } from "@/lib/planos";
 import { resumoDoLocal } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO, type TipoMetrica } from "@/lib/metricas";
 import { resumoSemana } from "@/lib/horarios";
@@ -86,7 +86,7 @@ export async function POST(request: Request) {
   const { data: local } = await supabase
     .from("locais")
     .select(
-      "id, dono_id, nome, resumo, descricao, endereco, bairro, telefone, whatsapp, site, instagram, capa_url, status, plano, plano_ate, categoria:categorias(nome)",
+      "id, dono_id, nome, resumo, descricao, endereco, bairro, telefone, whatsapp, site, instagram, capa_url, status, plano, plano_ate, gratis_ate, categoria:categorias(nome)",
     )
     .eq("id", corpo.local ?? "")
     .maybeSingle();
@@ -98,7 +98,7 @@ export async function POST(request: Request) {
     return Response.json({ erro: "Não encontrei." }, { status: 404 });
   }
 
-  const plano = planoAtivo(local.plano, local.plano_ate);
+  const plano = planoEmUso(local);
   if (!admin && !podeUsar("guia_painel", plano)) {
     return Response.json(
       { erro: `O assistente faz parte do ${planoDoModulo("guia_painel")}.` },

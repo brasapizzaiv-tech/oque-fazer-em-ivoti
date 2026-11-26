@@ -3,8 +3,11 @@ import { WHATSAPP_DO_GUIA } from "@/lib/marca";
 import {
   DIAS_DE_PRAZO,
   DIAS_GRATIS,
+  PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
   dataPorExtenso,
   menorMensalidade,
+  oQueOsDiasGratisLiberam,
   periodoGratis,
   planoAtivo,
   prazoDoLugar,
@@ -26,9 +29,10 @@ export function AvisoDeCobranca({ className = "" }: { className?: string }) {
       </p>
       <p className="mt-1 text-[14px]">
         Os primeiros {DIAS_GRATIS} dias no guia são grátis, contados do dia em
-        que o seu lugar entra no ar. É o tempo para você ver o guia
-        funcionando. Depois, a mensalidade é a partir de {menorMensalidade()},
-        sem fidelidade.
+        que o seu lugar entra no ar. Nesse tempo você usa tudo do plano{" "}
+        {PLANOS[PLANO_DOS_DIAS_GRATIS].nome} ({oQueOsDiasGratisLiberam()}),
+        para testar e ver se é o que você quer. Depois, a mensalidade é a
+        partir de {menorMensalidade()}, sem fidelidade.
       </p>
       <p className="mt-1 text-[14px]">
         Nada é cobrado sozinho: não pedimos cartão. Ao fim do período, a gente
@@ -68,7 +72,8 @@ export function SituacaoDoPeriodoGratis({
     return (
       <p className="mt-3 text-[14px] texto-suave">
         Os {DIAS_GRATIS} dias grátis começam a contar no dia em que o seu lugar
-        entrar no ar. Depois, a mensalidade é a partir de {menorMensalidade()}.{" "}
+        entrar no ar, com tudo do plano {PLANOS[PLANO_DOS_DIAS_GRATIS].nome}{" "}
+        liberado. Depois, a mensalidade é a partir de {menorMensalidade()}.{" "}
         <Link href="/planos" className="font-bold underline">
           Ver os planos
         </Link>
@@ -87,7 +92,9 @@ export function SituacaoDoPeriodoGratis({
           : periodo.dias === 1
             ? "(falta 1 dia)"
             : `(faltam ${periodo.dias} dias)`}
-        . Depois, a mensalidade é a partir de {menorMensalidade()}.{" "}
+        . Até lá você usa tudo do plano{" "}
+        {PLANOS[PLANO_DOS_DIAS_GRATIS].nome}: {oQueOsDiasGratisLiberam()}.
+        Depois, a mensalidade é a partir de {menorMensalidade()}.{" "}
         <Link href="/planos" className="font-bold underline">
           Ver os planos
         </Link>

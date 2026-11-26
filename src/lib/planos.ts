@@ -141,11 +141,15 @@ export const MODULOS: Record<Modulo, Definicao> = {
 };
 
 /**
- * O plano que vale hoje.
+ * O plano PAGO que vale hoje.
  *
  * Plano vencido responde "gratuito", sem ninguém precisar rebaixar nada.
  * A mesma regra existe no banco, na função `plano_ativo`, para o site e
  * as consultas nunca discordarem.
+ *
+ * Não conta os dias grátis. Serve para saber quem está pagando (a conta da
+ * administração, o aviso de cobrança, o prazo para escolher um plano). Para
+ * decidir o que o lugar pode USAR, a pergunta é `planoEmUso`, mais abaixo.
  *
  * "premium" é o nome antigo do degrau de cima. Continua sendo entendido
  * para o site não tirar os recursos de ninguém no intervalo entre a
@@ -207,8 +211,8 @@ export function diasParaVencer(
 // O período grátis
 // ============================================================
 // Todo comércio que entra no guia fica 60 dias sem pagar, contados do dia
-// em que o lugar vai ao ar. É o tempo para o dono ver o guia funcionando;
-// depois vem a mensalidade. A data de cada um mora no banco
+// em que o lugar vai ao ar, usando o que o plano Movimento libera. É o
+// tempo para o dono testar tudo; depois vem a mensalidade. A data de cada um mora no banco
 // (`locais.gratis_ate`, preenchida sozinha na publicação), e aqui ficam o
 // número e as frases, para as telas, o e-mail e a página de planos dizerem
 // a mesma coisa.
@@ -216,6 +220,56 @@ export function diasParaVencer(
 
 /** Quantos dias o comércio fica no guia sem pagar. */
 export const DIAS_GRATIS = 60;
+
+/**
+ * O plano que o comércio usa durante os dias grátis.
+ *
+ * Decisão do Rafael em 26/11/2026: nos 60 dias o comerciante tem o que o
+ * Movimento libera (eventos, promoções e métricas), para testar tudo e
+ * saber se é o que ele quer antes de escolher um plano. O mesmo
+ * "movimento" está na migration 0032, na função `plano_em_uso`.
+ */
+export const PLANO_DOS_DIAS_GRATIS: PlanoPago = "movimento";
+
+/** Os dias grátis deste lugar estão correndo hoje? */
+export function nosDiasGratis(gratis_ate: string | null | undefined): boolean {
+  // Do banco a data pode vir com hora: só o dia importa. Comparação por
+  // texto, como em `planoAtivo`.
+  return !!gratis_ate && gratis_ate.slice(0, 10) >= hojeEmIvoti();
+}
+
+/**
+ * O plano que o lugar pode USAR hoje: o pago ou o dos dias grátis, o que
+ * for mais alto.
+ *
+ * É a pergunta de toda tela que abre ou tranca um módulo. A mesma conta
+ * existe no banco (`plano_em_uso`, de onde `tem_plano` tira a resposta).
+ *
+ * Os dias grátis começam quando o lugar entra no ar: antes disso não há
+ * `gratis_ate` e vale só o plano pago.
+ */
+export function planoEmUso(local: {
+  plano: string | null | undefined;
+  plano_ate: string | null | undefined;
+  gratis_ate?: string | null;
+}): Plano {
+  const pago = planoAtivo(local.plano, local.plano_ate);
+  return nosDiasGratis(local.gratis_ate) && !temPlano(pago, PLANO_DOS_DIAS_GRATIS)
+    ? PLANO_DOS_DIAS_GRATIS
+    : pago;
+}
+
+/**
+ * "Eventos, Promoções e Métricas": o que os dias grátis liberam, tirado da
+ * tabela MODULOS para a frase acompanhar se um módulo mudar de degrau.
+ */
+export function oQueOsDiasGratisLiberam(): string {
+  const nomes = (Object.keys(MODULOS) as Modulo[])
+    .filter((m) => podeUsar(m, PLANO_DOS_DIAS_GRATIS))
+    .map((m) => MODULOS[m].nome.toLowerCase());
+  if (nomes.length <= 1) return nomes.join("");
+  return `${nomes.slice(0, -1).join(", ")} e ${nomes[nomes.length - 1]}`;
+}
 
 /** "R$ 49,90": a mensalidade mais baixa, que é a que o aviso cita. */
 export function menorMensalidade(): string {

@@ -6,7 +6,8 @@ import { locaisParaEvento } from "../locais-do-dono";
 export const dynamic = "force-dynamic";
 
 export default async function NovoEvento() {
-  const { locais, admin, bloqueado } = await locaisParaEvento("eventos");
+  const { locais, admin, bloqueado, antesDeIrAoAr } =
+    await locaisParaEvento("eventos");
 
   return (
     <>
@@ -26,7 +27,7 @@ export default async function NovoEvento() {
       </div>
 
       {bloqueado ? (
-        <Bloqueado modulo="eventos" />
+        <Bloqueado modulo="eventos" antesDeIrAoAr={antesDeIrAoAr} />
       ) : (
         <FormularioEvento locais={locais} ehAdmin={admin} />
       )}

@@ -1,5 +1,13 @@
+import Link from "next/link";
 import { NOME_DO_SITE, WHATSAPP_DO_GUIA } from "@/lib/marca";
-import { MODULOS, PLANOS, type Modulo } from "@/lib/planos";
+import {
+  DIAS_GRATIS,
+  MODULOS,
+  PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
+  podeUsar,
+  type Modulo,
+} from "@/lib/planos";
 
 /**
  * O véu que cobre um módulo para quem está num plano abaixo do dele.
@@ -15,16 +23,24 @@ import { MODULOS, PLANOS, type Modulo } from "@/lib/planos";
 export default function Bloqueado({
   modulo,
   nome,
+  antesDeIrAoAr = false,
   children,
 }: {
   modulo: Modulo;
   /** Nome do estabelecimento, para a mensagem já sair pronta. */
   nome?: string;
+  /**
+   * O lugar ainda não entrou no ar, então os dias grátis nem começaram.
+   * Se o módulo é dos que os dias grátis liberam, a tranca é só questão de
+   * tempo, e o aviso diz isso em vez de oferecer um plano.
+   */
+  antesDeIrAoAr?: boolean;
   /** A prévia real, que aparece borrada atrás do aviso. */
   children?: React.ReactNode;
 }) {
   const { nome: titulo, convite, exige } = MODULOS[modulo];
   const plano = PLANOS[exige].nome;
+  const esperando = antesDeIrAoAr && podeUsar(modulo, PLANO_DOS_DIAS_GRATIS);
 
   const mensagem = encodeURIComponent(
     `Olá! Quero saber sobre o plano ${plano} do ${NOME_DO_SITE}${nome ? ` para o ${nome}` : ""}.`,
@@ -52,20 +68,41 @@ export default function Bloqueado({
       >
         <div className="max-w-sm">
           <span className="grid h-11 w-11 place-items-center rounded-full bg-[color:var(--color-v-fundo)] text-xl mx-auto">
-            🔒
+            {esperando ? "⏳" : "🔒"}
           </span>
-          <p className="mt-3 font-semibold">
-            {titulo} é do plano {plano}
-          </p>
-          <p className="mt-1.5 text-sm texto-suave">{convite}</p>
-          <a
-            href={`https://wa.me/${WHATSAPP_DO_GUIA}?text=${mensagem}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 inline-block rounded-[9px] bg-[color:var(--color-v-torii)] px-6 py-3 text-[14px] font-bold text-[#FFFFFF] transition"
-          >
-            Quero saber mais
-          </a>
+          {esperando ? (
+            <>
+              <p className="mt-3 font-semibold">
+                {titulo} abre quando o seu lugar entrar no ar
+              </p>
+              <p className="mt-1.5 text-sm texto-suave">
+                Nos {DIAS_GRATIS} dias grátis você usa tudo do plano{" "}
+                {PLANOS[PLANO_DOS_DIAS_GRATIS].nome}, sem pagar. A contagem
+                começa no dia em que o cadastro é publicado.
+              </p>
+              <Link
+                href="/painel"
+                className="mt-5 inline-block rounded-[9px] bg-[color:var(--color-v-torii)] px-6 py-3 text-[14px] font-bold text-[#FFFFFF] transition"
+              >
+                Ver meu cadastro
+              </Link>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 font-semibold">
+                {titulo} é do plano {plano}
+              </p>
+              <p className="mt-1.5 text-sm texto-suave">{convite}</p>
+              <a
+                href={`https://wa.me/${WHATSAPP_DO_GUIA}?text=${mensagem}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-block rounded-[9px] bg-[color:var(--color-v-torii)] px-6 py-3 text-[14px] font-bold text-[#FFFFFF] transition"
+              >
+                Quero saber mais
+              </a>
+            </>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
+import { planoDoModulo, planoEmUso, podeUsar } from "@/lib/planos";
 import Bloqueado from "@/components/painel/Bloqueado";
 import EscolherLocal from "@/components/painel/EscolherLocal";
 import ChatDoPainel from "@/components/painel/ChatDoPainel";
@@ -26,7 +26,7 @@ export default async function Assistente({
 
   let consulta = supabase
     .from("locais")
-    .select("id, nome, plano, plano_ate")
+    .select("id, nome, plano, plano_ate, gratis_ate")
     .order("nome");
   if (!admin) consulta = consulta.eq("dono_id", user?.id ?? "");
 
@@ -47,7 +47,7 @@ export default async function Assistente({
   }
 
   const local = locais.find((l) => l.id === escolhido) ?? locais[0];
-  const plano = planoAtivo(local.plano, local.plano_ate);
+  const plano = planoEmUso(local);
 
   // Mesma regra das métricas: a administração enxerga tudo, e o comerciante
   // só com o plano que libera o assistente.

@@ -6,8 +6,11 @@ import { SITE } from "@/lib/site";
 import { dentroDoLimite } from "@/lib/limite-chat";
 import {
   DIAS_GRATIS,
+  PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
   dataPorExtenso,
   menorMensalidade,
+  oQueOsDiasGratisLiberam,
   periodoGratis,
   planoAtivo,
 } from "@/lib/planos";
@@ -261,7 +264,7 @@ function recadoDoPeriodoGratis(lugar: Lugar): string {
   if (planoAtivo(lugar.plano, lugar.plano_ate) !== "gratuito") return "";
   const periodo = periodoGratis(lugar.gratis_ate);
   if (periodo.situacao !== "valendo") return "";
-  return ` Seus ${DIAS_GRATIS} dias grátis vão até ${dataPorExtenso(periodo.ate)}. Depois, a mensalidade é a partir de ${menorMensalidade()}, sem fidelidade.`;
+  return ` Seus ${DIAS_GRATIS} dias grátis vão até ${dataPorExtenso(periodo.ate)}. Nesse período você usa tudo do plano ${PLANOS[PLANO_DOS_DIAS_GRATIS].nome} (${oQueOsDiasGratisLiberam()}), para testar. Depois, a mensalidade é a partir de ${menorMensalidade()}, sem fidelidade.`;
 }
 
 /** "Seu cadastro foi publicado" ou "precisa de um ajuste". */

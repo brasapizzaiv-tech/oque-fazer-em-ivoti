@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NOME_DO_TIPO, type TipoMetrica } from "@/lib/metricas";
 import { diasAtras } from "@/lib/metricas-resumo";
-import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
+import { planoDoModulo, planoEmUso, podeUsar } from "@/lib/planos";
 import { enderecoCurto } from "@/lib/roteiro";
 
 export const runtime = "nodejs";
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
   // existe, de proposito.
   const { data: local } = await supabase
     .from("locais")
-    .select("id, nome, plano, plano_ate")
+    .select("id, nome, plano, plano_ate, gratis_ate")
     .eq("id", localId)
     .maybeSingle();
 
@@ -58,7 +58,7 @@ export async function GET(request: Request) {
     return Response.json({ erro: "Não encontrei." }, { status: 404 });
   }
 
-  const plano = planoAtivo(local.plano, local.plano_ate);
+  const plano = planoEmUso(local);
   if (!admin && !podeUsar("metricas", plano)) {
     return Response.json(
       { erro: `A exportação faz parte do ${planoDoModulo("metricas")}.` },

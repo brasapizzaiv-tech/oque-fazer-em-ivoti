@@ -11,7 +11,7 @@ import {
 } from "./horarios";
 import { faixaPreco } from "./texto";
 import { distancia, formatarDistancia } from "./geo";
-import { hojeEmIvoti, planoAtivo, podeUsar, somarDias } from "./planos";
+import { hojeEmIvoti, planoEmUso, podeUsar, somarDias } from "./planos";
 import { quandoVale } from "./promocoes";
 import type { LocalCompleto } from "./tipos";
 
@@ -81,7 +81,7 @@ function descrever(
   const s = situacao(local.horarios, agora);
   const linhas: string[] = [];
 
-  const plano = planoAtivo(local.plano, local.plano_ate);
+  const plano = planoEmUso(local);
   const parceiro = podeUsar("prioridade_guia", plano);
   const noRoteiro = podeUsar("roteiro_guia", plano);
 
@@ -222,10 +222,10 @@ export async function catalogo(): Promise<Catalogo> {
   // aqui ela reforca o desempate que as instrucoes ja pedem — sem tirar
   // ninguem do catalogo.
   const locais = [...todos].sort((a, b) => {
-    const pa = podeUsar("prioridade_guia", planoAtivo(a.plano, a.plano_ate))
+    const pa = podeUsar("prioridade_guia", planoEmUso(a))
       ? 0
       : 1;
-    const pb = podeUsar("prioridade_guia", planoAtivo(b.plano, b.plano_ate))
+    const pb = podeUsar("prioridade_guia", planoEmUso(b))
       ? 0
       : 1;
     return pa - pb;

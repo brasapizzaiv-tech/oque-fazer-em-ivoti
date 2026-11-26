@@ -6,7 +6,8 @@ import { locaisParaEvento } from "../../eventos/locais-do-dono";
 export const dynamic = "force-dynamic";
 
 export default async function NovaPromocao() {
-  const { locais, bloqueado } = await locaisParaEvento("promocoes");
+  const { locais, bloqueado, antesDeIrAoAr } =
+    await locaisParaEvento("promocoes");
 
   return (
     <>
@@ -26,7 +27,7 @@ export default async function NovaPromocao() {
       </div>
 
       {bloqueado ? (
-        <Bloqueado modulo="promocoes" />
+        <Bloqueado modulo="promocoes" antesDeIrAoAr={antesDeIrAoAr} />
       ) : locais.length === 0 ? (
         <p className="caixa-painel border-dashed p-8 text-center text-sm texto-suave">
           Cadastre primeiro o seu estabelecimento — a promoção fica ligada a

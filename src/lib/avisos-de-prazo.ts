@@ -5,7 +5,10 @@ import { WHATSAPP_DO_GUIA } from "./marca";
 import {
   DIAS_DE_PRAZO,
   DIAS_GRATIS,
+  PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
   dataPorExtenso,
+  oQueOsDiasGratisLiberam,
   menorMensalidade,
   prazoDoLugar,
   type PrazoDoLugar,
@@ -129,6 +132,17 @@ function oQueTerminou(nome: string, prazo: Vencido): string {
     : `Os ${DIAS_GRATIS} dias grátis de <strong>${nome}</strong> no guia de Ivoti terminaram em ${quando}.`;
 }
 
+/**
+ * Nos dias grátis o comerciante usou o plano Movimento. Quando eles
+ * terminam, o que é desse plano sai do ar no mesmo dia, antes mesmo de o
+ * prazo de uma semana acabar: o recado precisa dizer isso, senão a
+ * promoção some e ele não sabe por quê.
+ */
+function oQueFechou(): string {
+  const plano = PLANOS[PLANO_DOS_DIAS_GRATIS].nome;
+  return `<br><br>Nos dias grátis você usou o plano ${plano}. Com o fim deles, o que é desse plano (${oQueOsDiasGratisLiberam()}) fica guardado e fora do ar, e volta sozinho quando você escolher o ${plano} ou um plano acima.`;
+}
+
 function recadoAoDono(
   lugar: Lugar,
   prazo: Vencido,
@@ -147,7 +161,9 @@ function recadoAoDono(
           prazo.motivo === "plano"
             ? "Seu plano venceu"
             : "Seu período grátis terminou",
-        texto: `${oQueTerminou(nome, prazo)} Para continuar aparecendo, escolha um plano até <strong>${ate}</strong>. A mensalidade é a partir de ${menorMensalidade()}, sem fidelidade.<br><br>Se nenhum plano for escolhido até essa data, ${nome} sai do ar no dia seguinte. Nada é apagado: ao escolher um plano, ele volta.`,
+        texto: `${oQueTerminou(nome, prazo)} Para continuar aparecendo, escolha um plano até <strong>${ate}</strong>. A mensalidade é a partir de ${menorMensalidade()}, sem fidelidade.${
+          prazo.motivo === "gratis" ? oQueFechou() : ""
+        }<br><br>Se nenhum plano for escolhido até essa data, ${nome} sai do ar no dia seguinte. Nada é apagado: ao escolher um plano, ele volta.`,
         botao: { rotulo: "Ver os planos", href: `${SITE}/planos` },
         rodape: `Para combinar o plano, fale com a gente pelo WhatsApp: <a href="${FALAR}" style="color:#e03a2f">abrir a conversa</a>. Se preferir, é só responder a este e-mail.`,
       }),

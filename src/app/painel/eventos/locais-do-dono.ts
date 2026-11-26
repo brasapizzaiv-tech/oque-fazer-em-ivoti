@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { LocalDoDono } from "@/components/painel/FormularioEvento";
-import { planoAtivo, podeUsar, type Modulo } from "@/lib/planos";
+import { planoEmUso, podeUsar, type Modulo } from "@/lib/planos";
 
 /**
  * Os locais que aparecem no seletor "onde vai ser" do evento.
@@ -10,9 +10,13 @@ import { planoAtivo, podeUsar, type Modulo } from "@/lib/planos";
  * acontecem em praca, no Nucleo de Casas Enxaimel e afins.
  *
  * Eventos e promocoes pertencem a um plano. Do dono, so entram os lugares
- * cujo plano libera o modulo pedido; "bloqueado" avisa a tela quando ele
+ * cujo plano em uso (o pago ou o dos dias gratis) libera o modulo pedido; "bloqueado" avisa a tela quando ele
  * tem estabelecimento mas nenhum com o plano, para ela mostrar o convite
  * em vez de um formulario que o banco recusaria.
+ *
+ * "antesDeIrAoAr" diz que o bloqueio e so questao de tempo: nenhum lugar
+ * dele entrou no ar ainda, entao os dias gratis (que liberam o modulo) nem
+ * comecaram a contar. A tela avisa isso em vez de oferecer um plano.
  *
  * "paraEditar" devolve todos os lugares do dono, com ou sem plano: quem
  * ja tem um evento no ar precisa conseguir corrigi-lo mesmo depois de o
@@ -25,6 +29,7 @@ export async function locaisParaEvento(
   locais: LocalDoDono[];
   admin: boolean;
   bloqueado: boolean;
+  antesDeIrAoAr: boolean;
 }> {
   const supabase = await createClient();
   const {
@@ -40,7 +45,7 @@ export async function locaisParaEvento(
 
   let consulta = supabase
     .from("locais")
-    .select("id, nome, plano, plano_ate")
+    .select("id, nome, plano, plano_ate, gratis_ate")
     .order("nome");
   if (admin) consulta = consulta.eq("status", "publicado");
   else consulta = consulta.eq("dono_id", user?.id ?? "");
@@ -51,11 +56,13 @@ export async function locaisParaEvento(
   const liberados =
     admin || paraEditar
       ? todos
-      : todos.filter((l) => podeUsar(modulo, planoAtivo(l.plano, l.plano_ate)));
+      : todos.filter((l) => podeUsar(modulo, planoEmUso(l)));
 
   return {
     locais: liberados.map((l) => ({ id: l.id, nome: l.nome })),
     admin,
     bloqueado: !admin && liberados.length === 0,
+    antesDeIrAoAr:
+      !admin && liberados.length === 0 && todos.every((l) => !l.gratis_ate),
   };
 }

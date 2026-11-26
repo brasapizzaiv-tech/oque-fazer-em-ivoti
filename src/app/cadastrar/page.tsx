@@ -11,7 +11,12 @@ import {
 } from "@/components/vidro/icones";
 import FormularioCadastro from "./FormularioCadastro";
 import { AvisoDeCobranca } from "@/components/AvisoDoPeriodoGratis";
-import { DIAS_GRATIS, menorMensalidade } from "@/lib/planos";
+import {
+  DIAS_GRATIS,
+  PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
+  menorMensalidade,
+} from "@/lib/planos";
 import { enderecoOficial } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -78,8 +83,9 @@ export default function Cadastrar() {
             style={{ color: "var(--color-v-texto-suave)" }}
           >
             Você cria a conta, preenche o perfil do jeito que quiser, e a gente
-            publica. Os primeiros {DIAS_GRATIS} dias são grátis; depois, a
-            mensalidade é a partir de {menorMensalidade()}.{" "}
+            publica. Os primeiros {DIAS_GRATIS} dias são grátis, com tudo do
+            plano {PLANOS[PLANO_DOS_DIAS_GRATIS].nome} para você testar;
+            depois, a mensalidade é a partir de {menorMensalidade()}.{" "}
             <Link
               href="/planos"
               className="font-semibold underline"

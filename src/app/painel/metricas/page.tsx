@@ -7,7 +7,7 @@ import {
   resumoDoLocal,
 } from "@/lib/metricas-resumo";
 import { NOME_DO_TIPO } from "@/lib/metricas";
-import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
+import { planoDoModulo, planoEmUso, podeUsar } from "@/lib/planos";
 import {
   BarrasRanqueadas,
   GraficoDias,
@@ -46,7 +46,7 @@ export default async function Metricas({
 
   let consulta = supabase
     .from("locais")
-    .select("id, nome, plano, plano_ate")
+    .select("id, nome, plano, plano_ate, gratis_ate")
     .order("nome");
   if (!admin) consulta = consulta.eq("dono_id", user?.id ?? "");
 
@@ -67,7 +67,7 @@ export default async function Metricas({
   }
 
   const local = locais.find((l) => l.id === escolhido) ?? locais[0];
-  const plano = planoAtivo(local.plano, local.plano_ate);
+  const plano = planoEmUso(local);
   // A administracao enxerga as metricas de qualquer local, com plano ou nao:
   // e voce quem precisa saber como o guia inteiro esta indo para decidir o
   // que melhorar e o que oferecer a quem. O bloqueio continua valendo para o
@@ -157,7 +157,11 @@ export default async function Metricas({
           </>
         ) : (
           <div className="sm:col-span-2">
-            <Bloqueado modulo="metricas" nome={local.nome}>
+            <Bloqueado
+              modulo="metricas"
+              nome={local.nome}
+              antesDeIrAoAr={!local.gratis_ate}
+            >
               <div className="grid gap-3 p-1 sm:grid-cols-2">
                 <Numero
                   valor={exemplo.indicacoes}
@@ -197,7 +201,11 @@ export default async function Metricas({
         </>
       ) : (
         <div className="mt-6">
-          <Bloqueado modulo="metricas" nome={local.nome}>
+          <Bloqueado
+            modulo="metricas"
+            nome={local.nome}
+            antesDeIrAoAr={!local.gratis_ate}
+          >
             <Detalhes resumo={exemplo} dias={dias} />
           </Bloqueado>
         </div>

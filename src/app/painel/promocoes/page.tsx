@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { quandoVale, type Promocao } from "@/lib/promocoes";
-import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
+import { planoDoModulo, planoEmUso, podeUsar } from "@/lib/planos";
 import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
@@ -13,7 +13,12 @@ import {
 export const dynamic = "force-dynamic";
 
 type Linha = Promocao & {
-  local: { nome: string; plano: string | null; plano_ate: string | null } | null;
+  local: {
+    nome: string;
+    plano: string | null;
+    plano_ate: string | null;
+    gratis_ate: string | null;
+  } | null;
 };
 
 /**
@@ -25,7 +30,11 @@ type Linha = Promocao & {
 function planoCobre(p: Linha): boolean {
   return podeUsar(
     "promocoes",
-    planoAtivo(p.local?.plano, p.local?.plano_ate),
+    planoEmUso({
+      plano: p.local?.plano,
+      plano_ate: p.local?.plano_ate,
+      gratis_ate: p.local?.gratis_ate,
+    }),
   );
 }
 
@@ -46,7 +55,7 @@ async function buscar() {
   // admin enxerga tudo por elas mesmas.
   const { data } = await supabase
     .from("promocoes")
-    .select("*, local:locais(nome, plano, plano_ate)")
+    .select("*, local:locais(nome, plano, plano_ate, gratis_ate)")
     .order("ativa", { ascending: false })
     .order("titulo");
 
@@ -98,7 +107,7 @@ export default async function Promocoes() {
           {semPlano.length > 0 && (
             <Lista
               titulo="Fora do ar"
-              aviso={`Não aparecem no guia porque o plano do lugar venceu ou não inclui promoções. Voltam sozinhas quando o ${planoDoModulo("promocoes")} estiver em dia.`}
+              aviso={`Não aparecem no guia porque os dias grátis terminaram, o plano do lugar venceu ou não inclui promoções. Voltam sozinhas quando o ${planoDoModulo("promocoes")} estiver em dia.`}
               promocoes={semPlano}
               apagado
             />

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import {
   ORDEM_DOS_PLANOS,
   PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
   dataPorExtenso,
   periodoGratis,
   planoAtivo,
@@ -153,6 +154,7 @@ function PrazoGratis({ local }: { local: Linha }) {
         : periodo.dias === 1
           ? " (falta 1 dia)"
           : ` (faltam ${periodo.dias} dias)`}
+      , usando o plano {PLANOS[PLANO_DOS_DIAS_GRATIS].nome}
     </p>
   );
 }

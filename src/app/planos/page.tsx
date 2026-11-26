@@ -9,6 +9,8 @@ import {
   IMPLANTACAO,
   ORDEM_DOS_PLANOS,
   PLANOS,
+  PLANO_DOS_DIAS_GRATIS,
+  oQueOsDiasGratisLiberam,
   precoPorExtenso,
   type PlanoPago,
 } from "@/lib/planos";
@@ -85,8 +87,10 @@ export default function Planos() {
           className="mt-3 max-w-[58ch] text-[15px]"
           style={{ color: "var(--color-v-texto-suave)" }}
         >
-          Os primeiros {DIAS_GRATIS} dias são grátis, para você ver o guia
-          funcionando. Depois, três planos mensais, sem fidelidade: você
+          Os primeiros {DIAS_GRATIS} dias são grátis e já com tudo do plano{" "}
+          {PLANOS[PLANO_DOS_DIAS_GRATIS].nome} liberado (
+          {oQueOsDiasGratisLiberam()}), para você testar e ver se é o que
+          quer. Depois, três planos mensais, sem fidelidade: você
           escolhe o degrau, e pode subir ou descer quando quiser. Ao fim dos
           dias grátis a gente avisa, e você tem {DIAS_DE_PRAZO} dias para
           escolher; sem plano, o lugar sai do ar até você escolher um.

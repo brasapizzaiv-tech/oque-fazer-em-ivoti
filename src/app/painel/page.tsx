@@ -2,9 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import {
+  PLANO_DOS_DIAS_GRATIS,
   planoAtivo,
   diasParaVencer,
   nomeDoPlano,
+  nosDiasGratis,
   prazoDoLugar,
   dataPorExtenso,
 } from "@/lib/planos";
@@ -27,9 +29,31 @@ export const dynamic = "force-dynamic";
  * plano" em toda linha viraria ruído, e os pontos da cidade nunca terão um.
  * Avisa quando falta pouco para vencer, que é quando ainda dá para renovar.
  */
-function SeloPlano({ plano, ate }: { plano: string; ate: string | null }) {
+function SeloPlano({
+  plano,
+  ate,
+  gratis,
+}: {
+  plano: string;
+  ate: string | null;
+  gratis: string | null;
+}) {
   const ativo = planoAtivo(plano, ate);
-  if (ativo === "gratuito") return null;
+
+  // Sem plano pago, mas nos dias grátis: o selo diz o que está liberado,
+  // para o comerciante saber que pode usar eventos, promoções e métricas.
+  if (ativo === "gratuito") {
+    if (!nosDiasGratis(gratis)) return null;
+    return (
+      <span
+        className="inline-flex items-center rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold tracking-[0.08em] uppercase"
+        style={{ backgroundColor: "var(--color-v-verde)", color: "#FFFFFF" }}
+        title={`Dias grátis até ${dataPorExtenso(gratis as string)}`}
+      >
+        Dias grátis · {nomeDoPlano(PLANO_DOS_DIAS_GRATIS)}
+      </span>
+    );
+  }
 
   const dias = diasParaVencer(ate);
   const acabando = dias !== null && dias <= 7;
@@ -169,6 +193,11 @@ export default async function Painel() {
                       <SeloPlano
                         plano={l.plano as string}
                         ate={l.plano_ate as string | null}
+                        gratis={
+                          l.status === "publicado"
+                            ? (l.gratis_ate as string | null)
+                            : null
+                        }
                       />
                     </div>
                     <p

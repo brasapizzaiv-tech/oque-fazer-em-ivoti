@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { quandoPorExtenso } from "@/lib/horarios";
-import { planoAtivo, planoDoModulo, podeUsar } from "@/lib/planos";
+import { planoDoModulo, planoEmUso, podeUsar } from "@/lib/planos";
 import { Botao } from "@/components/vidro/pecas";
 import {
   Caixa,
@@ -53,13 +53,13 @@ async function autoresSemPlano(
     supabase.from("perfis").select("id, papel").in("id", autores),
     supabase
       .from("locais")
-      .select("dono_id, plano, plano_ate")
+      .select("dono_id, plano, plano_ate, gratis_ate")
       .in("dono_id", autores),
   ]);
 
   const comPlano = new Set(
     (locais ?? [])
-      .filter((l) => podeUsar("eventos", planoAtivo(l.plano, l.plano_ate)))
+      .filter((l) => podeUsar("eventos", planoEmUso(l)))
       .map((l) => l.dono_id as string),
   );
   const admins = new Set(
@@ -151,8 +151,8 @@ export default async function MeusEventos() {
               className="mt-6 text-[14px]"
               style={{ color: "var(--color-v-texto-suave)" }}
             >
-              Seus eventos não aparecem na agenda porque o plano venceu ou não
-              inclui eventos. Eles continuam guardados e voltam sozinhos quando
+              Seus eventos não aparecem na agenda porque os dias grátis
+              terminaram, o plano venceu ou não inclui eventos. Eles continuam guardados e voltam sozinhos quando
               o {planoDoModulo("eventos")} estiver em dia.
             </p>
           )}
